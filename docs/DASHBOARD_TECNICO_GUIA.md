@@ -307,48 +307,6 @@ NIST CSF: 64%
 
 ---
 
-## 💡 Dicas para Apresentação em TCC
-
-### **1. Destaque a Metodologia**
-- Mencione o uso de frameworks reconhecidos (CIS, NIST, OWASP)
-- Explique o sistema de scoring CVSS
-- Apresente a matriz de risco técnico
-
-### **2. Foque nos Resultados Técnicos**
-- Mostre a tabela de CVEs mapeados
-- Explique os vetores de ataque identificados
-- Detalhe o processo de compliance
-
-### **3. Demonstre a IA (se disponível)**
-- Apresente as análises geradas
-- Compare análise manual vs IA
-- Mostre o valor agregado
-
-### **4. Use os Dados Visuais**
-- Security Score circular é muito impactante
-- Matriz de risco é clara e profissional
-- Barras de compliance mostram gaps
-
-### **5. Mencione Escalabilidade**
-- Sistema automático (não manual)
-- Integração com ferramentas existentes (Nmap)
-- Potencial de integração (Zabbix, SIEM)
-
----
-
-## 🎓 Valor para o TCC
-
-### **Pontos Fortes:**
-
-1. **Automação Completa**: Não é análise manual
-2. **Frameworks Reconhecidos**: CIS, NIST, OWASP, PCI-DSS
-3. **Análise Técnica Profunda**: CVEs, vetores, matriz de risco
-4. **IA Integrada**: Análises avançadas com LLM local
-5. **Apresentação Profissional**: Dashboard executivo
-6. **Metodologia Sólida**: CVSS, IANA, compliance
-7. **Reprodutível**: Código open source, documentado
-8. **Prático**: Pode ser usado em ambiente real
-
 ### **Diferenciais:**
 
 - ✅ Compliance com múltiplos frameworks
