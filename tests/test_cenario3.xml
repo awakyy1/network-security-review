@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<nmaprun scanner="nmap" args="nmap -sV -O Servidor Seguro" start="1700000000" version="7.94">
+  <host starttime="1700000000" endtime="1700000100">
+    <status state="up" reason="echo-reply"/>
+    <address addr="203.0.113.50" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="web-producao.empresa.com" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack"/>
+        <service name="ssh" product="OpenSSH" version="9.0"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack"/>
+        <service name="https" product="nginx" version="1.22.0"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Ubuntu Linux 22.04 LTS" accuracy="95"/>
+    </os>
+  </host>
+  <host starttime="1700000000" endtime="1700000100">
+    <status state="up" reason="echo-reply"/>
+    <address addr="203.0.113.51" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="api-producao.empresa.com" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack"/>
+        <service name="ssh" product="OpenSSH" version="9.0"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack"/>
+        <service name="https" product="nginx" version="1.22.0"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Ubuntu Linux 22.04 LTS" accuracy="95"/>
+    </os>
+  </host>
+</nmaprun>

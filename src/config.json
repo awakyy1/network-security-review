@@ -1,0 +1,17 @@
+{
+  "zabbix": {
+    "url": "http://localhost/zabbix/api_jsonrpc.php",
+    "user": "Admin",
+    "password": "zabbix",
+    "host_group_id": "2"
+  },
+  "nmap": {
+    "input_file": "../data/scan_result.xml",
+    "scan_command": "nmap -sV -O -oX ../data/scan_result.xml"
+  },
+  "output": {
+    "markdown_report": "../output/relatorio_seguranca.md",
+    "json_report": "../output/relatorio_seguranca.json",
+    "dashboard": "../output/dashboard.html"
+  }
+}
