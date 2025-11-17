@@ -6,7 +6,7 @@
     "host_group_id": "2"
   },
   "nmap": {
-    "input_file": "../data/scan_result.xml",
+    "input_file": "../data/1.1.xml",
     "scan_command": "nmap -sV -O -oX ../data/scan_result.xml"
   },
   "output": {

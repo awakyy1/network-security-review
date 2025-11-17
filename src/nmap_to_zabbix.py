@@ -179,12 +179,16 @@ class NmapParser:
             if osmatch is not None:
                 os_info = osmatch.get('name', 'Desconhecido')
         
+        # Vincular vulnerabilidades deste host específico
+        host_vulnerabilities = [v for v in self.vulnerabilities if v['ip'] == ip]
+        
         return {
             'ip': ip,
             'hostname': hostname,
             'os': os_info,
             'ports': ports,
-            'total_ports': len(ports)
+            'total_ports': len(ports),
+            'vulnerabilities': host_vulnerabilities
         }
     
     def _parse_port(self, port_elem, host_ip: str) -> Optional[Dict]:
@@ -378,17 +382,22 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     base_dir = os.path.dirname(script_dir)
     
-    # Configurações de caminhos
-    NMAP_FILE = os.path.join(base_dir, "data", "scan_result.xml")
+    # Carregar configurações do arquivo config.json
+    config_file = os.path.join(script_dir, "config.json")
+    with open(config_file, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    
+    # Configurações de caminhos (relativos ao base_dir)
+    NMAP_FILE = os.path.join(base_dir, config['nmap']['input_file'].lstrip('../'))
     OUTPUT_DIR = os.path.join(base_dir, "output")
     MD_REPORT = os.path.join(OUTPUT_DIR, "relatorio_seguranca.md")
     JSON_REPORT = os.path.join(OUTPUT_DIR, "relatorio_seguranca.json")
     DASHBOARD = os.path.join(OUTPUT_DIR, "dashboard.html")
     
     # Configurações do Zabbix
-    ZABBIX_URL = "http://localhost/zabbix/api_jsonrpc.php"
-    ZABBIX_USER = "Admin"
-    ZABBIX_PASSWORD = "zabbix"
+    ZABBIX_URL = config['zabbix']['url']
+    ZABBIX_USER = config['zabbix']['user']
+    ZABBIX_PASSWORD = config['zabbix']['password']
     
     # Garantir que a pasta output existe
     os.makedirs(OUTPUT_DIR, exist_ok=True)

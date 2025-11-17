@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """
-Gerador de Dashboard Técnico Avançado
-Dashboard profissional com máximo detalhamento técnico
+Gerador de Dashboard Tecnico Avancado
+Dashboard profissional com maximo detalhamento tecnico
 """
 
 import json
@@ -95,6 +96,8 @@ class TechnicalDashboard:
         
         # Análises adicionais
         port_analysis = self._analyze_ports(hosts)
+        network_topology = self._prepare_network_topology(hosts)
+        cisco_topology = self._prepare_cisco_topology(hosts)
         attack_vectors = self._identify_attack_vectors(vuln_summary)
         compliance_check = self._check_compliance(vuln_summary)
         risk_matrix = self._calculate_risk_matrix(vuln_summary)
@@ -118,7 +121,7 @@ class TechnicalDashboard:
         
         # Gerar HTML
         html = self._build_html(
-            hosts, vuln_summary, port_analysis, attack_vectors, 
+            hosts, vuln_summary, port_analysis, network_topology, cisco_topology, attack_vectors, 
             compliance_check, risk_matrix, ai_technical_analysis,
             ai_penetration_test, ai_compliance_report
         )
@@ -175,6 +178,254 @@ class TechnicalDashboard:
                     analysis['remote_access'] += 1
         
         return analysis
+    
+    def _prepare_network_topology(self, hosts: List[Dict]) -> Dict:
+        """Prepara dados da topologia de rede para visualização"""
+        nodes = []
+        edges = []
+        
+        # Criar nó central (gateway/firewall)
+        nodes.append({
+            'id': 'gateway',
+            'label': 'GATEWAY\n/\nFIREWALL',
+            'group': 'gateway',
+            'shape': 'diamond',
+            'size': 30
+        })
+        
+        # Agrupar hosts por subnet
+        subnets = {}
+        for idx, host in enumerate(hosts[:50]):  # Limitar a 50 hosts para visualização
+            ip = host['ip']
+            subnet = '.'.join(ip.split('.')[:3]) + '.0/24'
+            
+            if subnet not in subnets:
+                subnets[subnet] = []
+            
+            # Determinar grupo baseado em serviços
+            group = 'server'
+            if any(p['service'].lower() in ['mysql', 'postgresql', 'mongodb'] for p in host['ports']):
+                group = 'database'
+            elif any(p['service'].lower() in ['http', 'https', 'apache', 'nginx'] for p in host['ports']):
+                group = 'web'
+            elif any(p['service'].lower() in ['ssh', 'rdp', 'vnc', 'telnet'] for p in host['ports']):
+                group = 'workstation'
+            
+            # Calcular risco
+            vuln_count = sum(1 for p in host['ports'] if p['service'].lower() in ['telnet', 'ftp', 'smb', 'rdp', 'vnc'])
+            risk_level = 'high' if vuln_count > 2 else 'medium' if vuln_count > 0 else 'low'
+            
+            node_id = f"host_{idx}"
+            label = f"{host['hostname'][:15]}\n{ip}\n{host['total_ports']} portas"
+            
+            nodes.append({
+                'id': node_id,
+                'label': label,
+                'group': group,
+                'shape': 'box',
+                'size': 15 + (vuln_count * 5),
+                'borderWidth': 3 if risk_level == 'high' else 2,
+                'color': {
+                    'border': '#ef4444' if risk_level == 'high' else '#f59e0b' if risk_level == 'medium' else '#10b981',
+                    'background': '#fee2e2' if risk_level == 'high' else '#fef3c7' if risk_level == 'medium' else '#d1fae5'
+                }
+            })
+            
+            # Conectar ao gateway
+            edges.append({
+                'from': 'gateway',
+                'to': node_id,
+                'width': 2,
+                'smooth': {'type': 'curvedCW', 'roundness': 0.2}
+            })
+            
+            subnets[subnet].append(node_id)
+        
+        # Adicionar conexões entre hosts da mesma subnet (simulando comunicação interna)
+        for subnet, host_ids in subnets.items():
+            if len(host_ids) > 1:
+                # Conectar alguns hosts aleatoriamente para simular tráfego interno
+                for i in range(min(3, len(host_ids) - 1)):
+                    edges.append({
+                        'from': host_ids[i],
+                        'to': host_ids[i + 1],
+                        'width': 1,
+                        'dashes': True,
+                        'color': '#94a3b8'
+                    })
+        
+        return {'nodes': nodes, 'edges': edges}
+    
+    def _prepare_cisco_topology(self, hosts: List[Dict]) -> Dict:
+        """Prepara topologia estilo Cisco Packet Tracer com hierarquia usando dados reais"""
+        devices = []
+        connections = []
+        
+        # Agrupar hosts por subnet
+        subnets = {}
+        for host in hosts:
+            ip = host['ip']
+            subnet = '.'.join(ip.split('.')[:3]) + '.0/24'
+            if subnet not in subnets:
+                subnets[subnet] = []
+            subnets[subnet].append(host)
+        
+        # Pegar as subnets mais populosas (máximo 4 para visualização limpa)
+        top_subnets = sorted(subnets.items(), key=lambda x: len(x[1]), reverse=True)[:4]
+        
+        # Se não houver hosts suficientes, retornar vazio
+        if not top_subnets:
+            return {'devices': [], 'connections': []}
+        
+        # Núcleo da rede
+        devices.append({
+            'id': 'core-router',
+            'type': 'router',
+            'label': 'ROUTER CENTRAL',
+            'layer': 0,
+            'position': {'x': 450, 'y': 60},
+            'details': {
+                'name': 'Core Router',
+                'type': 'Router Principal',
+                'function': 'Roteamento entre redes',
+                'info': f'Conectando {len(top_subnets)} subnets'
+            }
+        })
+        
+        devices.append({
+            'id': 'firewall',
+            'type': 'firewall',
+            'label': 'FIREWALL',
+            'layer': 1,
+            'position': {'x': 450, 'y': 160},
+            'details': {
+                'name': 'Firewall de Perímetro',
+                'type': 'Security Gateway',
+                'function': 'Filtragem de tráfego',
+                'info': f'Protegendo {sum(len(h) for _, h in top_subnets)} dispositivos'
+            }
+        })
+        
+        # Backbone
+        connections.append({
+            'from': 'core-router',
+            'to': 'firewall',
+            'type': 'backbone'
+        })
+        
+        # Posições dos switches (layout horizontal organizado)
+        switch_positions = [
+            {'x': 200, 'y': 300},
+            {'x': 400, 'y': 300},
+            {'x': 600, 'y': 300},
+            {'x': 800, 'y': 300}
+        ]
+        
+        # Criar switches e dispositivos para cada subnet
+        import math
+        for idx, (subnet, hosts_in_subnet) in enumerate(top_subnets):
+            switch_id = f'switch-{idx}'
+            switch_pos = switch_positions[idx]
+            
+            # Contar informações da subnet
+            subnet_vulns = sum(len(h.get('vulnerabilities', [])) for h in hosts_in_subnet)
+            total_ports = sum(len(h.get('ports', [])) for h in hosts_in_subnet)
+            
+            devices.append({
+                'id': switch_id,
+                'type': 'switch',
+                'label': f'SWITCH {idx+1}\\n{subnet}',
+                'layer': 2,
+                'position': switch_pos,
+                'details': {
+                    'name': f'Switch de Distribuição {idx+1}',
+                    'type': 'L2 Switch',
+                    'subnet': subnet,
+                    'hosts': len(hosts_in_subnet),
+                    'ports_abertos': total_ports,
+                    'vulnerabilidades': subnet_vulns
+                }
+            })
+            
+            # Conectar switch ao firewall
+            connections.append({
+                'from': 'firewall',
+                'to': switch_id,
+                'type': 'trunk'
+            })
+            
+            # Adicionar hosts (máximo 8 por switch para visualização)
+            num_hosts = min(8, len(hosts_in_subnet))
+            for h_idx, host in enumerate(hosts_in_subnet[:num_hosts]):
+                # Determinar tipo de dispositivo baseado nos serviços
+                device_type = 'workstation'
+                services = [p.get('service', '').lower() for p in host.get('ports', [])]
+                ports_info = [f"{p.get('port')}/{p.get('protocol')} ({p.get('service', 'unknown')})" 
+                             for p in host.get('ports', [])]
+                
+                if any('mysql' in s or 'postgresql' in s or 'mongodb' in s or 'oracle' in s for s in services):
+                    device_type = 'database'
+                elif any('http' in s or 'apache' in s or 'nginx' in s for s in services):
+                    device_type = 'web-server'
+                elif any('ssh' in s or 'ftp' in s or 'domain' in s for s in services):
+                    device_type = 'server'
+                
+                # Calcular posição em semicírculo abaixo do switch
+                angle = 180 + (h_idx / max(num_hosts - 1, 1)) * 140 - 70
+                radius = 120
+                x = switch_pos['x'] + radius * math.cos(math.radians(angle))
+                y = switch_pos['y'] + radius * math.sin(math.radians(angle)) + 60
+                
+                # Status baseado em vulnerabilidades reais
+                host_vulns = host.get('vulnerabilities', [])
+                vuln_count = len(host_vulns)
+                
+                # Verificar serviços inseguros
+                insecure_services = ['telnet', 'ftp', 'smb', 'rdp', 'vnc', 'rlogin']
+                has_insecure = any(any(srv in p.get('service', '').lower() for srv in insecure_services) 
+                                  for p in host.get('ports', []))
+                
+                if vuln_count >= 3 or has_insecure:
+                    status = 'critical'
+                elif vuln_count >= 1:
+                    status = 'warning'
+                else:
+                    status = 'ok'
+                
+                host_id = f"host-{host['ip'].replace('.', '-')}"
+                hostname = host.get('hostname', f"host-{host['ip'].split('.')[-1]}")
+                os_info = host.get('os', 'Desconhecido')
+                
+                devices.append({
+                    'id': host_id,
+                    'type': device_type,
+                    'label': f"{hostname[:12]}\\n{host['ip']}",
+                    'layer': 3,
+                    'position': {'x': int(x), 'y': int(y)},
+                    'status': status,
+                    'details': {
+                        'name': hostname,
+                        'ip': host['ip'],
+                        'os': os_info,
+                        'tipo': device_type.replace('-', ' ').title(),
+                        'portas_abertas': len(host.get('ports', [])),
+                        'portas': ports_info[:5],  # Primeiras 5 portas
+                        'vulnerabilidades': len(host_vulns),
+                        'vuln_detalhes': [v.get('description', 'N/A') for v in host_vulns[:3]],
+                        'status': status.upper(),
+                        'servicos_inseguros': has_insecure
+                    }
+                })
+                
+                # Conectar ao switch
+                connections.append({
+                    'from': switch_id,
+                    'to': host_id,
+                    'type': 'access',
+                    'status': status
+                })
+        
+        return {'devices': devices, 'connections': connections}
     
     def _identify_attack_vectors(self, vuln_summary: Dict) -> List[Dict]:
         """Identifica vetores de ataque baseados nas vulnerabilidades"""
@@ -420,7 +671,7 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
         elif score >= 50: return 'ATENÇÃO NECESSÁRIA'
         else: return 'CRÍTICO'
     
-    def _build_html(self, hosts, vuln_summary, port_analysis, attack_vectors, 
+    def _build_html(self, hosts, vuln_summary, port_analysis, network_topology, cisco_topology, attack_vectors, 
                     compliance, risk_matrix, ai_technical, ai_pentest, ai_compliance):
         """Constrói HTML técnico avançado"""
         
@@ -838,6 +1089,57 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
             margin-top: 5px;
         }}
         
+        /* Accordion/Dropdown Styles */
+        .topology-accordion {{
+            margin: 20px 0;
+        }}
+        
+        .accordion-header {{
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+        }}
+        
+        .accordion-header:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }}
+        
+        .accordion-title {{
+            font-size: 1.1em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        
+        .accordion-icon {{
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }}
+        
+        .accordion-header.active .accordion-icon {{
+            transform: rotate(180deg);
+        }}
+        
+        .accordion-content {{
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }}
+        
+        .accordion-content.active {{
+            max-height: 1200px;
+            overflow: visible;
+        }}
+        
         .progress-bar {{
             width: 100%;
             height: 25px;
@@ -951,7 +1253,393 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
             background: #dcfce7;
             color: #166534;
         }}
+        
+        #network-topology {{
+            width: 100%;
+            height: 600px;
+            border: 2px solid var(--border);
+            background: #ffffff;
+            border-radius: 4px;
+        }}
+        
+        .topology-legend {{
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }}
+        
+        .legend-item {{
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }}
+        
+        .legend-item .color-box {{
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }}
+        
+        /* Cisco Topology Styles */
+        #cisco-topology {{
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 0;
+            height: 650px;
+            position: relative;
+            overflow: auto;
+            border: 2px solid var(--border);
+            cursor: grab;
+        }}
+        
+        #cisco-topology:active {{
+            cursor: grabbing;
+        }}
+        
+        #network-topology {{
+            width: 100%;
+            height: 600px;
+            border: 2px solid var(--border);
+            background: #ffffff;
+            border-radius: 4px;
+        }}
+        
+        .topology-container {{
+            background: white;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 10px;
+        }}
+        
+        .cisco-device {{
+            position: absolute;
+            text-align: center;
+            cursor: move;
+            cursor: grab;
+            transition: all 0.3s ease;
+            z-index: 10;
+            user-select: none;
+        }}
+        
+        .cisco-device:active {{
+            cursor: grabbing;
+            z-index: 200;
+        }}
+        
+        .cisco-device:hover {{
+            transform: scale(1.15);
+            z-index: 100;
+        }}
+        
+        .cisco-device.selected {{
+            transform: scale(1.2);
+            z-index: 101;
+        }}
+        
+        .cisco-device.dragging {{
+            opacity: 0.7;
+            cursor: grabbing;
+            z-index: 1000;
+        }}
+        
+        .vuln-badge {{
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc2626;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 7px;
+            border-radius: 10px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 5;
+            animation: pulse 2s infinite;
+        }}
+        
+        .vuln-badge.warning {{
+            background: #f59e0b;
+        }}
+        
+        .vuln-badge.critical {{
+            background: #dc2626;
+            animation: pulse 1s infinite;
+        }}
+        
+        @keyframes pulse {{
+            0%, 100% {{ transform: scale(1); }}
+            50% {{ transform: scale(1.1); }}
+        }}
+        
+        .device-wrapper {{
+            position: relative;
+            display: inline-block;
+        }}
+        
+        .device-icon {{
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.3));
+            transition: filter 0.3s ease;
+        }}
+        
+        .cisco-device:hover .device-icon {{
+            filter: drop-shadow(4px 4px 10px rgba(59,130,246,0.6));
+        }}
+        
+        .device-router {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="30" width="80" height="40" fill="%231e40af" rx="5"/><circle cx="25" cy="50" r="6" fill="%2360a5fa"/><circle cx="50" cy="50" r="6" fill="%2360a5fa"/><circle cx="75" cy="50" r="6" fill="%2360a5fa"/><rect x="20" y="75" width="60" height="8" fill="%231e3a8a"/><path d="M25,50 L25,75 M50,50 L50,75 M75,50 L75,75" stroke="%2360a5fa" stroke-width="2"/></svg>'); }}
+        
+        .device-firewall {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,10 L20,25 L20,55 Q20,75 50,85 Q80,75 80,55 L80,25 Z" fill="%23dc2626" stroke="%23991b1b" stroke-width="2"/><path d="M50,30 L50,60 M35,45 L65,45" stroke="white" stroke-width="4"/><circle cx="50" cy="50" r="15" fill="none" stroke="white" stroke-width="3"/></svg>'); }}
+        
+        .device-switch {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="35" width="80" height="30" fill="%2316a34a" rx="3"/><circle cx="20" cy="50" r="3" fill="%2322c55e"/><circle cx="30" cy="50" r="3" fill="%2322c55e"/><circle cx="40" cy="50" r="3" fill="%2322c55e"/><circle cx="50" cy="50" r="3" fill="%2322c55e"/><circle cx="60" cy="50" r="3" fill="%2322c55e"/><circle cx="70" cy="50" r="3" fill="%2322c55e"/><circle cx="80" cy="50" r="3" fill="%2322c55e"/><rect x="15" y="42" width="70" height="3" fill="%23166534"/></svg>'); }}
+        
+        .device-server {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="15" fill="%236b7280" rx="2"/><rect x="20" y="42" width="60" height="15" fill="%236b7280" rx="2"/><rect x="20" y="64" width="60" height="15" fill="%236b7280" rx="2"/><circle cx="70" cy="27" r="3" fill="%2322c55e"/><circle cx="70" cy="49" r="3" fill="%2322c55e"/><circle cx="70" cy="71" r="3" fill="%2322c55e"/><rect x="25" y="24" width="35" height="4" fill="%234b5563"/><rect x="25" y="46" width="35" height="4" fill="%234b5563"/><rect x="25" y="68" width="35" height="4" fill="%234b5563"/></svg>'); }}
+        
+        .device-database {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><ellipse cx="50" cy="25" rx="30" ry="12" fill="%23ea580c"/><rect x="20" y="25" width="60" height="30" fill="%23ea580c"/><ellipse cx="50" cy="55" rx="30" ry="12" fill="%23c2410c"/><ellipse cx="50" cy="25" rx="30" ry="12" fill="none" stroke="%239a3412" stroke-width="2"/><ellipse cx="50" cy="40" rx="30" ry="12" fill="none" stroke="%239a3412" stroke-width="1.5"/><ellipse cx="50" cy="55" rx="30" ry="12" fill="none" stroke="%239a3412" stroke-width="2"/></svg>'); }}
+        
+        .device-web-server {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="25" width="70" height="50" fill="%237c3aed" rx="3"/><rect x="20" y="30" width="60" height="8" fill="%235b21b6"/><circle cx="25" cy="34" r="2" fill="%23a78bfa"/><circle cx="31" cy="34" r="2" fill="%23a78bfa"/><circle cx="37" cy="34" r="2" fill="%23a78bfa"/><rect x="25" y="43" width="50" height="3" fill="%23a78bfa"/><rect x="25" y="50" width="40" height="3" fill="%23a78bfa"/><rect x="25" y="57" width="45" height="3" fill="%23a78bfa"/><path d="M30,65 L45,65 L37,62 L45,59 L30,59" fill="%23fbbf24"/></svg>'); }}
+        
+        .device-workstation {{ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="45" fill="%2394a3b8" rx="2"/><rect x="25" y="25" width="50" height="35" fill="%23475569"/><rect x="42" y="67" width="16" height="8" fill="%2364748b"/><rect x="30" y="75" width="40" height="3" fill="%2364748b" rx="1"/><circle cx="50" cy="30" r="2" fill="%2322c55e"/></svg>'); }}
+        
+        .device-label {{
+            font-size: 0.7em;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            background: rgba(255,255,255,0.95);
+            padding: 3px 8px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            line-height: 1.3;
+        }}
+        
+        .connection-line {{
+            position: absolute;
+            height: 2px;
+            transform-origin: left center;
+            pointer-events: none;
+        }}
+        
+        .connection-backbone {{
+            background: linear-gradient(90deg, %231e40af, %233b82f6);
+            height: 4px;
+            box-shadow: 0 0 6px %233b82f6;
+        }}
+        
+        .connection-trunk {{
+            background: %2316a34a;
+            height: 3px;
+        }}
+        
+        .connection-access {{
+            background: %236b7280;
+            height: 2px;
+        }}
+        
+        .connection-access.status-critical {{
+            background: %23dc2626;
+            height: 3px;
+            animation: pulse-red 1.5s infinite;
+        }}
+        
+        .connection-access.status-warning {{
+            background: %23f59e0b;
+            height: 2px;
+        }}
+        
+        @keyframes pulse-red {{
+            0%, 100% {{ opacity: 1; }}
+            50% {{ opacity: 0.5; }}
+        }}
+        
+        .status-indicator {{
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }}
+        
+        .status-ok {{ background: %2322c55e; }}
+        .status-warning {{ background: %23f59e0b; animation: blink 1s infinite; }}
+        .status-critical {{ background: %23dc2626; animation: blink 0.5s infinite; }}
+        
+        @keyframes blink {{
+            0%, 100% {{ opacity: 1; }}
+            50% {{ opacity: 0.3; }}
+        }}
+        
+        .topology-title {{
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        
+        .topology-legend {{
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-size: 0.75em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }}
+        
+        .topology-legend h4 {{
+            margin: 0 0 8px 0;
+            font-size: 0.9em;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }}
+        
+        .device-details-panel {{
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            max-height: 500px;
+            overflow-y: auto;
+        }}
+        
+        .device-details-panel.show {{
+            display: block;
+            animation: slideIn 0.3s ease;
+        }}
+        
+        @keyframes slideIn {{
+            from {{
+                opacity: 0;
+                transform: translateX(20px);
+            }}
+            to {{
+                opacity: 1;
+                transform: translateX(0);
+            }}
+        }}
+        
+        .details-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }}
+        
+        .details-header h3 {{
+            margin: 0;
+            color: var(--primary);
+            font-size: 1em;
+        }}
+        
+        .close-details {{
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+        }}
+        
+        .close-details:hover {{
+            background: #b91c1c;
+        }}
+        
+        .detail-row {{
+            margin: 8px 0;
+            font-size: 0.85em;
+        }}
+        
+        .detail-label {{
+            font-weight: 700;
+            color: var(--primary);
+            display: inline-block;
+            width: 120px;
+        }}
+        
+        .detail-value {{
+            color: var(--text);
+        }}
+        
+        .detail-list {{
+            margin: 8px 0 8px 120px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 3px;
+            font-size: 0.8em;
+            line-height: 1.6;
+        }}
+        
+        .detail-list li {{
+            margin: 4px 0;
+        }}
+        
+        .status-badge {{
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }}
+        
+        .status-badge.OK {{
+            background: #22c55e;
+            color: white;
+        }}
+        
+        .status-badge.WARNING {{
+            background: #f59e0b;
+            color: white;
+        }}
+        
+        .status-badge.CRITICAL {{
+            background: #dc2626;
+            color: white;
+        }}
+        
+        .legend-item {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }}
+        
+        .legend-color {{
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 2px solid #334155;
+        }}
     </style>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -1024,6 +1712,8 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
             </div>
         </div>
         
+        {self._generate_network_topology_html(network_topology)}
+        {self._generate_cisco_topology_html(cisco_topology)}
         {self._generate_port_analysis_html(port_analysis)}
         {self._generate_compliance_html(compliance)}
         {self._generate_risk_matrix_html(risk_matrix)}
@@ -1041,8 +1731,543 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
             </p>
         </footer>
     </div>
+    
+    <script>
+        // Função para toggle de acordeão
+        function toggleAccordion(contentId) {{
+            const header = event.currentTarget;
+            const content = document.getElementById(contentId);
+            
+            // Toggle classes
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }}
+        
+        // Sistema de arrastar dispositivos Cisco
+        let isDragging = false;
+        let currentDevice = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        // Função para iniciar o arrasto
+        function startDrag(event, deviceId) {{
+            // Prevenir ação padrão e propagação
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Não arrastar se clicar no nome/texto
+            if (event.target.tagName === 'SPAN' || event.target.tagName === 'DIV') {{
+                return;
+            }}
+            
+            isDragging = true;
+            currentDevice = document.querySelector(`[data-device-id="${{deviceId}}"]`);
+            
+            if (!currentDevice) return;
+            
+            // Adicionar classe de arrasto
+            currentDevice.classList.add('dragging');
+            
+            // Calcular offset do mouse em relação ao dispositivo
+            const rect = currentDevice.getBoundingClientRect();
+            const container = document.getElementById('cisco-topology').getBoundingClientRect();
+            
+            offsetX = event.clientX - rect.left;
+            offsetY = event.clientY - rect.top;
+            
+            // Adicionar listeners globais
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }}
+        
+        // Função para arrastar
+        function drag(event) {{
+            if (!isDragging || !currentDevice) return;
+            
+            event.preventDefault();
+            
+            const container = document.getElementById('cisco-topology');
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calcular nova posição
+            let newX = event.clientX - containerRect.left - offsetX;
+            let newY = event.clientY - containerRect.top - offsetY;
+            
+            // Limitar aos bounds do container
+            const deviceWidth = currentDevice.offsetWidth;
+            const deviceHeight = currentDevice.offsetHeight;
+            
+            newX = Math.max(0, Math.min(newX, containerRect.width - deviceWidth));
+            newY = Math.max(0, Math.min(newY, containerRect.height - deviceHeight));
+            
+            // Atualizar posição
+            currentDevice.style.left = newX + 'px';
+            currentDevice.style.top = newY + 'px';
+        }}
+        
+        // Função para parar o arrasto
+        function stopDrag(event) {{
+            if (!isDragging) return;
+            
+            event.preventDefault();
+            
+            if (currentDevice) {{
+                currentDevice.classList.remove('dragging');
+            }}
+            
+            isDragging = false;
+            currentDevice = null;
+            
+            // Remover listeners globais
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }}
+        
+        // Adicionar eventos de arrastar a todos os dispositivos Cisco ao carregar
+        document.addEventListener('DOMContentLoaded', function() {{
+            const devices = document.querySelectorAll('.cisco-device');
+            devices.forEach(device => {{
+                const deviceId = device.getAttribute('data-device-id');
+                device.addEventListener('mousedown', (e) => startDrag(e, deviceId));
+            }});
+        }});
+    </script>
 </body>
 </html>"""
+    
+    
+    def _generate_network_topology_html(self, topology_data):
+        """Gera HTML do mapa de topologia de rede com acordeão"""
+        import json
+        
+        nodes_json = json.dumps(topology_data['nodes'])
+        edges_json = json.dumps(topology_data['edges'])
+        
+        return f"""
+        <div class="topology-accordion">
+            <div class="accordion-header" onclick="toggleAccordion('topology-vis')">
+                <div class="accordion-title">
+                    <span>MAPA DE TOPOLOGIA DA REDE (Interativo)</span>
+                </div>
+                <span class="accordion-icon">&#9660;</span>
+            </div>
+            <div id="topology-vis" class="accordion-content">
+                <div class="topology-container">
+                    <p style="color: var(--text-light); margin-bottom: 15px;">
+                        Visualização interativa da arquitetura de rede com classificação de hosts por tipo de serviço e nível de risco.
+                        <strong>Cores:</strong> Verde = Baixo risco | Amarelo = Risco médio | Vermelho = Alto risco
+                    </p>
+                    
+                    <div id="network-topology"></div>
+                    
+                    <div class="topology-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3b82f6;"></div>
+                            <span>Gateway/Firewall</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #8b5cf6;"></div>
+                            <span>Servidores Web</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f59e0b;"></div>
+                            <span>Bancos de Dados</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #10b981;"></div>
+                            <span>Servidores</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #64748b;"></div>
+                            <span>Estações de Trabalho</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+        <script>
+            // Dados da topologia
+            const nodes = new vis.DataSet({nodes_json});
+            const edges = new vis.DataSet({edges_json});
+            
+            // Configuração de cores por grupo
+            const groups = {{
+                gateway: {{
+                    color: {{
+                        background: '#3b82f6',
+                        border: '#1e40af',
+                        highlight: {{background: '#60a5fa', border: '#1e40af'}}
+                    }},
+                    font: {{color: '#ffffff', size: 14, face: 'monospace', bold: true}}
+                }},
+                web: {{
+                    color: {{
+                        background: '#8b5cf6',
+                        border: '#6d28d9',
+                        highlight: {{background: '#a78bfa', border: '#6d28d9'}}
+                    }},
+                    font: {{color: '#ffffff', size: 12, face: 'monospace'}}
+                }},
+                database: {{
+                    color: {{
+                        background: '#f59e0b',
+                        border: '#d97706',
+                        highlight: {{background: '#fbbf24', border: '#d97706'}}
+                    }},
+                    font: {{color: '#ffffff', size: 12, face: 'monospace'}}
+                }},
+                server: {{
+                    color: {{
+                        background: '#10b981',
+                        border: '#059669',
+                        highlight: {{background: '#34d399', border: '#059669'}}
+                    }},
+                    font: {{color: '#ffffff', size: 12, face: 'monospace'}}
+                }},
+                workstation: {{
+                    color: {{
+                        background: '#64748b',
+                        border: '#475569',
+                        highlight: {{background: '#94a3b8', border: '#475569'}}
+                    }},
+                    font: {{color: '#ffffff', size: 12, face: 'monospace'}}
+                }}
+            }};
+            
+            // Container
+            const container = document.getElementById('network-topology');
+            
+            // Dados do grafo
+            const data = {{nodes: nodes, edges: edges}};
+            
+            // Opções de visualização
+            const options = {{
+                groups: groups,
+                nodes: {{
+                    shape: 'box',
+                    margin: 10,
+                    widthConstraint: {{minimum: 100, maximum: 150}},
+                    heightConstraint: {{minimum: 50}}
+                }},
+                edges: {{
+                    smooth: {{
+                        type: 'continuous',
+                        roundness: 0.5
+                    }},
+                    color: {{color: '#94a3b8', highlight: '#3b82f6'}},
+                    width: 2
+                }},
+                physics: {{
+                    enabled: true,
+                    solver: 'forceAtlas2Based',
+                    forceAtlas2Based: {{
+                        gravitationalConstant: -50,
+                        centralGravity: 0.01,
+                        springLength: 200,
+                        springConstant: 0.08,
+                        damping: 0.4,
+                        avoidOverlap: 0.5
+                    }},
+                    stabilization: {{
+                        enabled: true,
+                        iterations: 200
+                    }}
+                }},
+                interaction: {{
+                    hover: true,
+                    tooltipDelay: 200,
+                    navigationButtons: true,
+                    keyboard: true
+                }}
+            }};
+            
+            // Criar network
+            const network = new vis.Network(container, data, options);
+            
+            // Event handlers
+            network.on('stabilizationIterationsDone', function() {{
+                network.setOptions({{physics: false}});
+            }});
+            
+            network.on('click', function(params) {{
+                if (params.nodes.length > 0) {{
+                    const nodeId = params.nodes[0];
+                    console.log('Node clicked:', nodeId);
+                }}
+            }});
+        </script>
+        """
+    
+    def _generate_cisco_topology_html(self, cisco_data):
+        """Gera visualização estilo Cisco Packet Tracer com acordeão"""
+        
+        # Verificar se há dados
+        if not cisco_data.get('devices'):
+            return """
+            <div class="topology-accordion">
+                <div class="accordion-header" onclick="toggleAccordion('topology-cisco')">
+                    <div class="accordion-title">
+                        <span>TOPOLOGIA DA REDE (Cisco Style)</span>
+                    </div>
+                    <span class="accordion-icon">&#9660;</span>
+                </div>
+                <div id="topology-cisco" class="accordion-content">
+                    <div class="topology-container">
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            Nenhum dispositivo encontrado para visualização
+                        </div>
+                    </div>
+                </div>
+            </div>
+            """
+        
+        import json
+        devices_data = json.dumps(cisco_data['devices'], ensure_ascii=False)
+        
+        connections_svg = ""
+        devices_html = ""
+        
+        # Gerar linhas de conexão usando SVG
+        svg_lines = []
+        for conn in cisco_data['connections']:
+            from_device = next((d for d in cisco_data['devices'] if d['id'] == conn['from']), None)
+            to_device = next((d for d in cisco_data['devices'] if d['id'] == conn['to']), None)
+            
+            if not from_device or not to_device:
+                continue
+            
+            x1, y1 = from_device['position']['x'], from_device['position']['y'] + 30
+            x2, y2 = to_device['position']['x'], to_device['position']['y'] + 30
+            
+            # Cor e espessura baseada no tipo
+            if conn['type'] == 'backbone':
+                color = '#1e40af'
+                width = 5
+                opacity = 1
+            elif conn['type'] == 'trunk':
+                color = '#16a34a'
+                width = 3
+                opacity = 0.9
+            else:  # access
+                color = '#6b7280'
+                width = 2
+                opacity = 0.7
+                
+                if conn.get('status') == 'critical':
+                    color = '#dc2626'
+                    width = 3
+                    opacity = 1
+                elif conn.get('status') == 'warning':
+                    color = '#f59e0b'
+                    opacity = 0.8
+            
+            svg_lines.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{color}" stroke-width="{width}" opacity="{opacity}"/>')
+        
+        connections_svg = f'<svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">{"".join(svg_lines)}</svg>'
+        
+        # Gerar dispositivos
+        for device in cisco_data['devices']:
+            x, y = device['position']['x'], device['position']['y']
+            device_type = device['type']
+            label = device['label'].replace('\\n', '<br>')
+            
+            status_indicator = ""
+            if 'status' in device:
+                status_indicator = f'<div class="status-indicator status-{device["status"]}"></div>'
+            
+            # Badge de vulnerabilidades
+            vuln_badge = ""
+            vuln_count = device.get('details', {}).get('vulnerabilidades', 0)
+            if vuln_count > 0:
+                badge_class = "critical" if vuln_count >= 3 else "warning"
+                vuln_badge = f'<div class="vuln-badge {badge_class}">{vuln_count}</div>'
+            
+            devices_html += f'''
+            <div class="cisco-device" style="left: {x - 30}px; top: {y - 30}px;" 
+                 data-device-id="{device['id']}" onclick="showDeviceDetails('{device['id']}')">
+                <div class="device-wrapper">
+                    <div style="position: relative;">
+                        <div class="device-icon device-{device_type}"></div>
+                        {status_indicator}
+                    </div>
+                    {vuln_badge}
+                </div>
+                <div class="device-label">{label}</div>
+            </div>
+            '''
+        
+        # Estatísticas
+        total_devices = len(cisco_data['devices'])
+        total_connections = len(cisco_data['connections'])
+        critical_devices = sum(1 for d in cisco_data['devices'] if d.get('status') == 'critical')
+        warning_devices = sum(1 for d in cisco_data['devices'] if d.get('status') == 'warning')
+        
+        return f"""
+        <div class="topology-accordion">
+            <div class="accordion-header" onclick="toggleAccordion('topology-cisco')">
+                <div class="accordion-title">
+                    <span>TOPOLOGIA DA REDE (Cisco Style) - CLIQUE NOS DISPOSITIVOS</span>
+                </div>
+                <span class="accordion-icon">&#9660;</span>
+            </div>
+            <div id="topology-cisco" class="accordion-content">
+                <div class="topology-container">
+                    <div style="text-align: center; margin-bottom: 15px; color: #666; font-size: 0.85em;">
+                        {total_devices} dispositivos | {total_connections} conexões | 
+                        <span style="color: #dc2626; font-weight: 600;">{critical_devices} críticos</span> | 
+                        <span style="color: #f59e0b; font-weight: 600;">{warning_devices} atenção</span>
+                    </div>
+                    <div id="cisco-topology">
+                        {connections_svg}
+                        {devices_html}
+                        
+                        <!-- Painel de Detalhes -->
+                        <div id="device-details" class="device-details-panel">
+                            <div class="details-header">
+                                <h3 id="details-title">Informacoes do Dispositivo</h3>
+                                <button class="close-details" onclick="closeDetails()">X</button>
+                            </div>
+                            <div id="details-content"></div>
+                        </div>
+                        
+                        <div class="topology-legend">
+                            <h4>Legenda - Clique em qualquer dispositivo para ver detalhes</h4>
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-router" style="width: 25px; height: 25px;"></div>
+                                    <span>Router</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-firewall" style="width: 25px; height: 25px;"></div>
+                                    <span>Firewall</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-switch" style="width: 25px; height: 25px;"></div>
+                                    <span>Switch</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-server" style="width: 25px; height: 25px;"></div>
+                                    <span>Server</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-database" style="width: 25px; height: 25px;"></div>
+                                    <span>Database</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-web-server" style="width: 25px; height: 25px;"></div>
+                                    <span>Web Server</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="device-icon device-workstation" style="width: 25px; height: 25px;"></div>
+                                    <span>Workstation</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="status-indicator status-ok" style="position: relative;"></div>
+                                    <span>Seguro</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="status-indicator status-warning" style="position: relative;"></div>
+                                    <span>Atenção</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="status-indicator status-critical" style="position: relative;"></div>
+                                    <span>Crítico</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            const devicesData = {devices_data};
+            
+            function showDeviceDetails(deviceId) {{
+                const device = devicesData.find(d => d.id === deviceId);
+                if (!device) return;
+                
+                // Remover seleção anterior
+                document.querySelectorAll('.cisco-device').forEach(el => el.classList.remove('selected'));
+                
+                // Adicionar seleção atual
+                const deviceEl = document.querySelector(`[data-device-id="${{deviceId}}"]`);
+                if (deviceEl) deviceEl.classList.add('selected');
+                
+                const details = device.details || {{}};
+                let html = '';
+                
+                // Informações básicas
+                if (details.name) {{
+                    html += `<div class="detail-row"><span class="detail-label">Nome:</span><span class="detail-value">${{details.name}}</span></div>`;
+                }}
+                if (details.type) {{
+                    html += `<div class="detail-row"><span class="detail-label">Tipo:</span><span class="detail-value">${{details.type}}</span></div>`;
+                }}
+                if (details.ip) {{
+                    html += `<div class="detail-row"><span class="detail-label">Endereço IP:</span><span class="detail-value">${{details.ip}}</span></div>`;
+                }}
+                if (details.os) {{
+                    html += `<div class="detail-row"><span class="detail-label">Sistema:</span><span class="detail-value">${{details.os}}</span></div>`;
+                }}
+                if (details.subnet) {{
+                    html += `<div class="detail-row"><span class="detail-label">Subnet:</span><span class="detail-value">${{details.subnet}}</span></div>`;
+                }}
+                if (details.hosts !== undefined) {{
+                    html += `<div class="detail-row"><span class="detail-label">Hosts:</span><span class="detail-value">${{details.hosts}}</span></div>`;
+                }}
+                if (details.portas_abertas !== undefined) {{
+                    html += `<div class="detail-row"><span class="detail-label">Portas Abertas:</span><span class="detail-value">${{details.portas_abertas}}</span></div>`;
+                }}
+                if (details.ports_abertos !== undefined) {{
+                    html += `<div class="detail-row"><span class="detail-label">Total Portas:</span><span class="detail-value">${{details.ports_abertos}}</span></div>`;
+                }}
+                
+                // Portas detalhadas
+                if (details.portas && details.portas.length > 0) {{
+                    html += `<div class="detail-row"><span class="detail-label">Serviços:</span></div>`;
+                    html += `<ul class="detail-list">${{details.portas.map(p => '<li>' + p + '</li>').join('')}}</ul>`;
+                }}
+                
+                // Vulnerabilidades
+                if (details.vulnerabilidades !== undefined) {{
+                    const vulnClass = details.vulnerabilidades >= 3 ? 'CRITICAL' : details.vulnerabilidades >= 1 ? 'WARNING' : 'OK';
+                    html += `<div class="detail-row"><span class="detail-label">Vulnerabilidades:</span><span class="detail-value">${{details.vulnerabilidades}} <span class="status-badge ${{vulnClass}}">${{vulnClass}}</span></span></div>`;
+                }}
+                
+                if (details.vuln_detalhes && details.vuln_detalhes.length > 0) {{
+                    html += `<div class="detail-row"><span class="detail-label">Detalhes:</span></div>`;
+                    html += `<ul class="detail-list">${{details.vuln_detalhes.map(v => '<li>' + v + '</li>').join('')}}</ul>`;
+                }}
+                
+                if (details.servicos_inseguros) {{
+                    html += `<div class="detail-row"><span class="detail-label">Alerta:</span><span class="detail-value" style="color: #dc2626; font-weight: 600;">[!] Servicos inseguros detectados</span></div>`;
+                }}
+                
+                if (details.function) {{
+                    html += `<div class="detail-row"><span class="detail-label">Função:</span><span class="detail-value">${{details.function}}</span></div>`;
+                }}
+                if (details.info) {{
+                    html += `<div class="detail-row"><span class="detail-label">Info:</span><span class="detail-value">${{details.info}}</span></div>`;
+                }}
+                
+                // Status geral
+                if (details.status) {{
+                    html += `<div class="detail-row"><span class="detail-label">Status Geral:</span><span class="status-badge ${{details.status}}">${{details.status}}</span></div>`;
+                }}
+                
+                document.getElementById('details-content').innerHTML = html;
+                document.getElementById('device-details').classList.add('show');
+            }}
+            
+            function closeDetails() {{
+                document.getElementById('device-details').classList.remove('show');
+                document.querySelectorAll('.cisco-device').forEach(el => el.classList.remove('selected'));
+            }}
+        </script>
+        """
     
     def _generate_port_analysis_html(self, analysis):
         """Gera HTML da análise de portas"""
@@ -1185,8 +2410,8 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
     def _generate_findings_list(self, findings):
         """Gera lista de findings"""
         if not findings:
-            return "<li>✓ Nenhuma não-conformidade identificada</li>"
-        return "".join([f"<li>✗ {finding}</li>" for finding in findings[:3]])
+            return "<li>OK - Nenhuma nao-conformidade identificada</li>"
+        return "".join([f"<li>X {finding}</li>" for finding in findings[:3]])
     
     def _generate_risk_matrix_html(self, matrix):
         """Gera matriz de risco"""
@@ -1217,7 +2442,7 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
             </div>
             
             <div style="margin-top: 20px;">
-                <h3 style="font-size: 0.9em; color: var(--danger); margin-bottom: 15px; text-transform: uppercase;">Riscos Críticos (Score ≥ 7)</h3>
+                <h3 style="font-size: 0.9em; color: var(--danger); margin-bottom: 15px; text-transform: uppercase;">Riscos Criticos (Score >= 7)</h3>
                 {self._generate_risk_items_html(matrix['critical'][:5])}
             </div>
         </div>
@@ -1226,7 +2451,7 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
     def _generate_risk_items_html(self, risks):
         """Gera itens de risco"""
         if not risks:
-            return "<p style='color: var(--success);'>✓ Nenhum risco crítico identificado</p>"
+            return "<p style='color: var(--success);'>OK - Nenhum risco critico identificado</p>"
         
         html = ""
         for risk in risks:
@@ -1263,11 +2488,11 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
         for vector in vectors:
             html += f"""
             <div class="technical-block">
-                <h3>⚠ {vector['name']}</h3>
+                <h3>[!] {vector['name']}</h3>
                 <p><strong>Alvo:</strong> {vector['service']}</p>
-                <p><strong>Método:</strong> {vector['method']}</p>
+                <p><strong>Metodo:</strong> {vector['method']}</p>
                 <p><strong>Impacto:</strong> {vector['impact']}</p>
-                <p><strong>Mitigação:</strong> {vector['mitigation']}</p>
+                <p><strong>Mitigacao:</strong> {vector['mitigation']}</p>
             </div>
             """
         return html
@@ -1356,10 +2581,11 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
             badge_class = "badge-critical" if vuln['severity'] == 'ALTA' else "badge-high" if vuln['severity'] == 'MÉDIA' else "badge-low"
             service = vuln['service'].lower()
             cves = ', '.join(self.KNOWN_CVES.get(service, ['N/A'])[:2])
+            vuln_id = f"V-{str(idx).zfill(3)}"
             
             rows += f"""
             <tr>
-                <td><strong>V-{idx:03d}</strong></td>
+                <td><strong>{vuln_id}</strong></td>
                 <td>{vuln['ip']}:{vuln['port']}</td>
                 <td>{vuln['service'].upper()}</td>
                 <td>{vuln['product']} {vuln['version']}</td>
@@ -1398,16 +2624,30 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
         """Gera linhas de hosts"""
         rows = ""
         for host in hosts:
-            services = ", ".join([f"{p['port']}/{p['service']}" for p in host['ports'][:5]])
-            risk_level = "ALTO" if host['total_ports'] > 10 else "MÉDIO" if host['total_ports'] > 5 else "BAIXO"
-            badge_class = "badge-critical" if risk_level == "ALTO" else "badge-high" if risk_level == "MÉDIO" else "badge-low"
+            port_list = [f"{p.get('port', 0)}/{p.get('service', 'unknown')}" for p in host.get('ports', [])[:5]]
+            services = ", ".join(port_list)
+            total_ports = host.get('total_ports', 0)
+            
+            if total_ports > 10:
+                risk_level = "ALTO"
+                badge_class = "badge-critical"
+            elif total_ports > 5:
+                risk_level = "MEDIO"
+                badge_class = "badge-high"
+            else:
+                risk_level = "BAIXO"
+                badge_class = "badge-low"
+            
+            hostname = host.get('hostname', 'Unknown')
+            ip = host.get('ip', 'N/A')
+            os_info = host.get('os', 'Unknown')[:40]
             
             rows += f"""
             <tr>
-                <td><strong>{host['hostname']}</strong></td>
-                <td>{host['ip']}</td>
-                <td>{host['os'][:40]}</td>
-                <td>{host['total_ports']}</td>
+                <td><strong>{hostname}</strong></td>
+                <td>{ip}</td>
+                <td>{os_info}</td>
+                <td>{total_ports}</td>
                 <td><small>{services}</small></td>
                 <td><span class="badge {badge_class}">{risk_level}</span></td>
             </tr>
@@ -1416,10 +2656,10 @@ Linguagem de auditoria formal. Máximo 150 palavras."""
 
 
 def generate_technical_dashboard(hosts: List[Dict], vuln_summary: Dict, use_ai: bool = True, output_file: str = "dashboard.html"):
-    """Função principal para gerar dashboard técnico"""
+    """Funcao principal para gerar dashboard tecnico"""
     dashboard = TechnicalDashboard(use_ai=use_ai)
     return dashboard.generate(hosts, vuln_summary, output_file=output_file)
 
 
 if __name__ == "__main__":
-    print("Dashboard Técnico Avançado - Sistema de Análise de Segurança")
+    print("Dashboard Tecnico Avancado - Sistema de Analise de Seguranca")
