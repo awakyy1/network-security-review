@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sV -O target" start="1700000000" version="7.94">
+<host starttime="1700000000" endtime="1700000100">
+<status state="up" reason="echo-reply"/>
+<address addr="192.168.1.100" addrtype="ipv4"/>
+<hostnames>
+<hostname name="server01.local" type="PTR"/>
+</hostnames>
+<ports>
+<port protocol="tcp" portid="22">
+<state state="open" reason="syn-ack"/>
+<service name="ssh" product="OpenSSH" version="8.2p1" />
+</port>
+<port protocol="tcp" portid="80">
+<state state="open" reason="syn-ack"/>
+<service name="http" product="Apache" version="2.4.41" />
+</port>
+<port protocol="tcp" portid="3306">
+<state state="open" reason="syn-ack"/>
+<service name="mysql" product="MySQL" version="5.7.33" />
+</port>
+</ports>
+<os>
+<osmatch name="Linux 4.15 - 5.6" accuracy="95"/>
+</os>
+</host>
+<host starttime="1700000100" endtime="1700000200">
+<status state="up" reason="echo-reply"/>
+<address addr="192.168.1.101" addrtype="ipv4"/>
+<hostnames>
+<hostname name="server02.local" type="PTR"/>
+</hostnames>
+<ports>
+<port protocol="tcp" portid="21">
+<state state="open" reason="syn-ack"/>
+<service name="ftp" product="vsftpd" version="3.0.3" />
+</port>
+<port protocol="tcp" portid="23">
+<state state="open" reason="syn-ack"/>
+<service name="telnet" />
+</port>
+<port protocol="tcp" portid="445">
+<state state="open" reason="syn-ack"/>
+<service name="netbios-ssn" product="Samba" version="4.11.2" />
+</port>
+<port protocol="tcp" portid="3389">
+<state state="open" reason="syn-ack"/>
+<service name="rdp" product="Microsoft Terminal Services" />
+</port>
+</ports>
+<os>
+<osmatch name="Microsoft Windows Server 2016" accuracy="92"/>
+</os>
+</host>
+</nmaprun>

@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<nmaprun scanner="nmap" args="nmap -sV -O Casa Comum" start="1700000000" version="7.94">
+  <host starttime="1700000000" endtime="1700000100">
+    <status state="up" reason="echo-reply"/>
+    <address addr="192.168.0.1" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="router.home" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack"/>
+        <service name="http" product="lighttpd" version="1.4.35"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack"/>
+        <service name="https" product="lighttpd" version="1.4.35"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 3.x" accuracy="95"/>
+    </os>
+  </host>
+  <host starttime="1700000000" endtime="1700000100">
+    <status state="up" reason="echo-reply"/>
+    <address addr="192.168.0.10" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="desktop-home" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="135">
+        <state state="open" reason="syn-ack"/>
+        <service name="msrpc" product="Microsoft Windows RPC"/>
+      </port>
+      <port protocol="tcp" portid="139">
+        <state state="open" reason="syn-ack"/>
+        <service name="netbios-ssn"/>
+      </port>
+      <port protocol="tcp" portid="445">
+        <state state="open" reason="syn-ack"/>
+        <service name="netbios-ssn"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Microsoft Windows 10" accuracy="95"/>
+    </os>
+  </host>
+  <host starttime="1700000000" endtime="1700000100">
+    <status state="up" reason="echo-reply"/>
+    <address addr="192.168.0.15" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="nas.home" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack"/>
+        <service name="ssh" product="OpenSSH" version="8.4"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack"/>
+        <service name="http" product="nginx" version="1.18.0"/>
+      </port>
+      <port protocol="tcp" portid="445">
+        <state state="open" reason="syn-ack"/>
+        <service name="netbios-ssn" product="Samba" version="4.13.3"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 4.x" accuracy="95"/>
+    </os>
+  </host>
+</nmaprun>
