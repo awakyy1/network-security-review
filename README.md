@@ -542,5 +542,3 @@ output/    - Saída (relatórios e dashboard)
 **Última Atualização:** Novembro 2025
 
 **Versão do Sistema:** 2.0
-
-**Status:** Produção
