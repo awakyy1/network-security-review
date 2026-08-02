@@ -1,555 +1,325 @@
-"""
-Sistema de Análise de Segurança de Redes
-Processa logs do Nmap, cria topologia no Zabbix e gera relatório de vulnerabilidades
-Autor: TCC - Segurança de Redes
-"""
+"""Parse authorized Nmap XML scans and produce evidence-based review findings."""
 
-import xml.etree.ElementTree as ET
+from __future__ import annotations
+
+import argparse
 import json
-import requests
-from datetime import datetime
-from typing import Dict, List, Optional
 import os
+import sys
+import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import requests
+
+
+@dataclass(frozen=True)
+class ReviewRule:
+    services: tuple[str, ...]
+    ports: tuple[str, ...]
+    severity: str
+    title: str
+    evidence: str
+    recommendation: str
+
+
+REVIEW_RULES = (
+    ReviewRule(("telnet",), ("23",), "high", "Cleartext remote administration exposed", "An open Telnet service was observed.", "Replace Telnet with SSH and restrict administrative access at the network boundary."),
+    ReviewRule(("ftp",), ("21",), "medium", "Cleartext file transfer exposed", "An open FTP service was observed.", "Use SFTP or FTPS and verify that anonymous access is disabled."),
+    ReviewRule(("http",), ("80",), "low", "Unencrypted HTTP requires review", "An open HTTP service was observed.", "Confirm that HTTP redirects to HTTPS and that no sensitive traffic is accepted over cleartext."),
+    ReviewRule(("netbios-ssn", "microsoft-ds", "smb"), ("139", "445"), "medium", "SMB exposure requires review", "An open SMB or NetBIOS service was observed.", "Limit SMB to required network segments and verify signing, authentication, and supported protocol versions."),
+    ReviewRule(("mysql", "postgresql"), ("3306", "5432"), "medium", "Database listener exposure requires review", "An open database service was observed.", "Restrict database listeners to approved application networks and require encrypted authenticated connections."),
+    ReviewRule(("ms-wbt-server", "rdp"), ("3389",), "medium", "Remote desktop exposure requires review", "An open RDP service was observed.", "Place remote desktop behind an approved access path, require MFA, and limit source networks."),
+    ReviewRule(("vnc",), ("5900",), "medium", "VNC exposure requires review", "An open VNC service was observed.", "Restrict VNC to a protected management network and require encrypted strong authentication."),
+    ReviewRule(("ssh",), ("22",), "low", "SSH hardening review", "An open SSH service was observed.", "Verify key-based authentication, supported algorithms, logging, and source-network restrictions."),
+    ReviewRule(("smtp",), ("25",), "low", "Mail transport configuration review", "An open SMTP service was observed.", "Verify relay restrictions, authentication requirements, and opportunistic or mandatory TLS as appropriate."),
+)
 
 
 class ZabbixAPI:
-    """Classe para interação com a API do Zabbix"""
-    
-    def __init__(self, url: str, user: str, password: str):
+    """Minimal JSON-RPC client used only when integration is explicitly enabled."""
+
+    def __init__(self, url: str, username: str, password: str, *, timeout: float = 10, verify_tls: bool = True):
         self.url = url
-        self.user = user
+        self.username = username
         self.password = password
-        self.auth_token = None
+        self.timeout = timeout
+        self.verify_tls = verify_tls
+        self.auth_token: str | None = None
         self.request_id = 1
-        
-    def _make_request(self, method: str, params: dict) -> dict:
-        """Faz requisição à API do Zabbix"""
-        headers = {'Content-Type': 'application/json'}
-        
-        payload = {
+
+    def _make_request(self, method: str, params: dict[str, Any]) -> Any:
+        payload: dict[str, Any] = {
             "jsonrpc": "2.0",
             "method": method,
             "params": params,
             "id": self.request_id,
         }
-        
         if self.auth_token:
             payload["auth"] = self.auth_token
-            
         self.request_id += 1
-        
-        try:
-            response = requests.post(self.url, json=payload, headers=headers, verify=False)
-            response.raise_for_status()
-            result = response.json()
-            
-            if 'error' in result:
-                raise Exception(f"Erro Zabbix API: {result['error']}")
-                
-            return result.get('result')
-        except Exception as e:
-            print(f"Erro na requisição: {e}")
-            return None
-    
-    def login(self) -> bool:
-        """Autentica no Zabbix"""
-        result = self._make_request("user.login", {
-            "user": self.user,
-            "password": self.password
+
+        response = requests.post(
+            self.url,
+            json=payload,
+            headers={"Content-Type": "application/json"},
+            timeout=self.timeout,
+            verify=self.verify_tls,
+        )
+        response.raise_for_status()
+        body = response.json()
+        if "error" in body:
+            raise RuntimeError(f"Zabbix API error: {body['error']}")
+        return body.get("result")
+
+    def login(self) -> None:
+        self.auth_token = self._make_request("user.login", {
+            "username": self.username,
+            "password": self.password,
         })
-        
-        if result:
-            self.auth_token = result
-            print("[OK] Autenticado no Zabbix com sucesso")
-            return True
-        return False
-    
-    def create_host(self, hostname: str, ip: str, group_id: str = "2") -> Optional[str]:
-        """Cria um host no Zabbix"""
-        params = {
+        if not self.auth_token:
+            raise RuntimeError("Zabbix authentication returned no token")
+
+    def create_host(self, hostname: str, ip_address: str, group_id: str) -> str:
+        result = self._make_request("host.create", {
             "host": hostname,
             "interfaces": [{
-                "type": 1,  # Agent
+                "type": 1,
                 "main": 1,
                 "useip": 1,
-                "ip": ip,
+                "ip": ip_address,
                 "dns": "",
-                "port": "10050"
+                "port": "10050",
             }],
-            "groups": [{"groupid": group_id}]
-        }
-        
-        result = self._make_request("host.create", params)
-        if result and 'hostids' in result:
-            return result['hostids'][0]
-        return None
-    
-    def create_map(self, name: str, hosts: List[Dict]) -> Optional[str]:
-        """Cria um mapa de rede no Zabbix"""
-        # Preparar elementos do mapa
-        selements = []
-        links = []
-        
-        # Adicionar hosts ao mapa
-        for idx, host in enumerate(hosts):
-            selements.append({
-                "selementid": str(idx + 1),
-                "elementtype": 0,  # Host
-                "elements": [{"hostid": host.get('hostid', '0')}],
-                "x": (idx % 5) * 150 + 100,
-                "y": (idx // 5) * 150 + 100,
-                "iconid_off": "1"
-            })
-        
-        params = {
-            "name": name,
-            "width": 800,
-            "height": 600,
-            "selements": selements,
-            "links": links
-        }
-        
-        result = self._make_request("map.create", params)
-        if result and 'sysmapids' in result:
-            return result['sysmapids'][0]
-        return None
+            "groups": [{"groupid": group_id}],
+        })
+        return result["hostids"][0]
 
 
 class NmapParser:
-    """Classe para análise de logs do Nmap"""
-    
-    def __init__(self, nmap_file: str):
-        self.nmap_file = nmap_file
+    """Parse live hosts and open services from an Nmap XML document."""
+
+    def __init__(self, nmap_file: str | Path):
+        self.nmap_file = Path(nmap_file)
+        self.hosts: list[dict[str, Any]] = []
+        self.findings: list[dict[str, Any]] = []
+
+    def parse_xml(self) -> list[dict[str, Any]]:
         self.hosts = []
-        self.vulnerabilities = []
-        
-    def parse_xml(self) -> bool:
-        """Processa arquivo XML do Nmap"""
+        self.findings = []
         try:
-            tree = ET.parse(self.nmap_file)
-            root = tree.getroot()
-            
-            for host in root.findall('.//host'):
-                host_data = self._parse_host(host)
-                if host_data:
-                    self.hosts.append(host_data)
-            
-            print(f"[OK] Processados {len(self.hosts)} hosts do scan Nmap")
-            return True
-        except Exception as e:
-            print(f"[ERRO] Erro ao processar XML: {e}")
-            return False
-    
-    def _parse_host(self, host_elem) -> Optional[Dict]:
-        """Extrai informações de um host"""
-        # Obter IP
-        address = host_elem.find('address')
-        if address is None:
+            root = ET.parse(self.nmap_file).getroot()
+        except (OSError, ET.ParseError) as error:
+            raise ValueError(f"Unable to parse Nmap XML: {error}") from error
+
+        for host_element in root.findall(".//host"):
+            host = self._parse_host(host_element)
+            if host:
+                self.hosts.append(host)
+        return self.hosts
+
+    def _parse_host(self, element: ET.Element) -> dict[str, Any] | None:
+        status = element.find("status")
+        if status is None or status.get("state") != "up":
             return None
-            
-        ip = address.get('addr')
-        
-        # Obter hostname
-        hostnames = host_elem.find('hostnames')
-        hostname = ip
-        if hostnames is not None:
-            hostname_elem = hostnames.find('hostname')
-            if hostname_elem is not None:
-                hostname = hostname_elem.get('name', ip)
-        
-        # Obter status
-        status = host_elem.find('status')
-        if status is None or status.get('state') != 'up':
+
+        address = next((item for item in element.findall("address") if item.get("addrtype") in {"ipv4", "ipv6"}), None)
+        if address is None or not address.get("addr"):
             return None
-        
-        # Obter portas e serviços
+        ip_address = address.get("addr", "")
+
+        hostname_element = element.find("./hostnames/hostname")
+        hostname = hostname_element.get("name", ip_address) if hostname_element is not None else ip_address
+        os_match = element.find("./os/osmatch")
+        operating_system = os_match.get("name", "Unknown") if os_match is not None else "Unknown"
+
         ports = []
-        ports_elem = host_elem.find('ports')
-        if ports_elem is not None:
-            for port in ports_elem.findall('port'):
-                port_data = self._parse_port(port, ip)
-                if port_data:
-                    ports.append(port_data)
-        
-        # Obter sistema operacional
-        os_info = "Desconhecido"
-        os_elem = host_elem.find('os')
-        if os_elem is not None:
-            osmatch = os_elem.find('osmatch')
-            if osmatch is not None:
-                os_info = osmatch.get('name', 'Desconhecido')
-        
-        # Vincular vulnerabilidades deste host específico
-        host_vulnerabilities = [v for v in self.vulnerabilities if v['ip'] == ip]
-        
+        host_findings = []
+        for port_element in element.findall("./ports/port"):
+            parsed_port = self._parse_port(port_element, ip_address)
+            if parsed_port:
+                ports.append(parsed_port)
+                finding = self._review_service(ip_address, parsed_port)
+                if finding:
+                    self.findings.append(finding)
+                    host_findings.append(finding)
+
         return {
-            'ip': ip,
-            'hostname': hostname,
-            'os': os_info,
-            'ports': ports,
-            'total_ports': len(ports),
-            'vulnerabilities': host_vulnerabilities
+            "ip": ip_address,
+            "hostname": hostname,
+            "os": operating_system,
+            "ports": ports,
+            "total_ports": len(ports),
+            "findings": host_findings,
         }
-    
-    def _parse_port(self, port_elem, host_ip: str) -> Optional[Dict]:
-        """Extrai informações de uma porta"""
-        port_id = port_elem.get('portid')
-        protocol = port_elem.get('protocol')
-        
-        state = port_elem.find('state')
-        if state is None or state.get('state') != 'open':
+
+    @staticmethod
+    def _parse_port(element: ET.Element, ip_address: str) -> dict[str, str] | None:
+        state = element.find("state")
+        if state is None or state.get("state") != "open":
             return None
-        
-        service = port_elem.find('service')
-        service_name = "unknown"
-        service_product = ""
-        service_version = ""
-        
-        if service is not None:
-            service_name = service.get('name', 'unknown')
-            service_product = service.get('product', '')
-            service_version = service.get('version', '')
-        
-        # Análise de vulnerabilidades
-        self._check_vulnerabilities(host_ip, port_id, service_name, service_product, service_version)
-        
+        service_element = element.find("service")
         return {
-            'port': port_id,
-            'protocol': protocol,
-            'service': service_name,
-            'product': service_product,
-            'version': service_version
+            "port": element.get("portid", ""),
+            "protocol": element.get("protocol", "unknown"),
+            "service": service_element.get("name", "unknown") if service_element is not None else "unknown",
+            "product": service_element.get("product", "") if service_element is not None else "",
+            "version": service_element.get("version", "") if service_element is not None else "",
+            "ip": ip_address,
         }
-    
-    def _check_vulnerabilities(self, ip: str, port: str, service: str, product: str, version: str):
-        """Identifica possíveis vulnerabilidades"""
-        vuln_db = {
-            'ftp': {'ports': ['21'], 'severity': 'MÉDIA', 'description': 'Serviço FTP detectado - transmissão não criptografada'},
-            'telnet': {'ports': ['23'], 'severity': 'ALTA', 'description': 'Telnet detectado - protocolo inseguro sem criptografia'},
-            'smtp': {'ports': ['25'], 'severity': 'BAIXA', 'description': 'SMTP aberto - possível relay não autorizado'},
-            'http': {'ports': ['80'], 'severity': 'MÉDIA', 'description': 'HTTP sem criptografia detectado'},
-            'netbios-ssn': {'ports': ['139', '445'], 'severity': 'ALTA', 'description': 'SMB/NetBIOS exposto - vulnerável a ataques'},
-            'mysql': {'ports': ['3306'], 'severity': 'ALTA', 'description': 'MySQL exposto publicamente'},
-            'postgresql': {'ports': ['5432'], 'severity': 'ALTA', 'description': 'PostgreSQL exposto publicamente'},
-            'rdp': {'ports': ['3389'], 'severity': 'ALTA', 'description': 'RDP exposto - alvo comum de ataques'},
-            'vnc': {'ports': ['5900'], 'severity': 'ALTA', 'description': 'VNC exposto - acesso remoto sem autenticação forte'},
-            'ssh': {'ports': ['22'], 'severity': 'BAIXA', 'description': 'SSH exposto - verificar configuração de autenticação'},
+
+    @staticmethod
+    def _review_service(ip_address: str, port: dict[str, str]) -> dict[str, Any] | None:
+        service = port["service"].lower()
+        for rule in REVIEW_RULES:
+            if service in rule.services or port["port"] in rule.ports:
+                return {
+                    "ip": ip_address,
+                    "port": port["port"],
+                    "protocol": port["protocol"],
+                    "service": port["service"],
+                    "product": port["product"],
+                    "version": port["version"],
+                    "severity": rule.severity,
+                    "title": rule.title,
+                    "evidence": rule.evidence,
+                    "recommendation": rule.recommendation,
+                    "classification": "configuration-review",
+                    "confirmed_vulnerability": False,
+                    "cves": [],
+                }
+        return None
+
+    def get_finding_summary(self) -> dict[str, Any]:
+        return {
+            "total": len(self.findings),
+            "high": sum(item["severity"] == "high" for item in self.findings),
+            "medium": sum(item["severity"] == "medium" for item in self.findings),
+            "low": sum(item["severity"] == "low" for item in self.findings),
+            "findings": self.findings,
         }
-        
-        for service_key, vuln_info in vuln_db.items():
-            if service == service_key or port in vuln_info['ports']:
-                self.vulnerabilities.append({
-                    'ip': ip,
-                    'port': port,
-                    'service': service,
-                    'product': product,
-                    'version': version,
-                    'severity': vuln_info['severity'],
-                    'description': vuln_info['description'],
-                    'recommendation': self._get_recommendation(service)
-                })
-    
-    def _get_recommendation(self, service: str) -> str:
-        """Retorna recomendações de segurança"""
-        recommendations = {
-            'ftp': 'Migrar para SFTP ou FTPS',
-            'telnet': 'Substituir por SSH',
-            'smtp': 'Configurar autenticação e usar TLS',
-            'http': 'Implementar HTTPS com certificado SSL/TLS',
-            'netbios-ssn': 'Restringir acesso via firewall',
-            'mysql': 'Restringir acesso apenas a IPs confiáveis',
-            'postgresql': 'Restringir acesso apenas a IPs confiáveis',
-            'rdp': 'Usar VPN e implementar MFA',
-            'vnc': 'Usar túnel SSH ou VPN',
-            'ssh': 'Desabilitar autenticação por senha, usar apenas chaves'
-        }
-        return recommendations.get(service, 'Revisar configurações de segurança')
-    
-    def get_vulnerability_summary(self) -> Dict:
-        """Gera resumo de vulnerabilidades"""
-        summary = {
-            'total': len(self.vulnerabilities),
-            'alta': len([v for v in self.vulnerabilities if v['severity'] == 'ALTA']),
-            'media': len([v for v in self.vulnerabilities if v['severity'] == 'MÉDIA']),
-            'baixa': len([v for v in self.vulnerabilities if v['severity'] == 'BAIXA']),
-            'vulnerabilities': self.vulnerabilities
-        }
-        return summary
 
 
 class ReportGenerator:
-    """Classe para geração de relatórios"""
-    
     @staticmethod
-    def generate_markdown_report(hosts: List[Dict], vuln_summary: Dict, output_file: str):
-        """Gera relatório em Markdown"""
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write("# Relatório de Análise de Segurança de Rede\n\n")
-            f.write(f"**Data da Análise:** {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n\n")
-            
-            # Resumo Executivo
-            f.write("## RESUMO EXECUTIVO\n\n")
-            f.write(f"- **Total de Hosts Descobertos:** {len(hosts)}\n")
-            f.write(f"- **Total de Vulnerabilidades:** {vuln_summary['total']}\n")
-            f.write(f"  - **Alta (Crítica):** {vuln_summary['alta']}\n")
-            f.write(f"  - **Média:** {vuln_summary['media']}\n")
-            f.write(f"  - **Baixa:** {vuln_summary['baixa']}\n\n")
-            
-            # Hosts Descobertos
-            f.write("## HOSTS DESCOBERTOS\n\n")
-            for idx, host in enumerate(hosts, 1):
-                f.write(f"### {idx}. {host['hostname']}\n\n")
-                f.write(f"- **IP:** {host['ip']}\n")
-                f.write(f"- **Sistema Operacional:** {host['os']}\n")
-                f.write(f"- **Portas Abertas:** {host['total_ports']}\n\n")
-                
-                if host['ports']:
-                    f.write("**Serviços Detectados:**\n\n")
-                    f.write("| Porta | Protocolo | Serviço | Produto | Versão |\n")
-                    f.write("|-------|-----------|---------|---------|--------|\n")
-                    for port in host['ports']:
-                        f.write(f"| {port['port']} | {port['protocol']} | {port['service']} | "
-                               f"{port['product']} | {port['version']} |\n")
-                    f.write("\n")
-            
-            # Vulnerabilidades Detalhadas
-            f.write("## 🔒 Vulnerabilidades Identificadas\n\n")
-            
-            if vuln_summary['vulnerabilities']:
-                # Agrupar por severidade
-                for severity in ['ALTA', 'MÉDIA', 'BAIXA']:
-                    vulns = [v for v in vuln_summary['vulnerabilities'] if v['severity'] == severity]
-                    if vulns:
-                        icon = '🔴' if severity == 'ALTA' else '🟡' if severity == 'MÉDIA' else '🟢'
-                        f.write(f"### {icon} Severidade {severity}\n\n")
-                        
-                        for vuln in vulns:
-                            f.write(f"#### {vuln['ip']}:{vuln['port']} - {vuln['service']}\n\n")
-                            f.write(f"- **Descrição:** {vuln['description']}\n")
-                            if vuln['product']:
-                                f.write(f"- **Produto:** {vuln['product']} {vuln['version']}\n")
-                            f.write(f"- **Recomendação:** {vuln['recommendation']}\n\n")
-            else:
-                f.write("Nenhuma vulnerabilidade crítica identificada.\n\n")
-            
-            # Recomendações Gerais
-            f.write("## 💡 Recomendações Gerais de Segurança\n\n")
-            f.write("1. **Minimizar Superfície de Ataque:** Fechar portas desnecessárias\n")
-            f.write("2. **Implementar Criptografia:** Usar protocolos seguros (HTTPS, SSH, SFTP)\n")
-            f.write("3. **Autenticação Forte:** Implementar MFA onde possível\n")
-            f.write("4. **Segmentação de Rede:** Isolar serviços críticos\n")
-            f.write("5. **Monitoramento Contínuo:** Implementar IDS/IPS\n")
-            f.write("6. **Atualizações Regulares:** Manter sistemas e serviços atualizados\n")
-            f.write("7. **Firewall:** Configurar regras restritivas\n")
-            f.write("8. **Backup:** Implementar política de backup regular\n\n")
-            
-            f.write("---\n")
-            f.write("*Relatório gerado automaticamente pelo Sistema de Análise de Segurança de Redes*\n")
-        
-        print(f"[OK] Relatório gerado: {output_file}")
-    
-    @staticmethod
-    def generate_json_report(hosts: List[Dict], vuln_summary: Dict, output_file: str):
-        """Gera relatório em JSON"""
+    def generate_json_report(hosts: list[dict[str, Any]], summary: dict[str, Any], output_file: str | Path) -> Path:
+        path = Path(output_file)
+        path.parent.mkdir(parents=True, exist_ok=True)
         report = {
-            'timestamp': datetime.now().isoformat(),
-            'summary': {
-                'total_hosts': len(hosts),
-                'total_vulnerabilities': vuln_summary['total'],
-                'high_severity': vuln_summary['alta'],
-                'medium_severity': vuln_summary['media'],
-                'low_severity': vuln_summary['baixa']
-            },
-            'hosts': hosts,
-            'vulnerabilities': vuln_summary['vulnerabilities']
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "disclaimer": "Findings are configuration-review prompts based on observed open services, not confirmed vulnerabilities.",
+            "summary": {key: summary[key] for key in ("total", "high", "medium", "low")},
+            "hosts": hosts,
+            "findings": summary["findings"],
         }
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(report, f, indent=4, ensure_ascii=False)
-        
-        print(f"[OK] Relatório JSON gerado: {output_file}")
+        path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+        return path
+
+    @staticmethod
+    def generate_markdown_report(hosts: list[dict[str, Any]], summary: dict[str, Any], output_file: str | Path) -> Path:
+        path = Path(output_file)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Network Inventory and Security Review",
+            "",
+            "> Findings are review prompts based on observed open services. They are not confirmed vulnerabilities and do not imply a CVE match.",
+            "",
+            f"Generated: {datetime.now(timezone.utc).isoformat()}",
+            "",
+            "## Summary",
+            "",
+            f"- Live hosts: {len(hosts)}",
+            f"- Review findings: {summary['total']}",
+            f"- High: {summary['high']}",
+            f"- Medium: {summary['medium']}",
+            f"- Low: {summary['low']}",
+            "",
+            "## Inventory",
+            "",
+        ]
+        for host in hosts:
+            lines.extend([f"### {host['hostname']} ({host['ip']})", "", f"Operating system guess: {host['os']}", "", "| Port | Protocol | Service | Product | Version |", "|---:|---|---|---|---|"])
+            for port in host["ports"]:
+                lines.append(f"| {port['port']} | {port['protocol']} | {port['service']} | {port['product']} | {port['version']} |")
+            lines.append("")
+
+        lines.extend(["## Review findings", ""])
+        for finding in summary["findings"]:
+            lines.extend([
+                f"### {finding['title']}",
+                "",
+                f"- Endpoint: `{finding['ip']}:{finding['port']}/{finding['protocol']}`",
+                f"- Severity: {finding['severity']}",
+                f"- Evidence: {finding['evidence']}",
+                f"- Recommendation: {finding['recommendation']}",
+                "- Confirmed vulnerability: no",
+                "",
+            ])
+        path.write_text("\n".join(lines), encoding="utf-8")
+        return path
 
 
-def main():
-    """Função principal"""
-    print("=" * 60)
-    print("Sistema de Análise de Segurança de Redes")
-    print("TCC - Segurança de Redes")
-    print("=" * 60)
-    print()
-    
-    # Obter diretório do script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    base_dir = os.path.dirname(script_dir)
-    
-    # Carregar configurações do arquivo config.json
-    config_file = os.path.join(script_dir, "config.json")
-    with open(config_file, 'r', encoding='utf-8') as f:
-        config = json.load(f)
-    
-    # Configurações de caminhos (relativos ao base_dir)
-    NMAP_FILE = os.path.join(base_dir, config['nmap']['input_file'].lstrip('../'))
-    OUTPUT_DIR = os.path.join(base_dir, "output")
-    MD_REPORT = os.path.join(OUTPUT_DIR, "relatorio_seguranca.md")
-    JSON_REPORT = os.path.join(OUTPUT_DIR, "relatorio_seguranca.json")
-    DASHBOARD = os.path.join(OUTPUT_DIR, "dashboard.html")
-    
-    # Configurações do Zabbix
-    ZABBIX_URL = config['zabbix']['url']
-    ZABBIX_USER = config['zabbix']['user']
-    ZABBIX_PASSWORD = config['zabbix']['password']
-    
-    # Garantir que a pasta output existe
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
-    # Verificar se arquivo Nmap existe
-    if not os.path.exists(NMAP_FILE):
-        print(f"[AVISO] Arquivo {NMAP_FILE} não encontrado!")
-        print(f"Execute o Nmap com: nmap -sV -O -oX {NMAP_FILE} <target>")
-        print()
-        print("Criando arquivo de exemplo para demonstração...")
-        create_example_nmap_file(NMAP_FILE)
-    
-    # Parsear Nmap
-    print("[INFO] Processando scan do Nmap...")
-    parser = NmapParser(NMAP_FILE)
-    
-    if not parser.parse_xml():
-        print("[ERRO] Falha ao processar arquivo Nmap")
-        return
-    
-    # Obter resumo de vulnerabilidades
-    vuln_summary = parser.get_vulnerability_summary()
-    
-    # Gerar relatórios
-    print("\n[INFO] Gerando relatórios...")
-    ReportGenerator.generate_markdown_report(
-        parser.hosts, 
-        vuln_summary, 
-        MD_REPORT
+def load_config(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def export_to_zabbix(hosts: list[dict[str, Any]], config: dict[str, Any]) -> None:
+    zabbix = config["zabbix"]
+    username = os.environ.get("ZABBIX_USERNAME")
+    password = os.environ.get("ZABBIX_PASSWORD")
+    if not username or not password:
+        raise RuntimeError("ZABBIX_USERNAME and ZABBIX_PASSWORD are required for Zabbix export")
+    api = ZabbixAPI(
+        zabbix["url"],
+        username,
+        password,
+        timeout=float(zabbix.get("timeout_seconds", 10)),
+        verify_tls=bool(zabbix.get("verify_tls", True)),
     )
-    ReportGenerator.generate_json_report(
-        parser.hosts, 
-        vuln_summary, 
-        JSON_REPORT
-    )
-    
-    # Integração com Zabbix (opcional)
-    print("\n[INFO] Integrando com Zabbix...")
-    try:
-        zabbix = ZabbixAPI(ZABBIX_URL, ZABBIX_USER, ZABBIX_PASSWORD)
-        
-        if zabbix.login():
-            hosts_created = []
-            for host in parser.hosts:
-                host_id = zabbix.create_host(host['hostname'], host['ip'])
-                if host_id:
-                    print(f"  [OK] Host criado: {host['hostname']} ({host['ip']})")
-                    hosts_created.append({'hostid': host_id, 'name': host['hostname']})
-            
-            if hosts_created:
-                map_name = f"Topologia_Rede_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-                map_id = zabbix.create_map(map_name, hosts_created)
-                if map_id:
-                    print(f"  [OK] Mapa criado: {map_name}")
-    except Exception as e:
-        print(f"[AVISO] Erro ao conectar com Zabbix: {e}")
-        print("  Continuando sem integração Zabbix...")
-    
-    print("\n" + "=" * 60)
-    print("[SUCESSO] Análise concluída com sucesso!")
-    print("=" * 60)
-    print(f"\n[ESTATÍSTICAS]")
-    print(f"   - Hosts analisados: {len(parser.hosts)}")
-    print(f"   - Vulnerabilidades encontradas: {vuln_summary['total']}")
-    print(f"     - Alta (Crítica): {vuln_summary['alta']}")
-    print(f"     - Média: {vuln_summary['media']}")
-    print(f"     - Baixa: {vuln_summary['baixa']}")
-    print(f"\n[RELATÓRIOS GERADOS]")
-    print(f"   - {os.path.basename(MD_REPORT)}")
-    print(f"   - {os.path.basename(JSON_REPORT)}")
-    
-    # Gerar Dashboard Técnico Avançado com IA
-    print("\n[INFO] Gerando Dashboard Técnico Avançado...")
-    try:
-        from dashboard_tecnico import generate_technical_dashboard
-        dashboard_file = generate_technical_dashboard(
-            parser.hosts, 
-            vuln_summary,
-            use_ai=True,  # Ativa IA se Ollama estiver disponível
-            output_file=DASHBOARD
-        )
-        print(f"   [OK] {os.path.basename(dashboard_file)}")
-    except Exception as e:
-        print(f"   [ERRO] Erro ao gerar dashboard: {e}")
-    
-    print()
+    api.login()
+    for host in hosts:
+        api.create_host(host["hostname"], host["ip"], str(zabbix.get("host_group_id", "2")))
 
 
-def create_example_nmap_file(filename: str):
-    """Cria arquivo XML de exemplo do Nmap para demonstração"""
-    example_xml = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE nmaprun>
-<nmaprun scanner="nmap" args="nmap -sV -O target" start="1700000000" version="7.94">
-<host starttime="1700000000" endtime="1700000100">
-<status state="up" reason="echo-reply"/>
-<address addr="192.168.1.100" addrtype="ipv4"/>
-<hostnames>
-<hostname name="server01.local" type="PTR"/>
-</hostnames>
-<ports>
-<port protocol="tcp" portid="22">
-<state state="open" reason="syn-ack"/>
-<service name="ssh" product="OpenSSH" version="8.2p1" />
-</port>
-<port protocol="tcp" portid="80">
-<state state="open" reason="syn-ack"/>
-<service name="http" product="Apache" version="2.4.41" />
-</port>
-<port protocol="tcp" portid="3306">
-<state state="open" reason="syn-ack"/>
-<service name="mysql" product="MySQL" version="5.7.33" />
-</port>
-</ports>
-<os>
-<osmatch name="Linux 4.15 - 5.6" accuracy="95"/>
-</os>
-</host>
-<host starttime="1700000100" endtime="1700000200">
-<status state="up" reason="echo-reply"/>
-<address addr="192.168.1.101" addrtype="ipv4"/>
-<hostnames>
-<hostname name="server02.local" type="PTR"/>
-</hostnames>
-<ports>
-<port protocol="tcp" portid="21">
-<state state="open" reason="syn-ack"/>
-<service name="ftp" product="vsftpd" version="3.0.3" />
-</port>
-<port protocol="tcp" portid="23">
-<state state="open" reason="syn-ack"/>
-<service name="telnet" />
-</port>
-<port protocol="tcp" portid="445">
-<state state="open" reason="syn-ack"/>
-<service name="netbios-ssn" product="Samba" version="4.11.2" />
-</port>
-<port protocol="tcp" portid="3389">
-<state state="open" reason="syn-ack"/>
-<service name="rdp" product="Microsoft Terminal Services" />
-</port>
-</ports>
-<os>
-<osmatch name="Microsoft Windows Server 2016" accuracy="92"/>
-</os>
-</host>
-</nmaprun>"""
-    
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write(example_xml)
-    
-    print(f"✓ Arquivo de exemplo criado: {filename}")
+def main(argv: list[str] | None = None) -> int:
+    repository_root = Path(__file__).resolve().parent.parent
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=repository_root / "src" / "config.json")
+    parser.add_argument("--input", type=Path, help="Override the configured Nmap XML file")
+    parser.add_argument("--output-dir", type=Path, help="Override the configured output directory")
+    parser.add_argument("--zabbix", action="store_true", help="Explicitly export discovered hosts to Zabbix")
+    arguments = parser.parse_args(argv)
+
+    config = load_config(arguments.config)
+    input_path = arguments.input or repository_root / config["nmap"]["input_file"]
+    output_dir = arguments.output_dir or repository_root / config["output"]["directory"]
+    if not input_path.is_file():
+        print(f"Input file not found: {input_path}", file=sys.stderr)
+        return 2
+
+    nmap_parser = NmapParser(input_path)
+    try:
+        hosts = nmap_parser.parse_xml()
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
+    summary = nmap_parser.get_finding_summary()
+
+    markdown = ReportGenerator.generate_markdown_report(hosts, summary, output_dir / "network-review.md")
+    json_report = ReportGenerator.generate_json_report(hosts, summary, output_dir / "network-review.json")
+
+    from dashboard_tecnico import generate_technical_dashboard
+    dashboard = generate_technical_dashboard(hosts, summary, output_file=output_dir / "dashboard.html")
+
+    if arguments.zabbix:
+        export_to_zabbix(hosts, config)
+
+    print(f"Parsed {len(hosts)} live hosts and produced {summary['total']} review findings.")
+    print(f"Reports: {markdown}, {json_report}, {dashboard}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

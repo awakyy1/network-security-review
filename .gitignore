@@ -1,63 +1,28 @@
-# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual Environment
 .venv/
 venv/
-ENV/
-env/
+.pytest_cache/
+.coverage
+htmlcov/
 
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Output files (gerados automaticamente)
-output/*.html
-output/*.md
-output/*.json
-
-# Logs
+output/
 *.log
-
-# Configurações locais (preservar o template)
 config.local.json
-
-# Arquivos temporários
 *.tmp
 *.bak
-*.backup
 
-# Scans Nmap (dados sensíveis)
+# Nmap output may contain sensitive network inventory.
 data/*.xml
 !data/scan_result.xml
 !data/scan_backup.xml
-
-# Ollama cache
-.ollama/
