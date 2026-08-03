@@ -10,8 +10,8 @@ authors:
   - family-names: Favaro
     given-names: Vinicius Mota
     affiliation: Centro Universitário UniOpet
-repository-code: "https://github.com/awakyy1/TCC"
-url: "https://github.com/awakyy1/TCC"
+repository-code: "https://github.com/awakyy1/network-security-review"
+url: "https://github.com/awakyy1/network-security-review"
 abstract: >-
   Defensive Python artifact that parses authorized Nmap XML output, preserves
   observable evidence, produces transparent configuration-review prompts and

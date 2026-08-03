@@ -1,6 +1,6 @@
 # Network Security Review
 
-[![CI](https://github.com/awakyy1/TCC/actions/workflows/ci.yml/badge.svg)](https://github.com/awakyy1/TCC/actions/workflows/ci.yml)
+[![CI](https://github.com/awakyy1/network-security-review/actions/workflows/ci.yml/badge.svg)](https://github.com/awakyy1/network-security-review/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Thesis](https://img.shields.io/badge/thesis-approved-2E7D32)
 [![License: MIT](https://img.shields.io/badge/code-MIT-2F74C0)](LICENSE)
