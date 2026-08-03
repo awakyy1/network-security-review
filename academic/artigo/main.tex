@@ -1,0 +1,247 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Arial}
+\setsansfont{Arial}
+\setmonofont{Arial}
+\usepackage[english]{babel}
+\usepackage{microtype}
+\usepackage[a4paper,top=3cm,left=3cm,right=2cm,bottom=2cm]{geometry}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[alf]{abntex2cite}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{fancyhdr}
+
+% NBR 10520:2023: parenthetical author names retain normal capitalization.
+\makeatletter
+\DeclareRobustCommand{\cite}[2][]{%
+  \leavevmode
+  \let\@citeprevious\@empty
+  \@cite{%
+    \@for\@citekey:=#2\do{%
+      \edef\@citekey{\expandafter\@firstofone\@citekey\@empty}%
+      \expandafter\let\expandafter\@citename\csname b@\@citekey++EXPL\endcsname
+      \expandafter\let\expandafter\@citeyear\csname b@\@citekey++YEAR\endcsname
+      \ifx\@citeprevious\@empty\else
+        \ifx\@citename\@citeprevious\ABCIcitecommadefault\else\ABCIcitecolondefault\fi
+      \fi
+      \if@filesw\immediate\write\@auxout{\string\citation{\@citekey}}\fi
+      \@ifundefined{b@\@citekey++EXPL}{%
+        {\bfseries??}\G@refundefinedtrue
+        \@latex@warning{Citation `\@citekey' on page \thepage\space undefined}%
+      }{%
+        \ifx\@citename\@citeprevious
+          {\yearstyle\@citeyear\@}\@%
+        \else
+          {\authorcapstyle\@citename}, {\yearstyle\@citeyear\@}%
+        \fi
+        \let\@citeprevious\@citename
+      }%
+      \ifthenelse{\boolean{ABNTbackref}}{\Hy@backout{#2}}{}%
+    }%
+  }{#1}%
+}
+\makeatother
+
+\newcommand{\articleTitle}{Application of Artificial Intelligence in Identifying Vulnerabilities in Local Area Networks with Firewall Integration}
+\hypersetup{hidelinks,pdftitle={\articleTitle},pdfauthor={João Vitor Ielen and Vinicius Mota Favaro}}
+\def\UrlLeft{}
+\def\UrlRight{}
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+\onehalfspacing
+\DeclareCaptionFont{fontTen}{\fontsize{10}{12}\selectfont}
+\captionsetup{font=fontTen,labelfont=bf,labelsep=endash,singlelinecheck=false}
+\titleformat{\section}{\normalfont\normalsize\bfseries}{\thesection}{1em}{\MakeUppercase}
+\titleformat{name=\section,numberless}[block]{\normalfont\normalsize\bfseries}{}{0pt}{\MakeUppercase}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+\titlespacing*{\section}{0pt}{1.5\baselineskip}{0.5\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.0\baselineskip}{0.5\baselineskip}
+\renewcommand{\refname}{REFERENCES}
+\addto\captionsenglish{\renewcommand{\abstractname}{ABSTRACT}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\fontsize{10}{12}\selectfont\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+\citeoption{abnt-and-type=&}
+\citeoption{abnt-doi=link}
+\begin{center}
+  {\bfseries\MakeUppercase{\articleTitle}\par}
+  \vspace{1.5\baselineskip}
+  João Vitor Ielen\footnote{Undergraduate student in Software Engineering, Centro Universitário UniOpet, Curitiba, Brazil.}
+  \quad
+  Vinicius Mota Favaro\footnote{Undergraduate student in Software Engineering, Centro Universitário UniOpet, Curitiba, Brazil.}
+
+  \vspace{0.5\baselineskip}
+  Advisor: Prof. Michel Cesar dos Santos, Centro Universitário UniOpet
+\end{center}
+
+\noindent\textbf{Academic approval:} 19 November 2025. This date records the approval of the associated undergraduate thesis and is not a journal acceptance date.
+
+\vspace{\baselineskip}
+
+\begin{abstract}
+Interpreting network-scan output is labor-intensive and may lead to overstatement when an observed service is treated as a confirmed vulnerability. This paper presents a defensive pipeline that parses authorized Nmap XML scans, inventories live hosts and open services, applies configuration-review rules, and generates JSON, Markdown, and self-contained HTML reports. The artifact defended in 2025 also included optional local language-model analysis and Zabbix integration; active firewall integration remained an architectural proposal. Deterministic evidence is conceptually separated from generated narrative. The reported evaluation comprises three scenarios, 24 hosts, and 21 open ports, in which seven review items were recorded. No independent ground-truth matrix was preserved to confirm false-positive counts or calculate detection metrics. The sample is too small to support universal claims, and open ports alone do not establish exploitability. Results indicate that the approach is useful for inventory, triage, and communication, provided that generated output is advisory and findings are validated against asset ownership, network position, product identity, version evidence, and configuration.
+\end{abstract}
+
+\noindent\textbf{Keywords:} network security; artificial intelligence; Nmap; large language model; defensive automation.
+
+\section{Introduction}
+
+The expansion of connected business processes has increased both operational efficiency and the number of services that organizations must inventory and protect. Network scans can reveal active hosts, open ports, service fingerprints, and operating-system guesses, but those observations require contextual interpretation. An open port is a communication endpoint, not proof of a vulnerability. Its security relevance depends on the actual product, version, configuration, reachability, authentication, encryption, business purpose, and compensating controls.
+
+Nmap is widely used for network discovery and service fingerprinting \cite{lyon2009,nmapdocs2025}. Its XML output is suitable for automated processing, yet a scan of even a modest network may produce enough detail to burden a small security team. Artificial intelligence, particularly large language models (LLMs), may assist with summarization and explanation. However, generated text can also invent CVEs, conflate exposure with exploitability, or recommend disruptive actions.
+
+This study addresses the following question: \emph{How can artificial-intelligence techniques support the identification, contextualization, and responsible mitigation of security risks observed in local networks?} The proposed answer is a hybrid architecture in which deterministic code owns evidence collection and rule matching, while an optional local LLM provides advisory narrative. The contribution is not a replacement for vulnerability management. It is an explainable bridge between scan evidence, human review, and defensive tooling.
+
+The paper makes four contributions: (1) a reproducible parser and normalized inventory; (2) explicit review rules whose outputs are marked as unconfirmed; (3) a local-first architecture for LLM-assisted contextualization; and (4) a critical evaluation that distinguishes results supported by the sample from broader claims requiring further evidence.
+
+\section{Background}
+
+\subsection{Network discovery and vulnerability evidence}
+
+Nmap supports host discovery, port scanning, version detection, and probabilistic operating-system fingerprinting \cite{lyon2009}. Fingerprints can be incomplete or wrong. A reliable association with a Common Vulnerabilities and Exposures identifier requires normalized product identity, affected-version evaluation, source freshness, and sometimes configuration information from an authenticated assessment. The National Vulnerability Database provides structured vulnerability information, but a service banner is not by itself a sufficient matching key \cite{nvd2025}.
+
+Network controls such as segmentation, firewalls, secure administration paths, and logging operate together \cite{kurose2021,nist80053}. Automating a firewall response can shorten exposure, but an incorrect rule can disrupt legitimate services. Safe automation therefore needs approval, minimal scope, expiration, logging, and rollback.
+
+\subsection{Local language models in security analysis}
+
+Transformer-based LLMs generate text conditioned on prompts and supplied evidence. Llama-family models can be executed on local hardware \cite{llama3}, and Ollama exposes a local API for model management and inference \cite{ollama2025}. Local execution can keep topology information away from third-party cloud services, but it does not remove model risk.
+
+An LLM may explain why Telnet deserves review, summarize affected endpoints, or organize validation questions. It should not independently assert exploitability, certify compliance, or issue blocking commands. The NIST AI Risk Management Framework emphasizes governance, measurement, and ongoing management of AI risks \cite{nistai1001}. In this architecture, generated narrative remains traceable to deterministic input and subject to human review.
+
+\section{System Design}
+
+\subsection{Pipeline}
+
+The system is divided into acquisition, normalization, deterministic review, contextual analysis, and presentation/integration. An operator first obtains an authorized Nmap XML scan. The parser retains hosts marked as up, selects an IP address, and extracts hostname, OS guess, and ports marked as open. For each port it records protocol, service name, product, and version.
+
+The review engine compares service names and conventional ports with a small documented rule set. It covers cleartext administration and file transfer, web transport review, SMB/NetBIOS, database listeners, remote desktop, VNC, SSH hardening, and mail transport. A result contains the endpoint, observed fingerprint, triage severity, evidence, recommendation, and the explicit field \texttt{confirmed\_vulnerability=false}.
+
+Figure~\ref{fig:pipeline} summarizes the evidence-preserving processing pipeline, from the authorized Nmap XML input to human validation and defensive integration.
+
+\begin{figure}[ht]
+\centering
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Authorized Nmap XML $\rightarrow$ parser and normalization $\rightarrow$ review rules\\[3pt]
+$\downarrow$ evidence-preserving inventory $\downarrow$\\[3pt]
+JSON/Markdown/HTML $\rightarrow$ human validation $\rightarrow$ defensive integration
+\end{minipage}}
+\caption{Evidence-preserving processing pipeline.}
+\label{fig:pipeline}
+\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Prepared by the authors (2025).}
+\end{figure}
+
+\subsection{Contextual analysis}
+
+The pre-defense artifact implemented three prompt families: technical summary, authorized test-scenario discussion, and compliance-oriented review. Its prompts supplied aggregate findings and requested a technical narrative. Model output did not modify the inventory, but the implementation did not enforce a structured output schema or independently verify the generated claims.
+
+This distinction is essential. Python code determines what was parsed and which transparent rule matched. The LLM converts the structured result into human-readable context. Any future retrieval from authoritative sources should attach provenance and affected-version logic before a CVE is displayed.
+
+A technical-analysis prompt summarized the attack surface and requested priorities. A controlled-assessment prompt discussed plausible attack paths for an authorized laboratory. A compliance-review prompt related findings to frameworks, although its output could not constitute certification. For all three, temperature and nucleus-sampling settings affect linguistic variability rather than factual reliability.
+
+Model execution should be recorded as part of the experiment: model identifier, quantization, context length, generation parameters, prompt template, response, hardware, and elapsed time. Schema-constrained output and low-variance settings improve testability. Scan-controlled strings must be delimited as untrusted data because a hostname or banner could contain prompt-like instructions.
+
+\subsection{Reporting and integration}
+
+JSON supports machine processing, Markdown supports review and version control, and a self-contained HTML dashboard supports distribution without a web server. Nmap-controlled text is escaped before HTML rendering. The current Zabbix JSON-RPC integration uses environment-based credentials, finite timeouts, and TLS verification by default \cite{zabbix2025}. Export must be explicitly enabled.
+
+Repository history provides two distinct software cuts \cite{ielen2025repo}. Commit \texttt{dd63d4c}, produced before the defense, implemented optional Ollama inference, a static service-to-CVE table, risk and compliance heuristics, the dashboard, and Zabbix export. Neither that cut nor the current code applies firewall rules. The current hardened core, introduced in \texttt{b191269}, removes LLM inference, CVE mapping, and heuristic scores while preserving inventory, transparent review rules, reports, and explicit Zabbix export. Code presence demonstrates implementation, not effectiveness or external validity.
+
+\subsection{Responsible firewall integration}
+
+A safe firewall workflow separates recommendation from authority. The analysis component should produce a proposal that identifies source, destination, protocol, port, rationale, duration, and affected assets. An authorized operator reviews the proposal before a vendor-specific adapter validates and applies it. Temporary rules require expiration, change logging, connectivity checks, and rollback. Protected management paths and critical services require explicit safeguards. The LLM must never hold direct firewall credentials.
+
+\subsection{Evidence states}
+
+To prevent semantic escalation, the design distinguishes four states: observed scan data; inferred fingerprint or context; deterministic review required; and independently confirmed vulnerability. Only a controlled follow-up assessment can assign the final state. Reports preserve those distinctions so that downstream consumers do not transform a conventional-port match into a CVE claim.
+
+\section{Method}
+
+The research is applied, exploratory, and technological. It is described retrospectively through the Design Science Research Methodology stages of problem identification, objectives, design and development, demonstration, evaluation, and communication \cite{peffers2007}. Development followed incremental cycles inspired by Scrum \cite{scrum2020}. The reported evaluation is an exploratory demonstration rather than a controlled comparative experiment.
+
+Scenario 1 represented a heterogeneous network with 19 active hosts and no deliberately planted weaknesses. Scenario 2 represented a simulated home network with three hosts and deliberately exposed SMB and HTTP services. Scenario 3 used two documentation-range servers configured with SSH and HTTPS to observe false-positive behavior in a hardened environment.
+
+\begin{table}[ht]
+\centering
+\caption{Reported evaluation scenarios.}
+\label{tab:scenarios}
+\begin{tabular}{llrrrr}
+\toprule
+ID & Environment & Hosts & Open ports & Review items & Time (s) \\
+\midrule
+1 & Heterogeneous network & 19 & 9 & 3 & 222 \\
+2 & Simulated vulnerable LAN & 3 & 8 & 4 & 78 \\
+3 & Hardened servers & 2 & 4 & 0 & 52 \\
+\midrule
+Total & & 24 & 21 & 7 & 352 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Data reported in the original study (2025).}
+\end{table}
+
+Precision and recall require an independently labeled ground truth. If $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively, then
+\begin{equation}
+\mathrm{precision}=\frac{TP}{TP+FP},\qquad
+\mathrm{recall}=\frac{TP}{TP+FN}.
+\end{equation}
+When the same rule database defines both expected and observed items, perfect scores primarily demonstrate conformance to that database. They cannot establish coverage of unknown services or the vulnerability landscape.
+
+For reproducibility, each run should preserve the authorization and scope, Nmap parameters, source-XML hash, software commit, Python and dependency versions, generated reports, and an independently prepared ground-truth matrix. LLM evaluation additionally requires stored prompts and responses and a rubric covering evidence fidelity, technical correctness, usefulness, clarity, and unsupported assertions. Repeated runs are needed to characterize both timing and generation variability.
+
+\section{Results and Discussion}
+
+Across the reported scenarios, 24 hosts and 21 open ports were processed, producing seven items in the scope of the evaluated rule set. The hardened scenario produced no items in the original evaluation. These figures were not reproduced during the present review because the complete source XML files, execution logs, and independent labels were not preserved. They support only a description of the reported demonstration.
+
+The original manuscript reported approximately 7.5 seconds per host. The disclosed aggregate durations sum to 352 seconds; divided by 24 hosts, this is approximately 14.7 seconds per host. Even this corrected ratio should not be generalized because scanning time depends on port range, latency, retries, filters, scan method, and inference hardware. Likewise, a claim of linear scalability or a reported coefficient of determination cannot be reproduced without the underlying repeated measurements.
+
+The evaluation is limited by the small sample and by potential circularity between rules and labels. Seven matched items do not establish broad vulnerability-detection performance. A service that is secure in context can still match a conventional-port rule, while an uncatalogued application vulnerability can be missed. The appropriate interpretation is \emph{review prioritization}, not automated vulnerability confirmation.
+
+The system's strongest property is semantic separation. Observable fields remain available in the report; rule-based findings explain why review is requested; and generated analysis is advisory. This design reduces the risk that plausible LLM text is mistaken for scanner evidence.
+
+\subsection{Scenario-level interpretation}
+
+In Scenario 1, the reported items involved HTTP and SMB exposure. Because the environment was not deliberately configured for the experiment, claiming no false positives would require independent validation of the policy and controls of each asset. The scenario demonstrates discovery but does not by itself provide ground truth.
+
+Scenario 2 is a functional regression fixture. Its deliberately exposed services verify that parsing and expected rules operate consistently. Since the fixture is constructed from catalogued categories, it cannot measure performance on unknown weaknesses.
+
+Scenario 3 illustrates semantic evolution. The original implementation reported no vulnerability for the SSH and HTTPS endpoints. The current hardened repository produces an SSH hardening review. This is not necessarily a false positive because the item explicitly asks for validation and states that it is not a confirmed vulnerability. Metrics must therefore score the precise output semantics rather than only count alerts.
+
+\subsection{Artifact-to-manuscript consistency}
+
+The source manuscript's larger dashboard, local Ollama inference, static CVE mappings, and risk/compliance heuristics are present in the pre-defense commit. No code was found that applied vendor firewall rules. The current repository implements a narrower defensive core: inventory, transparent review rules, static reports, and optional Zabbix export. This paper therefore recognizes the LLM as implemented in 2025 but not quantitatively validated, and recognizes firewall integration as proposed rather than implemented. Synchronizing claims with a tagged release is a prerequisite for a reproducible experimental claim.
+
+\subsection{Performance interpretation}
+
+Parser cost grows approximately with the number of XML host and port elements, while full-document parsing also creates a memory constraint. LLM inference, when enabled in an earlier prototype, was hardware-dependent and should be benchmarked separately. A future experiment should use fixed XML fixtures of increasing size, repeated measurements, and separate distributions for parsing, report generation, and inference.
+
+\section{Threats to Validity and Limitations}
+
+Internal validity is affected if expected outcomes were derived from the same static database used by the detector. External validity is limited by three scenarios, 24 hosts, and a narrow service set. Construct validity is threatened when open services, review items, and confirmed vulnerabilities are treated as equivalent. Reproducibility is limited because complete logs, repeated runs, exact prompts, hardware configuration, and independent expert ratings were not preserved in the source document.
+
+Technical limitations include static rules, uncertain service fingerprints, absence of authenticated checks, lack of active exploitability validation, and full-document XML parsing. Markdown output requires robust escaping of untrusted values. Zabbix export should become idempotent. The LLM extension needs schema-constrained output, prompt-injection defenses, deterministic test fixtures, and evaluation by multiple blinded reviewers.
+
+Ethically, only authorized scan data may be processed. Reports reveal sensitive infrastructure information and must be protected accordingly. Automated firewall changes should remain outside the trust boundary until approval, audit logging, expiration, and rollback have been implemented and tested.
+
+\section{Conclusion}
+
+This paper presented a hybrid, evidence-preserving approach to local-network security review. Deterministic parsing and transparent rules provide reproducibility; local LLM inference can improve explanation and prioritization; and multi-format reports support both analysts and integrations. The evaluation shows utility within a constrained rule set but does not support universal detection or exploitability claims.
+
+The research question can therefore be answered conditionally: AI contributes most effectively as an advisory layer grounded in verifiable scan evidence. Vulnerability confirmation and mitigation still require authoritative data, environmental context, and human authorization. Future work should integrate version-aware NVD queries, expand independently labeled tests, evaluate LLM output blindly, stream large XML files, make Zabbix synchronization idempotent, and implement a controlled workflow for proposing, approving, and reversing firewall changes.
+
+\singlespacing
+\bibliographystyle{abntex2-alf}
+\bibliography{../shared/referencias}
+
+\end{document}

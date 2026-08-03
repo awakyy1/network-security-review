@@ -15,10 +15,10 @@ def _text(value: Any) -> str:
 def _host_rows(hosts: list[dict[str, Any]]) -> str:
     rows = []
     for host in hosts:
-        services = ", ".join(
-            f"{port['port']}/{port['protocol']} {port['service']}"
-            for port in host.get("ports", [])
-        ) or "None observed"
+        services = (
+            ", ".join(f"{port['port']}/{port['protocol']} {port['service']}" for port in host.get("ports", []))
+            or "None observed"
+        )
         rows.append(
             "<tr>"
             f"<td><strong>{_text(host.get('hostname'))}</strong></td>"
@@ -107,10 +107,10 @@ def generate_technical_dashboard(
     <div class="notice"><strong>Interpretation boundary:</strong> these are configuration-review prompts based on observed open services. They are not confirmed vulnerabilities, CVE matches, exploitation results, or compliance determinations.</div>
     <div class="metrics" aria-label="Summary">
       <div class="metric"><span>Live hosts</span><strong>{len(hosts)}</strong></div>
-      <div class="metric"><span>Review findings</span><strong>{int(finding_summary.get('total', 0))}</strong></div>
-      <div class="metric"><span>High</span><strong>{int(finding_summary.get('high', 0))}</strong></div>
-      <div class="metric"><span>Medium</span><strong>{int(finding_summary.get('medium', 0))}</strong></div>
-      <div class="metric"><span>Low</span><strong>{int(finding_summary.get('low', 0))}</strong></div>
+      <div class="metric"><span>Review findings</span><strong>{int(finding_summary.get("total", 0))}</strong></div>
+      <div class="metric"><span>High</span><strong>{int(finding_summary.get("high", 0))}</strong></div>
+      <div class="metric"><span>Medium</span><strong>{int(finding_summary.get("medium", 0))}</strong></div>
+      <div class="metric"><span>Low</span><strong>{int(finding_summary.get("low", 0))}</strong></div>
     </div>
 
     <section>
@@ -125,7 +125,7 @@ def generate_technical_dashboard(
       <h2>Configuration-review findings</h2>
       <div class="table-wrap"><table>
         <thead><tr><th>Severity</th><th>Finding</th><th>Endpoint</th><th>Observed service</th><th>Recommendation</th></tr></thead>
-        <tbody>{_finding_rows(finding_summary.get('findings', []))}</tbody>
+        <tbody>{_finding_rows(finding_summary.get("findings", []))}</tbody>
       </table></div>
     </section>
     <footer>Use only with scan data collected under explicit authorization. Validate every finding against network context, service configuration, and asset ownership.</footer>
@@ -138,4 +138,4 @@ def generate_technical_dashboard(
 
 
 if __name__ == "__main__":
-    raise SystemExit("Import generate_technical_dashboard from nmap_to_zabbix.py.")
+    raise SystemExit("This module is a library component. Run src/nmap_to_zabbix.py instead.")

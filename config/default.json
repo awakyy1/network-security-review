@@ -1,6 +1,6 @@
 {
   "nmap": {
-    "input_file": "data/scan_result.xml"
+    "input_file": "examples/nmap/synthetic-enterprise.xml"
   },
   "output": {
     "directory": "output"

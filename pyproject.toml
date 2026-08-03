@@ -1,0 +1,12 @@
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+extend-exclude = [".review"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

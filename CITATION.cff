@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software or its academic results, please cite the associated undergraduate thesis."
+title: "Network Security Review: evidence-based analysis of authorized Nmap scans"
+type: software
+license: MIT
+authors:
+  - family-names: Ielen
+    given-names: João Vitor
+    affiliation: Centro Universitário UniOpet
+  - family-names: Favaro
+    given-names: Vinicius Mota
+    affiliation: Centro Universitário UniOpet
+repository-code: "https://github.com/awakyy1/TCC"
+url: "https://github.com/awakyy1/TCC"
+abstract: >-
+  Defensive Python artifact that parses authorized Nmap XML output, preserves
+  observable evidence, produces transparent configuration-review prompts and
+  optionally exports discovered hosts to Zabbix.
+keywords:
+  - network security
+  - Nmap
+  - security review
+  - artificial intelligence
+  - Zabbix
+  - research software
+preferred-citation:
+  type: thesis
+  title: "Aplicação de Inteligência Artificial na Identificação de Vulnerabilidades em Redes Locais com Integração a Firewall"
+  authors:
+    - family-names: Ielen
+      given-names: João Vitor
+    - family-names: Favaro
+      given-names: Vinicius Mota
+  year: 2025
+  thesis-type: "Undergraduate thesis in Software Engineering"
+  institution:
+    name: Centro Universitário UniOpet
+  location:
+    name: Curitiba, Paraná, Brazil

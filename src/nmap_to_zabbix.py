@@ -26,15 +26,78 @@ class ReviewRule:
 
 
 REVIEW_RULES = (
-    ReviewRule(("telnet",), ("23",), "high", "Cleartext remote administration exposed", "An open Telnet service was observed.", "Replace Telnet with SSH and restrict administrative access at the network boundary."),
-    ReviewRule(("ftp",), ("21",), "medium", "Cleartext file transfer exposed", "An open FTP service was observed.", "Use SFTP or FTPS and verify that anonymous access is disabled."),
-    ReviewRule(("http",), ("80",), "low", "Unencrypted HTTP requires review", "An open HTTP service was observed.", "Confirm that HTTP redirects to HTTPS and that no sensitive traffic is accepted over cleartext."),
-    ReviewRule(("netbios-ssn", "microsoft-ds", "smb"), ("139", "445"), "medium", "SMB exposure requires review", "An open SMB or NetBIOS service was observed.", "Limit SMB to required network segments and verify signing, authentication, and supported protocol versions."),
-    ReviewRule(("mysql", "postgresql"), ("3306", "5432"), "medium", "Database listener exposure requires review", "An open database service was observed.", "Restrict database listeners to approved application networks and require encrypted authenticated connections."),
-    ReviewRule(("ms-wbt-server", "rdp"), ("3389",), "medium", "Remote desktop exposure requires review", "An open RDP service was observed.", "Place remote desktop behind an approved access path, require MFA, and limit source networks."),
-    ReviewRule(("vnc",), ("5900",), "medium", "VNC exposure requires review", "An open VNC service was observed.", "Restrict VNC to a protected management network and require encrypted strong authentication."),
-    ReviewRule(("ssh",), ("22",), "low", "SSH hardening review", "An open SSH service was observed.", "Verify key-based authentication, supported algorithms, logging, and source-network restrictions."),
-    ReviewRule(("smtp",), ("25",), "low", "Mail transport configuration review", "An open SMTP service was observed.", "Verify relay restrictions, authentication requirements, and opportunistic or mandatory TLS as appropriate."),
+    ReviewRule(
+        ("telnet",),
+        ("23",),
+        "high",
+        "Cleartext remote administration exposed",
+        "An open Telnet service was observed.",
+        "Replace Telnet with SSH and restrict administrative access at the network boundary.",
+    ),
+    ReviewRule(
+        ("ftp",),
+        ("21",),
+        "medium",
+        "Cleartext file transfer exposed",
+        "An open FTP service was observed.",
+        "Use SFTP or FTPS and verify that anonymous access is disabled.",
+    ),
+    ReviewRule(
+        ("http",),
+        ("80",),
+        "low",
+        "Unencrypted HTTP requires review",
+        "An open HTTP service was observed.",
+        "Confirm that HTTP redirects to HTTPS and that no sensitive traffic is accepted over cleartext.",
+    ),
+    ReviewRule(
+        ("netbios-ssn", "microsoft-ds", "smb"),
+        ("139", "445"),
+        "medium",
+        "SMB exposure requires review",
+        "An open SMB or NetBIOS service was observed.",
+        "Limit SMB to required network segments and verify signing, authentication, and supported protocol versions.",
+    ),
+    ReviewRule(
+        ("mysql", "postgresql"),
+        ("3306", "5432"),
+        "medium",
+        "Database listener exposure requires review",
+        "An open database service was observed.",
+        "Restrict database listeners to approved application networks and require encrypted authenticated connections.",
+    ),
+    ReviewRule(
+        ("ms-wbt-server", "rdp"),
+        ("3389",),
+        "medium",
+        "Remote desktop exposure requires review",
+        "An open RDP service was observed.",
+        "Place remote desktop behind an approved access path, require MFA, and limit source networks.",
+    ),
+    ReviewRule(
+        ("vnc",),
+        ("5900",),
+        "medium",
+        "VNC exposure requires review",
+        "An open VNC service was observed.",
+        "Restrict VNC to a protected management network and require encrypted strong authentication.",
+    ),
+    ReviewRule(
+        ("ssh",),
+        ("22",),
+        "low",
+        "SSH hardening review",
+        "An open SSH service was observed.",
+        "Verify key-based authentication, supported algorithms, logging, and source-network restrictions.",
+    ),
+    ReviewRule(
+        ("smtp",),
+        ("25",),
+        "low",
+        "Mail transport configuration review",
+        "An open SMTP service was observed.",
+        "Verify relay restrictions, authentication requirements, and opportunistic or mandatory TLS as appropriate.",
+    ),
 )
 
 
@@ -75,26 +138,34 @@ class ZabbixAPI:
         return body.get("result")
 
     def login(self) -> None:
-        self.auth_token = self._make_request("user.login", {
-            "username": self.username,
-            "password": self.password,
-        })
+        self.auth_token = self._make_request(
+            "user.login",
+            {
+                "username": self.username,
+                "password": self.password,
+            },
+        )
         if not self.auth_token:
             raise RuntimeError("Zabbix authentication returned no token")
 
     def create_host(self, hostname: str, ip_address: str, group_id: str) -> str:
-        result = self._make_request("host.create", {
-            "host": hostname,
-            "interfaces": [{
-                "type": 1,
-                "main": 1,
-                "useip": 1,
-                "ip": ip_address,
-                "dns": "",
-                "port": "10050",
-            }],
-            "groups": [{"groupid": group_id}],
-        })
+        result = self._make_request(
+            "host.create",
+            {
+                "host": hostname,
+                "interfaces": [
+                    {
+                        "type": 1,
+                        "main": 1,
+                        "useip": 1,
+                        "ip": ip_address,
+                        "dns": "",
+                        "port": "10050",
+                    }
+                ],
+                "groups": [{"groupid": group_id}],
+            },
+        )
         return result["hostids"][0]
 
 
@@ -240,23 +311,36 @@ class ReportGenerator:
             "",
         ]
         for host in hosts:
-            lines.extend([f"### {host['hostname']} ({host['ip']})", "", f"Operating system guess: {host['os']}", "", "| Port | Protocol | Service | Product | Version |", "|---:|---|---|---|---|"])
+            lines.extend(
+                [
+                    f"### {host['hostname']} ({host['ip']})",
+                    "",
+                    f"Operating system guess: {host['os']}",
+                    "",
+                    "| Port | Protocol | Service | Product | Version |",
+                    "|---:|---|---|---|---|",
+                ]
+            )
             for port in host["ports"]:
-                lines.append(f"| {port['port']} | {port['protocol']} | {port['service']} | {port['product']} | {port['version']} |")
+                lines.append(
+                    f"| {port['port']} | {port['protocol']} | {port['service']} | {port['product']} | {port['version']} |"
+                )
             lines.append("")
 
         lines.extend(["## Review findings", ""])
         for finding in summary["findings"]:
-            lines.extend([
-                f"### {finding['title']}",
-                "",
-                f"- Endpoint: `{finding['ip']}:{finding['port']}/{finding['protocol']}`",
-                f"- Severity: {finding['severity']}",
-                f"- Evidence: {finding['evidence']}",
-                f"- Recommendation: {finding['recommendation']}",
-                "- Confirmed vulnerability: no",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"### {finding['title']}",
+                    "",
+                    f"- Endpoint: `{finding['ip']}:{finding['port']}/{finding['protocol']}`",
+                    f"- Severity: {finding['severity']}",
+                    f"- Evidence: {finding['evidence']}",
+                    f"- Recommendation: {finding['recommendation']}",
+                    "- Confirmed vulnerability: no",
+                    "",
+                ]
+            )
         path.write_text("\n".join(lines), encoding="utf-8")
         return path
 
@@ -286,7 +370,7 @@ def export_to_zabbix(hosts: list[dict[str, Any]], config: dict[str, Any]) -> Non
 def main(argv: list[str] | None = None) -> int:
     repository_root = Path(__file__).resolve().parent.parent
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=repository_root / "src" / "config.json")
+    parser.add_argument("--config", type=Path, default=repository_root / "config" / "default.json")
     parser.add_argument("--input", type=Path, help="Override the configured Nmap XML file")
     parser.add_argument("--output-dir", type=Path, help="Override the configured output directory")
     parser.add_argument("--zabbix", action="store_true", help="Explicitly export discovered hosts to Zabbix")
@@ -310,7 +394,11 @@ def main(argv: list[str] | None = None) -> int:
     markdown = ReportGenerator.generate_markdown_report(hosts, summary, output_dir / "network-review.md")
     json_report = ReportGenerator.generate_json_report(hosts, summary, output_dir / "network-review.json")
 
-    from dashboard_tecnico import generate_technical_dashboard
+    if __package__:
+        from .dashboard import generate_technical_dashboard
+    else:
+        from dashboard import generate_technical_dashboard
+
     dashboard = generate_technical_dashboard(hosts, summary, output_file=output_dir / "dashboard.html")
 
     if arguments.zabbix:
