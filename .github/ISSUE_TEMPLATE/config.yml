@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/awakyy1/TCC/security/advisories/new
+    about: Report security issues privately; never include credentials or real scan data in a public issue.

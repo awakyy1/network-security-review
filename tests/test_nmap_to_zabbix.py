@@ -6,9 +6,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from src.dashboard_tecnico import generate_technical_dashboard
+from src.dashboard import generate_technical_dashboard
 from src.nmap_to_zabbix import NmapParser, ReportGenerator, ZabbixAPI
-
 
 SAMPLE_XML = """<?xml version="1.0"?>
 <nmaprun>

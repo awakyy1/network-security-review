@@ -1,19 +1,36 @@
 # Security Model and Finding Semantics
 
-## What the tool can state
+## Security objective
 
-The parser can state that an Nmap document reported a live host, an open port, a service name, and optional product or version text. A review rule can explain why that observed exposure deserves manual validation.
+The artifact should preserve scanner evidence without turning incomplete observations into unsupported vulnerability claims. It is a review aid, not an exploitation framework or compliance authority.
 
-## What the tool cannot state
+## Finding states
 
-The tool cannot determine internet exposure from a scan alone, verify authentication policy, prove traffic contents, confirm a product fingerprint, establish exploitability, or demonstrate compliance. It does not map CVEs because reliable mapping requires normalized product identity, affected-version evaluation, source freshness, and often configuration context.
+| State | Meaning | Supported by this tool |
+|---|---|---|
+| Observation | Nmap reported a host, port or fingerprint | Yes |
+| Review finding | A transparent rule explains why the observation deserves validation | Yes |
+| Confirmed vulnerability | Independent evidence establishes an actual weakness and context | No |
+| Remediation action | An authorized change is approved, executed and audited | No |
 
-## Severity meaning
+Consumers must preserve `confirmed_vulnerability: false` unless a separate controlled assessment supplies independent confirmation.
 
-Severity ranks review urgency, not CVSS or confirmed technical impact:
+## Severity semantics
 
-- `high`: cleartext administrative access observed.
-- `medium`: remote access, file sharing, or database exposure requiring contextual validation.
-- `low`: common service hardening or encrypted-transport review.
+Severity ranks review urgency, not CVSS or confirmed impact:
 
-Consumers must preserve the `confirmed_vulnerability: false` field unless another controlled assessment independently confirms a vulnerability.
+- `high`: cleartext administrative access was observed;
+- `medium`: remote access, file sharing or database exposure requires contextual validation;
+- `low`: common service-hardening or encrypted-transport review.
+
+## Threats and controls
+
+| Threat | Existing control | Residual risk |
+|---|---|---|
+| Malicious XML text rendered in HTML | Contextual HTML escaping | Reports still disclose sensitive inventory |
+| Credential exposure | Zabbix credentials only in environment variables | Process and CI environments must be protected |
+| Accidental remote mutation | Zabbix disabled unless `--zabbix` is passed | Export is not idempotent and can create duplicates |
+| Unsupported scientific claim | Explicit evidence boundary and deterministic rules | Operators can still misinterpret output externally |
+| Sensitive scan committed to Git | Raw XML ignored; only reviewed fixtures allowed | Human review is still required before commits |
+
+The parser cannot determine public exposure from one scan, verify authentication policy, confirm product identity, establish exploitability or demonstrate compliance. See [SECURITY.md](../SECURITY.md) for responsible disclosure.
