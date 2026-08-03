@@ -1,12 +1,16 @@
+# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
 venv/
 .pytest_cache/
+.ruff_cache/
 .coverage
+coverage.xml
 htmlcov/
 
+# Editors and operating systems
 .vscode/
 .idea/
 *.swp
@@ -16,13 +20,32 @@ htmlcov/
 Thumbs.db
 desktop.ini
 
+# Generated application output and local configuration
 output/
-*.log
+config/local.json
 config.local.json
 *.tmp
 *.bak
 
-# Nmap output may contain sensitive network inventory.
-data/*.xml
-!data/scan_result.xml
-!data/scan_backup.xml
+# Internal review material: original drafts, extracted text and page renders.
+.review/
+
+# LaTeX build products. Final academic PDFs remain versionable.
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fls
+*.fdb_latexmk
+*.lof
+*.log
+*.lot
+*.out
+*.synctex.gz
+*.toc
+
+# Raw Nmap output can expose sensitive infrastructure. Only reviewed,
+# explicitly synthetic fixtures under examples/ and tests/ belong in Git.
+*.xml
+!examples/**/*.xml
+!tests/fixtures/**/*.xml

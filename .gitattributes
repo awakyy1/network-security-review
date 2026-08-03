@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+
+# Academic sources are documentation rather than the implementation language.
+academic/** linguist-documentation
