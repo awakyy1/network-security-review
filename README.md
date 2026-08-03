@@ -16,17 +16,14 @@ Artefato acadêmico defensivo para transformar XMLs do Nmap em inventário verif
 
 O projeto preserva uma fronteira simples: evidências observadas pelo Nmap são inventário; correspondências com regras são pedidos de revisão; vulnerabilidades só podem ser confirmadas por uma avaliação independente e contextualizada.
 
-```mermaid
-flowchart LR
-    A[XML Nmap autorizado] --> B[Parser e normalização]
-    B --> C[Inventário de hosts e serviços]
-    C --> D[Regras transparentes de revisão]
-    C --> E[Relatórios Markdown e JSON]
-    D --> E
-    E --> F[Dashboard HTML]
-    C -->|opção --zabbix| G[Zabbix API]
-    E --> H[Validação humana]
-```
+### Fluxo de uso
+
+1. **Entrada autorizada:** o sistema recebe um XML já produzido pelo Nmap; ele não executa a varredura.
+2. **Leitura das evidências:** o parser normaliza hosts, endereços, serviços, portas e fingerprints observados.
+3. **Produção dos resultados:** regras transparentes geram pedidos de revisão e relatórios em Markdown, JSON e HTML.
+4. **Decisão humana:** os resultados apoiam a análise, mas não confirmam vulnerabilidades automaticamente.
+
+A exportação para o Zabbix é uma etapa opcional e separada, ativada somente pelo argumento `--zabbix`.
 
 ### O que o sistema faz
 
