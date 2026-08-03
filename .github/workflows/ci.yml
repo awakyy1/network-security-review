@@ -57,3 +57,16 @@ jobs:
           test -s output/ci/network-review.md
           test -s output/ci/network-review.json
           test -s output/ci/dashboard.html
+
+  required-status:
+    name: test
+    if: ${{ always() }}
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Verify matrix result
+        env:
+          MATRIX_RESULT: ${{ needs.quality.result }}
+        run: test "$MATRIX_RESULT" = "success"
