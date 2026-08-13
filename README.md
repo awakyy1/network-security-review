@@ -77,11 +77,35 @@ O guia completo está em [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 O commit pré-banca `dd63d4c` contém o protótipo de 2025, incluindo análise opcional com Ollama, dashboard, heurísticas e integração opcional ao Zabbix. O núcleo atual, endurecido em `b191269`, mantém inventário, regras verificáveis, relatórios e Zabbix, removendo componentes que não possuíam validação experimental suficiente. Essa diferença é documentada em [docs/ACADEMIC_CONTEXT.md](docs/ACADEMIC_CONTEXT.md) e no [histórico](CHANGELOG.md).
 
+### Extensão científica V2
+
+O artigo pós-aprovação acrescenta, sem modificar a monografia, um caminho de
+pesquisa separado para telemetria comportamental e priorização local com
+Ollama. As regras são transparentes, o modelo cita identificadores de evidência
+sob esquema JSON fechado e nenhuma resposta automática é executada.
+
+Na comparação automatizada repetida, o protocolo grounded preservou os
+identificadores exatos de achados e evidências em 50/50 chamadas, contra 0/50
+na reconstrução histórica em texto livre. Esse resultado demonstra
+rastreabilidade e validação determinística no artefato fixo; não demonstra
+superioridade semântica geral nem substitui avaliação humana cega.
+
+A validação externa preserva também o resultado negativo: no holdout CTU-13,
+as regras de fluxo obtiveram F1 de 0,317 e MCC de -0,282. Portanto, o sistema é
+apresentado como apoio à triagem humana, não como detector confiável de malware
+ou mecanismo autônomo de bloqueio. Consulte o
+[protocolo V2](docs/V2_RESEARCH_PROTOCOL.md), a
+[validação CTU-13](docs/CTU13_EXTERNAL_VALIDATION.md) e os
+[resultados preservados](research/v2/results/README.md).
+
 ## Documentação
 
 - [Contexto acadêmico e banca](docs/ACADEMIC_CONTEXT.md)
 - [Arquitetura e fluxo de dados](docs/ARCHITECTURE.md)
+- [Estado atual do sistema](docs/CURRENT_SYSTEM.md)
 - [Metodologia e limites das evidências](docs/METHODOLOGY.md)
+- [Protocolo científico V2](docs/V2_RESEARCH_PROTOCOL.md)
+- [Validação externa CTU-13](docs/CTU13_EXTERNAL_VALIDATION.md)
 - [Guia de reprodução](docs/REPRODUCIBILITY.md)
 - [Política dos documentos acadêmicos](docs/DOCUMENT_POLICY.md)
 - [Modelo de segurança](docs/SECURITY_MODEL.md)

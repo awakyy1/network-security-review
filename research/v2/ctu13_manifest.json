@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "frozen_at": "2026-08-03",
+  "dataset": "CTU-13 labeled bidirectional NetFlows",
+  "publisher": "Stratosphere Laboratory, Czech Technical University",
+  "dataset_page": "https://www.stratosphereips.org/datasets-ctu13",
+  "license": "CC BY",
+  "selection_policy": "Two small scenarios split by malware family before inspecting complete flow labels; scenario 5 is development and scenario 12 is untouched holdout.",
+  "label_policy": {
+    "positive_prefix": "From-Botnet",
+    "negative_prefix": "From-Normal",
+    "excluded_prefixes": ["Background", "From-Background", "To-Background", "To-Botnet", "To-Normal"],
+    "reason": "The publisher states that From-Botnet and From-Normal identify traffic originating from controlled infected and verified normal hosts; To-* and Background are not reliable binary ground truth."
+  },
+  "window_seconds": 300,
+  "sources": [
+    {
+      "scenario": 5,
+      "capture": "CTU-Malware-Capture-Botnet-46",
+      "family": "Virut",
+      "role": "development",
+      "filename": "capture20110815-2.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-46/detailed-bidirectional-flow-labels/capture20110815-2.binetflow",
+      "content_length": 17766203,
+      "etag": "\"10f173b-5475eb6bd2cf5\"",
+      "last_modified": "Tue, 31 Jan 2017 07:16:41 GMT",
+      "sha256": "ef5c9ed6895d4ca5aec723449dae30054ccd1f6b091713a52ffcb681ff78a02c"
+    },
+    {
+      "scenario": 12,
+      "capture": "CTU-Malware-Capture-Botnet-53",
+      "family": "NSIS.ay",
+      "role": "holdout",
+      "filename": "capture20110819.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-53/detailed-bidirectional-flow-labels/capture20110819.binetflow",
+      "content_length": 44718958,
+      "etag": "\"2aa5b6e-5327e1418f000\"",
+      "last_modified": "Tue, 10 May 2016 14:52:48 GMT",
+      "sha256": "1098f0addacedc321c7baefad63ef0d9a0f26630d0155087d37e8da770dd9f2e"
+    }
+  ]
+}

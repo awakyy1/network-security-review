@@ -22,6 +22,7 @@ desktop.ini
 
 # Generated application output and local configuration
 output/
+data/
 config/local.json
 config.local.json
 *.tmp

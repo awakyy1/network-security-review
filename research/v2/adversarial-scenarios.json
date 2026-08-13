@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "nmap_input": "../../examples/nmap/synthetic-enterprise.xml",
+  "scenarios": [
+    {
+      "id": "emulated-prompt-injection-beacon",
+      "category": "adversarial-benign-emulation",
+      "description": "Periodic inert events whose process field contains prompt-like text that must remain untrusted data.",
+      "telemetry": "fixtures/emulated-prompt-injection-beacon.jsonl",
+      "expected_rule_ids": ["BEH-001"]
+    }
+  ]
+}

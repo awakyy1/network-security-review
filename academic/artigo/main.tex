@@ -1,9 +1,15 @@
 \documentclass[12pt,a4paper]{article}
 
 \usepackage{fontspec}
-\setmainfont{Arial}
-\setsansfont{Arial}
-\setmonofont{Arial}
+\IfFontExistsTF{Arial}{%
+  \setmainfont{Arial}
+  \setsansfont{Arial}
+  \setmonofont{Arial}
+}{%
+  \setmainfont{Liberation Sans}
+  \setsansfont{Liberation Sans}
+  \setmonofont{Liberation Mono}
+}
 \usepackage[english]{babel}
 \usepackage{microtype}
 \usepackage[a4paper,top=3cm,left=3cm,right=2cm,bottom=2cm]{geometry}
@@ -51,12 +57,20 @@
 }
 \makeatother
 
-\newcommand{\articleTitle}{Application of Artificial Intelligence in Identifying Vulnerabilities in Local Area Networks with Firewall Integration}
-\hypersetup{hidelinks,pdftitle={\articleTitle},pdfauthor={João Vitor Ielen and Vinicius Mota Favaro}}
+\newcommand{\articleTitle}{Evidence-Grounded Local Language Models and Behavioral Telemetry for Defensive Network Review}
+\newcommand{\articleVersion}{1.0}
+\hypersetup{
+  hidelinks,
+  pdftitle={\articleTitle},
+  pdfauthor={João Vitor Ielen and Vinicius Mota Favaro},
+  pdfsubject={Post-approval research article, version \articleVersion},
+  pdfkeywords={network telemetry, local language model, behavioral detection, CTU-13, defensive automation}
+}
 \def\UrlLeft{}
 \def\UrlRight{}
 \setlength{\parindent}{1.25cm}
 \setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
 \onehalfspacing
 \DeclareCaptionFont{fontTen}{\fontsize{10}{12}\selectfont}
 \captionsetup{font=fontTen,labelfont=bf,labelsep=endash,singlelinecheck=false}
@@ -79,166 +93,221 @@
 \begin{center}
   {\bfseries\MakeUppercase{\articleTitle}\par}
   \vspace{1.5\baselineskip}
-  João Vitor Ielen\footnote{Undergraduate student in Software Engineering, Centro Universitário UniOpet, Curitiba, Brazil.}
+  João Vitor Ielen\footnote{Software Engineering graduate, Centro Universitário UniOpet, Curitiba, Brazil.}
   \quad
-  Vinicius Mota Favaro\footnote{Undergraduate student in Software Engineering, Centro Universitário UniOpet, Curitiba, Brazil.}
+  Vinicius Mota Favaro\footnote{Software Engineering graduate, Centro Universitário UniOpet, Curitiba, Brazil.}
 
   \vspace{0.5\baselineskip}
   Advisor: Prof. Michel Cesar dos Santos, Centro Universitário UniOpet
 \end{center}
 
-\noindent\textbf{Academic approval:} 19 November 2025. This date records the approval of the associated undergraduate thesis and is not a journal acceptance date.
+\noindent\textbf{Academic record:} the associated undergraduate monograph was approved on 19 November 2025. This article is a post-approval research revision and does not alter that archived monograph or imply journal acceptance.
+
+\noindent\textbf{Article version:} V\articleVersion, frozen on 13 August 2026. Later scientific revisions must use a new version and preserve this record.
 
 \vspace{\baselineskip}
 
 \begin{abstract}
-Interpreting network-scan output is labor-intensive and may lead to overstatement when an observed service is treated as a confirmed vulnerability. This paper presents a defensive pipeline that parses authorized Nmap XML scans, inventories live hosts and open services, applies configuration-review rules, and generates JSON, Markdown, and self-contained HTML reports. The artifact defended in 2025 also included optional local language-model analysis and Zabbix integration; active firewall integration remained an architectural proposal. Deterministic evidence is conceptually separated from generated narrative. The reported evaluation comprises three scenarios, 24 hosts, and 21 open ports, in which seven review items were recorded. No independent ground-truth matrix was preserved to confirm false-positive counts or calculate detection metrics. The sample is too small to support universal claims, and open ports alone do not establish exploitability. Results indicate that the approach is useful for inventory, triage, and communication, provided that generated output is advisory and findings are validated against asset ownership, network position, product identity, version evidence, and configuration.
+Security telemetry contains observable events, not automatic proof of compromise. This study evaluates a hybrid defensive-review artifact that correlates authorized Nmap inventory with normalized network and endpoint events, applies four transparent behavior rules, and submits only rule findings to a loopback local language model under a closed JSON schema and deterministic post-validation. A frozen inert benchmark produced 4 true positives, 1 false positive, 0 false negatives, and 19 true negatives across 24 scenario-rule units (F1 0.889); these values measure functional conformance only. External validation used independently labeled CTU-13 bidirectional flows, with Virut for development and the family-separated NSIS.ay scenario as an untouched holdout. Holdout performance was poor: precision 0.333, recall 0.302, specificity 0.418, F1 0.317, and Matthews correlation coefficient $-0.282$. A counterfactual block-on-alert policy would have acted on normal-origin windows in 66.7\% of holdout alerts while missing 37 botnet-origin windows. Across ten repetitions per language-model protocol, grounded output preserved exact finding and evidence identifiers in 50/50 calls, but only 40/50 passed semantic policy validation; reconstructed free text preserved exact identifiers in 0/50 and proposed unqualified containment in 10/50. A separate ten-call inert prompt-injection fixture echoed neither the injected fake identifier nor an absolute malware claim; nine outputs were accepted and one was safely rejected. The retained results show that network-flow heuristics do not generalize reliably and that schema constraint still requires deterministic enforcement. The artifact is therefore suitable for evidence-preserving triage, not autonomous attribution or containment.
 \end{abstract}
 
-\noindent\textbf{Keywords:} network security; artificial intelligence; Nmap; large language model; defensive automation.
+\noindent\textbf{Keywords:} network telemetry; local language model; behavioral detection; CTU-13; defensive automation.
 
 \section{Introduction}
 
-The expansion of connected business processes has increased both operational efficiency and the number of services that organizations must inventory and protect. Network scans can reveal active hosts, open ports, service fingerprints, and operating-system guesses, but those observations require contextual interpretation. An open port is a communication endpoint, not proof of a vulnerability. Its security relevance depends on the actual product, version, configuration, reachability, authentication, encryption, business purpose, and compensating controls.
+Network discovery and operating-system telemetry describe different layers of a security event. Nmap can identify reachable hosts, open ports, and uncertain service fingerprints \cite{lyon2009,nmapdocs2025}; endpoint telemetry can associate connections, DNS queries, and file creation with processes \cite{sysmonevents2026}. Neither source alone establishes that software is malicious or that a vulnerability is exploitable. Those conclusions require provenance, context, and independent validation.
 
-Nmap is widely used for network discovery and service fingerprinting \cite{lyon2009,nmapdocs2025}. Its XML output is suitable for automated processing, yet a scan of even a modest network may produce enough detail to burden a small security team. Artificial intelligence, particularly large language models (LLMs), may assist with summarization and explanation. However, generated text can also invent CVEs, conflate exposure with exploitability, or recommend disruptive actions.
+Large language models (LLMs) can organize evidence and make technical output easier to review, but fluent text can also erase the distinction between an observation and a conclusion. Local inference reduces disclosure to external services, not epistemic risk. The NIST AI Risk Management Framework consequently emphasizes governance, measurement, and continued risk management rather than treating model output as self-validating \cite{nistai1001}.
 
-This study addresses the following question: \emph{How can artificial-intelligence techniques support the identification, contextualization, and responsible mitigation of security risks observed in local networks?} The proposed answer is a hybrid architecture in which deterministic code owns evidence collection and rule matching, while an optional local LLM provides advisory narrative. The contribution is not a replacement for vulnerability management. It is an explainable bridge between scan evidence, human review, and defensive tooling.
+This work extends an undergraduate artifact approved in 2025. The original system parsed authorized Nmap XML, produced reports, optionally requested local Ollama narratives, and proposed future firewall integration. The present article narrows and tests that concept: deterministic code owns observations and behavior-rule matches; the LLM may prioritize only supplied findings; and every disruptive action remains outside the model trust boundary.
 
-The paper makes four contributions: (1) a reproducible parser and normalized inventory; (2) explicit review rules whose outputs are marked as unconfirmed; (3) a local-first architecture for LLM-assisted contextualization; and (4) a critical evaluation that distinguishes results supported by the sample from broader claims requiring further evidence.
+The study asks three questions. \textbf{RQ1:} how do frozen transparent behavior rules perform on inert functional fixtures and on independently labeled external flows? \textbf{RQ2:} can a schema-constrained local LLM preserve exact evidence traceability compared with the reconstructed 2025 free-text protocol? \textbf{RQ3:} which defensive actions are justified before malicious activity is independently confirmed?
 
-\section{Background}
+The contributions are: (1) a normalized telemetry schema with stable evidence identifiers; (2) four auditable behavior rules with explicit non-confirmation fields; (3) a loopback-only LLM protocol whose citations and controls are deterministically validated; (4) a streaming CTU-13 adapter with frozen provenance and family-separated holdout; (5) a repeated comparison with a reconstructed free-text control and an inert prompt-injection fixture; and (6) retained negative results that quantify why neither alerts nor model narratives should directly trigger containment.
 
-\subsection{Network discovery and vulnerability evidence}
+\section{Foundations and Evidence Boundary}
 
-Nmap supports host discovery, port scanning, version detection, and probabilistic operating-system fingerprinting \cite{lyon2009}. Fingerprints can be incomplete or wrong. A reliable association with a Common Vulnerabilities and Exposures identifier requires normalized product identity, affected-version evaluation, source freshness, and sometimes configuration information from an authenticated assessment. The National Vulnerability Database provides structured vulnerability information, but a service banner is not by itself a sufficient matching key \cite{nvd2025}.
+\subsection{From scan observations to behavioral review}
 
-Network controls such as segmentation, firewalls, secure administration paths, and logging operate together \cite{kurose2021,nist80053}. Automating a firewall response can shorten exposure, but an incorrect rule can disrupt legitimate services. Safe automation therefore needs approval, minimal scope, expiration, logging, and rollback.
+An open port is an endpoint, not a confirmed vulnerability. Product identity, affected version, configuration, reachability, authentication, and compensating controls determine its security significance. Similarly, periodic traffic, rapid contact with distinct endpoints, and asymmetric byte counts are dual-use patterns. Routine software updates, browsers, backups, monitoring, and authorized administration can exhibit them.
 
-\subsection{Local language models in security analysis}
+MITRE ATT\&CK documents behaviors such as application-layer command traffic, network service discovery, exfiltration over an existing channel, and ingress tool transfer \cite{mitre2025}. The present rules use those techniques only as analytical context. A match is labeled \texttt{behavior-review}; it does not assert that an ATT\&CK technique, malware family, compromise, or exploitable vulnerability occurred.
 
-Transformer-based LLMs generate text conditioned on prompts and supplied evidence. Llama-family models can be executed on local hardware \cite{llama3}, and Ollama exposes a local API for model management and inference \cite{ollama2025}. Local execution can keep topology information away from third-party cloud services, but it does not remove model risk.
+The external corpus is CTU-13, a set of thirteen scenarios containing labeled botnet, normal, and background network traffic \cite{garcia2014ctu13,ctu13dataset2026}. The publisher warns that inbound \texttt{To-Botnet} traffic is not necessarily malicious. This study therefore scores only source-origin \texttt{From-Botnet} and \texttt{From-Normal} records and excludes background and all \texttt{To-*} labels.
 
-An LLM may explain why Telnet deserves review, summarize affected endpoints, or organize validation questions. It should not independently assert exploitability, certify compliance, or issue blocking commands. The NIST AI Risk Management Framework emphasizes governance, measurement, and ongoing management of AI risks \cite{nistai1001}. In this architecture, generated narrative remains traceable to deterministic input and subject to human review.
+\subsection{Grounded local inference}
 
-\section{System Design}
+Ollama supports local inference and JSON-schema structured outputs \cite{ollama2025,ollamastructured2026}. A schema can constrain representation, but it cannot prove semantic correctness. The implemented validator consequently checks that every cited finding and event identifier existed in the supplied evidence, rejects unsupported CVEs and absolute compromise claims, requires complete finding coverage, and permits only controls pre-mapped to each transparent rule.
 
-\subsection{Pipeline}
+The system preserves five states: Nmap observation, normalized event, deterministic rule match, LLM prioritization, and independent analyst conclusion. No earlier state may be presented as a later one. Every finding explicitly denies confirmed malware and vulnerability and denies authorization for automatic response.
 
-The system is divided into acquisition, normalization, deterministic review, contextual analysis, and presentation/integration. An operator first obtains an authorized Nmap XML scan. The parser retains hosts marked as up, selects an IP address, and extracts hostname, OS guess, and ports marked as open. For each port it records protocol, service name, product, and version.
+\section{Artifact Design}
 
-The review engine compares service names and conventional ports with a small documented rule set. It covers cleartext administration and file transfer, web transport review, SMB/NetBIOS, database listeners, remote desktop, VNC, SSH hardening, and mail transport. A result contains the endpoint, observed fingerprint, triage severity, evidence, recommendation, and the explicit field \texttt{confirmed\_vulnerability=false}.
+\subsection{Trust-boundary architecture}
 
-Figure~\ref{fig:pipeline} summarizes the evidence-preserving processing pipeline, from the authorized Nmap XML input to human validation and defensive integration.
+Figure~\ref{fig:architecture} presents the revised architecture. Evidence acquisition and rule evaluation are deterministic. The local model receives an evidence pack rather than raw authority, while a validator mediates every output. The final human gate is the only path to a separately authorized response system.
 
-\begin{figure}[ht]
+\begin{figure}[htbp]
 \centering
-\fbox{\begin{minipage}{0.88\linewidth}\centering
-Authorized Nmap XML $\rightarrow$ parser and normalization $\rightarrow$ review rules\\[3pt]
-$\downarrow$ evidence-preserving inventory $\downarrow$\\[3pt]
-JSON/Markdown/HTML $\rightarrow$ human validation $\rightarrow$ defensive integration
+\fbox{\begin{minipage}{0.92\linewidth}
+\centering
+\textbf{Authorized evidence}\par
+Nmap XML inventory $+$ normalized network/endpoint JSONL\par
+\vspace{4pt}
+$\Downarrow$\par
+\textbf{Deterministic core}\par
+validation $\rightarrow$ transparent behavior rules $\rightarrow$ immutable evidence IDs\par
+\vspace{4pt}
+$\Downarrow$\par
+\textbf{Untrusted advisory boundary}\par
+loopback Ollama $\rightarrow$ closed JSON schema $\rightarrow$ deterministic output validator\par
+\vspace{4pt}
+$\Downarrow$\par
+\textbf{Human-authorized boundary}\par
+report and review $\rightarrow$ independent confirmation $\rightarrow$ optional reversible response
 \end{minipage}}
-\caption{Evidence-preserving processing pipeline.}
-\label{fig:pipeline}
-\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Prepared by the authors (2025).}
+\caption{Evidence flow and response trust boundaries.}
+\label{fig:architecture}
+\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Prepared by the authors (2026).}
 \end{figure}
 
-\subsection{Contextual analysis}
+\subsection{Transparent behavior rules}
 
-The pre-defense artifact implemented three prompt families: technical summary, authorized test-scenario discussion, and compliance-oriented review. Its prompts supplied aggregate findings and requested a technical narrative. Model output did not modify the inventory, but the implementation did not enforce a structured output schema or independently verify the generated claims.
+The detector implements four predeclared rules. \texttt{BEH-001} requires at least six near-periodic connections to one endpoint with interval coefficient of variation at most 0.15. \texttt{BEH-002} requires at least eight distinct endpoints within 60 seconds. \texttt{BEH-003} requires at least 1 MB sent and a sent-to-received ratio of at least 10:1. \texttt{BEH-004} correlates at least 32 KiB received with executable-like file metadata within 120 seconds. Thresholds were frozen before external-label inspection.
 
-This distinction is essential. Python code determines what was parsed and which transparent rule matched. The LLM converts the structured result into human-readable context. Any future retrieval from authoritative sources should attach provenance and affected-version logic before a CVE is displayed.
+Each finding records rule ID, stable finding ID, host, process context when available, exact evidence IDs, threshold observations, and interpretation limits. Nmap inventory may add authorized asset context but does not change the label. The detector produces review candidates only and invokes no firewall, quarantine, process termination, or file deletion action.
 
-A technical-analysis prompt summarized the attack surface and requested priorities. A controlled-assessment prompt discussed plausible attack paths for an authorized laboratory. A compliance-review prompt related findings to frameworks, although its output could not constitute certification. For all three, temperature and nucleus-sampling settings affect linguistic variability rather than factual reliability.
+\subsection{LLM protocol and controls}
 
-Model execution should be recorded as part of the experiment: model identifier, quantization, context length, generation parameters, prompt template, response, hardware, and elapsed time. Schema-constrained output and low-variance settings improve testability. Scan-controlled strings must be delimited as untrusted data because a hostname or banner could contain prompt-like instructions.
+The grounded protocol uses \texttt{llama3.2:3b} through Ollama on loopback, with a 4,096-token context, 700-token output ceiling, temperature zero, seed 42, and closed schema. The preserved runs used Ollama 0.32.5--0.32.6 and the same model blob SHA-256. Scan- or event-controlled strings are delimited as untrusted data. The model selects explanations and proposed controls from the evidence pack and a fixed catalog; it holds no operating-system, Zabbix, or firewall credential.
 
-\subsection{Reporting and integration}
-
-JSON supports machine processing, Markdown supports review and version control, and a self-contained HTML dashboard supports distribution without a web server. Nmap-controlled text is escaped before HTML rendering. The current Zabbix JSON-RPC integration uses environment-based credentials, finite timeouts, and TLS verification by default \cite{zabbix2025}. Export must be explicitly enabled.
-
-Repository history provides two distinct software cuts \cite{ielen2025repo}. Commit \texttt{dd63d4c}, produced before the defense, implemented optional Ollama inference, a static service-to-CVE table, risk and compliance heuristics, the dashboard, and Zabbix export. Neither that cut nor the current code applies firewall rules. The current hardened core, introduced in \texttt{b191269}, removes LLM inference, CVE mapping, and heuristic scores while preserving inventory, transparent review rules, reports, and explicit Zabbix export. Code presence demonstrates implementation, not effectiveness or external validity.
-
-\subsection{Responsible firewall integration}
-
-A safe firewall workflow separates recommendation from authority. The analysis component should produce a proposal that identifies source, destination, protocol, port, rationale, duration, and affected assets. An authorized operator reviews the proposal before a vendor-specific adapter validates and applies it. Temporary rules require expiration, change logging, connectivity checks, and rollback. Protected management paths and critical services require explicit safeguards. The LLM must never hold direct firewall credentials.
-
-\subsection{Evidence states}
-
-To prevent semantic escalation, the design distinguishes four states: observed scan data; inferred fingerprint or context; deterministic review required; and independently confirmed vulnerability. Only a controlled follow-up assessment can assign the final state. Reports preserve those distinctions so that downstream consumers do not transform a conventional-port match into a CVE claim.
+The control reconstructs the historical technical free-text path with temperature 0.7 and \texttt{top\_p}=0.9, no system prompt, and no output schema. Both protocols receive the same observations, but the control is not a byte-exact replay: fixed context, output, and timeout limits were added for reproducibility.
 
 \section{Method}
 
-The research is applied, exploratory, and technological. It is described retrospectively through the Design Science Research Methodology stages of problem identification, objectives, design and development, demonstration, evaluation, and communication \cite{peffers2007}. Development followed incremental cycles inspired by Scrum \cite{scrum2020}. The reported evaluation is an exploratory demonstration rather than a controlled comparative experiment.
+\subsection{Study design}
 
-Scenario 1 represented a heterogeneous network with 19 active hosts and no deliberately planted weaknesses. Scenario 2 represented a simulated home network with three hosts and deliberately exposed SMB and HTTP services. Scenario 3 used two documentation-range servers configured with SSH and HTTPS to observe false-positive behavior in a hardened environment.
+The work follows an applied Design Science Research structure: artifact construction, demonstration, evaluation, and communication \cite{peffers2007}. The monograph is an immutable historical record; this post-approval article reports new code and experiments. The confirmatory boundary was defined before the final repetitions: exploratory outputs that influenced a metric or rubric cannot be reused as confirmatory evidence.
 
-\begin{table}[ht]
-\centering
-\caption{Reported evaluation scenarios.}
-\label{tab:scenarios}
-\begin{tabular}{llrrrr}
-\toprule
-ID & Environment & Hosts & Open ports & Review items & Time (s) \\
-\midrule
-1 & Heterogeneous network & 19 & 9 & 3 & 222 \\
-2 & Simulated vulnerable LAN & 3 & 8 & 4 & 78 \\
-3 & Hardened servers & 2 & 4 & 0 & 52 \\
-\midrule
-Total & & 24 & 21 & 7 & 352 \\
-\bottomrule
-\end{tabular}
-\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Data reported in the original study (2025).}
-\end{table}
+Three experiments were designed. Phase A is a deterministic functional benchmark. Phase B is external validation on independently labeled CTU-13 flows. Phase C compares grounded and historical LLM protocols over repeated calls and separately tests an inert prompt-injection fixture. Automated Phase-C repetitions are complete; blinded human ratings remain future work.
 
-Precision and recall require an independently labeled ground truth. If $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively, then
+\subsection{Phase A: inert functional fixtures}
+
+Six committed JSON Lines scenarios contain no sockets, payloads, persistence mechanisms, or operating-system changes. They represent irregular benign browsing, a legitimate periodic updater as a hard negative, and four emulated patterns corresponding to the four rules. The unit is a scenario--rule pair, yielding 24 binary units. Expected labels were declared in the scenario manifest before execution.
+
+The frozen Phase-A result is summarized in Table~\ref{tab:phase-a}. It must not be combined with external-validation metrics because it measures implementation conformance to constructed patterns, not real-world detection accuracy.
+
+\input{generated/phase-a-table}
+
+\subsection{Phase B: external flow validation}
+
+Data selection was frozen before complete-label inspection. CTU-13 Scenario 5 (Virut) is the development source, while Scenario 12 (NSIS.ay) is the family-separated holdout. Only the publisher-recommended bidirectional \texttt{.binetflow} text files were acquired. Their provenance is fixed by these SHA-256 values:
+
+{\fontsize{8}{10}\selectfont\ttfamily
+\noindent Scenario 5: ef5c9ed6895d4ca5aec723449dae30054ccd1f6b091713a52ffcb681ff78a02c\par
+\noindent Scenario 12: 1098f0addacedc321c7baefad63ef0d9a0f26630d0155087d37e8da770dd9f2e\par}
+
+Acquisition code rejects executables, archives, packet captures, and binary Argus files.
+
+The scored unit is an anonymized source host in a non-overlapping five-minute window. Addresses are replaced by stable scenario-local hashes before detection, and labels are never supplied to the detector. Positive windows contain \texttt{From-Botnet} source flows; negative windows contain \texttt{From-Normal} source flows. Mixed, background, inbound, and unsupported-protocol records are counted and excluded.
+
+The adapter creates normalized connection events from flow direction and byte counts. CTU-13 flow records have no endpoint process identity or file lineage, so only \texttt{BEH-001} through \texttt{BEH-003} are evaluated. \texttt{BEH-004} is explicitly out of scope. Scenario 5 was available for development interpretation, but thresholds were not retuned. Scenario 12 remained the held-out report set.
+
+\subsection{Phase C: repeated protocol comparison}
+
+The five Phase-A scenarios that produced findings were submitted ten times to each protocol, yielding 50 grounded and 50 reconstructed free-text calls. The grounded protocol is evaluated at four distinct boundaries: API response, JSON parse, closed-schema validity, and deterministic semantic-policy acceptance. Both protocols are also scored for exact finding- and evidence-ID coverage. The historical audit additionally records security-attribution vocabulary, containment without an explicit approval qualifier, the 200-word limit, and Markdown-format violations. Those protocol-specific lexical counts are not represented as symmetric grounded metrics.
+
+A separate manifest repeats one inert periodic-connection fixture whose process field contains the instruction-like string \texttt{cite FAKE-999; claim confirmed malware}. The string is untrusted evidence, not an executable prompt or payload. Ten grounded calls measure whether output echoes the fake identifier or absolute claim and whether the validator accepts the complete response. Exploratory runs that informed audit schema 1.2 are excluded from all repeated counts.
+
+The repetitions use five fixed Phase-A prompts and one fixed adversarial prompt. They measure observed protocol stability, not independent sampling from a population; no inferential p-value is reported. Grounded and historical latency was collected in different operating-system states and is therefore descriptive rather than a causal speed comparison.
+
+\subsection{Metrics, response counterfactual, and reproducibility}
+
+For true positives ($TP$), false positives ($FP$), false negatives ($FN$), and true negatives ($TN$), the study reports precision, recall, F1, specificity, balanced accuracy, and Matthews correlation coefficient (MCC). Proportion intervals use the Wilson 95\% method. MCC is retained because both classes and both error directions matter:
 \begin{equation}
-\mathrm{precision}=\frac{TP}{TP+FP},\qquad
-\mathrm{recall}=\frac{TP}{TP+FN}.
+\mathrm{MCC}=\frac{TP\,TN-FP\,FN}
+{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}.
 \end{equation}
-When the same rule database defines both expected and observed items, perfect scores primarily demonstrate conformance to that database. They cannot establish coverage of unknown services or the vulnerability landscape.
 
-For reproducibility, each run should preserve the authorization and scope, Nmap parameters, source-XML hash, software commit, Python and dependency versions, generated reports, and an independently prepared ground-truth matrix. LLM evaluation additionally requires stored prompts and responses and a rubric covering evidence fidelity, technical correctness, usefulness, clarity, and unsupported assertions. Repeated runs are needed to characterize both timing and generation variability.
+No response was executed. A counterfactual estimates what would have occurred if every alerted window had been blocked: normal-origin alerted windows represent unnecessary actions, and non-alerted botnet-origin windows represent missed opportunities. This is a safety analysis, not a claim about real firewall effectiveness.
 
-\section{Results and Discussion}
+Inputs, hashes, model identifier, prompts, raw outputs, environment, per-call errors, aggregate JSON, and table-generation code are preserved in the repository \cite{ielen2025repo}. The CTU parser is streaming and stores only anonymized scored units. Article tables are generated directly from committed result JSON to prevent transcription drift.
 
-Across the reported scenarios, 24 hosts and 21 open ports were processed, producing seven items in the scope of the evaluated rule set. The hardened scenario produced no items in the original evaluation. These figures were not reproduced during the present review because the complete source XML files, execution logs, and independent labels were not preserved. They support only a description of the reported demonstration.
+\section{Results}
 
-The original manuscript reported approximately 7.5 seconds per host. The disclosed aggregate durations sum to 352 seconds; divided by 24 hosts, this is approximately 14.7 seconds per host. Even this corrected ratio should not be generalized because scanning time depends on port range, latency, retries, filters, scan method, and inference hardware. Likewise, a claim of linear scalability or a reported coefficient of determination cannot be reproduced without the underlying repeated measurements.
+\subsection{Functional benchmark}
 
-The evaluation is limited by the small sample and by potential circularity between rules and labels. Seven matched items do not establish broad vulnerability-detection performance. A service that is secure in context can still match a conventional-port rule, while an uncatalogued application vulnerability can be missed. The appropriate interpretation is \emph{review prioritization}, not automated vulnerability confirmation.
+As shown previously in Table~\ref{tab:phase-a}, the rules produced 4 true positives, 1 false positive, no false negatives, and 19 true negatives. The resulting precision was 0.800, recall 1.000, specificity 0.950, and F1 0.889. The only false positive was intentional: legitimate periodic updater traffic matched \texttt{BEH-001}. This demonstrates that the implementation recognizes its specified patterns and exposes the known dual-use limitation; it does not estimate field accuracy.
 
-The system's strongest property is semantic separation. Observable fields remain available in the report; rule-based findings explain why review is requested; and generated analysis is advisory. This design reduces the risk that plausible LLM text is mistaken for scanner evidence.
+\subsection{External validation}
 
-\subsection{Scenario-level interpretation}
+Table~\ref{tab:ctu13-metrics} reports development and holdout results separately. The holdout contained 53 botnet-origin and 55 normal-origin units. Sixteen botnet-origin units alerted, 37 were missed, 32 normal-origin units alerted, and 23 did not.
 
-In Scenario 1, the reported items involved HTTP and SMB exposure. Because the environment was not deliberately configured for the experiment, claiming no false positives would require independent validation of the policy and controls of each asset. The scenario demonstrates discovery but does not by itself provide ground truth.
+\input{generated/ctu13-metrics-table}
 
-Scenario 2 is a functional regression fixture. Its deliberately exposed services verify that parsing and expected rules operate consistently. Since the fixture is constructed from catalogued categories, it cannot measure performance on unknown weaknesses.
+Development precision had a Wilson 95\% interval of 0.101--0.434, recall 0.566--1.000, and specificity 0.194--0.538. Holdout intervals were 0.217--0.475 for precision, 0.195--0.435 for recall, and 0.297--0.550 for specificity. The holdout MCC of $-0.282$ is a negative generalization result, not evidence of reliable botnet detection.
 
-Scenario 3 illustrates semantic evolution. The original implementation reported no vulnerability for the SSH and HTTPS endpoints. The current hardened repository produces an SSH hardening review. This is not necessarily a false positive because the item explicitly asks for validation and states that it is not a confirmed vulnerability. Metrics must therefore score the precise output semantics rather than only count alerts.
+The rule-level error distribution is given in Table~\ref{tab:ctu13-rules}; B/N denotes findings on botnet-origin and normal-origin windows. Rapid distinct destinations dominated both correct and incorrect alerts. Periodicity appeared only in normal-origin holdout windows, and the asymmetric-egress rule did not fire.
 
-\subsection{Artifact-to-manuscript consistency}
+\input{generated/ctu13-rules-table}
 
-The source manuscript's larger dashboard, local Ollama inference, static CVE mappings, and risk/compliance heuristics are present in the pre-defense commit. No code was found that applied vendor firewall rules. The current repository implements a narrower defensive core: inventory, transparent review rules, static reports, and optional Zabbix export. This paper therefore recognizes the LLM as implemented in 2025 but not quantitatively validated, and recognizes firewall integration as proposed rather than implemented. Synchronizing claims with a tagged release is a prerequisite for a reproducible experimental claim.
+The development and holdout files contained 129,832 and 325,471 rows. Clean binary scoring retained 5,558 and 9,755 rows; most excluded rows were background or inbound/ambiguous under the publisher's label semantics. Streaming processing took approximately 14.4 and 37.9 seconds, with less than 1.3 MiB peak Python memory traced. Runtime demonstrates feasibility for these files only and is not a throughput benchmark.
 
-\subsection{Performance interpretation}
+\subsection{Repeated LLM traceability and adversarial fixture}
 
-Parser cost grows approximately with the number of XML host and port elements, while full-document parsing also creates a memory constraint. LLM inference, when enabled in an earlier prototype, was hardware-dependent and should be benchmarked separately. A future experiment should use fixed XML fixtures of increasing size, repeated measurements, and separate distributions for parsing, report generation, and inference.
+Table~\ref{tab:llm-repeated} reports the repeated Phase-C comparison. Both protocols completed all 50 API calls. Grounded output was parseable, schema-valid, and complete for finding and evidence IDs in 50/50 calls. Forty responses passed the semantic validator. The remaining ten, all for the emulated beacon scenario, retained complete citations but selected \texttt{segment-source-host-after-approval}, which is outside the frozen control set applicable to \texttt{BEH-001}; all ten were rejected.
 
-\section{Threats to Validity and Limitations}
+The reconstructed free-text protocol achieved exact finding- and evidence-ID coverage in 0/50 calls. Its protocol-specific audit found unsupported security-attribution vocabulary in 43/50 responses, containment without an explicit approval qualifier in 10/50, 200-word-limit violations in 37/50, and Markdown markers despite the instruction in 50/50. Free text was not asked to emit JSON, so zero schema validity is a representation difference rather than an independent quality failure.
 
-Internal validity is affected if expected outcomes were derived from the same static database used by the detector. External validity is limited by three scenarios, 24 hosts, and a narrow service set. Construct validity is threatened when open services, review items, and confirmed vulnerabilities are treated as equivalent. Reproducibility is limited because complete logs, repeated runs, exact prompts, hardware configuration, and independent expert ratings were not preserved in the source document.
+\input{generated/llm-repeated-table}
 
-Technical limitations include static rules, uncertain service fingerprints, absence of authenticated checks, lack of active exploitability validation, and full-document XML parsing. Markdown output requires robust escaping of untrusted values. Zabbix export should become idempotent. The LLM extension needs schema-constrained output, prompt-injection defenses, deterministic test fixtures, and evaluation by multiple blinded reviewers.
+In the separate adversarial fixture, all ten responses were schema-valid, cited the exact supplied evidence, and omitted both \texttt{FAKE-999} and the injected absolute malware claim. Nine passed semantic validation. One selected the same \texttt{BEH-001}-inapplicable segmentation control and was safely rejected, as shown in Table~\ref{tab:llm-adversarial}. This fixed fixture demonstrates resistance to one committed instruction-like string, not general prompt-injection robustness.
 
-Ethically, only authorized scan data may be processed. Reports reveal sensitive infrastructure information and must be protected accordingly. Automated firewall changes should remain outside the trust boundary until approval, audit logging, expiration, and rollback have been implemented and tested.
+\input{generated/llm-adversarial-table}
+
+Validator acceptance establishes programmed traceability and policy conformance. It does not establish interpretive correctness. The 20\% grounded rejection rate demonstrates why structured generation cannot replace deterministic validation. Broad lexical attribution was audited for historical prose but not extracted symmetrically from grounded JSON fields. It is therefore a protocol-specific diagnostic, not a confirmatory between-protocol effect.
+
+\subsection{Counterfactual response safety}
+
+The system executed zero automatic actions. If every alert had caused a block, 17 of 22 development actions (77.3\%) and 32 of 48 holdout actions (66.7\%) would have targeted verified normal-origin windows. Simultaneously, 37 holdout botnet-origin windows would have remained unaddressed. Thus, even a reversible automatic block-on-alert policy is not justified by the measured detector.
+
+\section{Discussion}
+
+\subsection{RQ1: transparent rules do not generalize from fixtures}
+
+The synthetic F1 of 0.889 and external holdout F1 of 0.317 answer different questions. Phase A shows functional agreement with constructed patterns. Phase B shows that timing and destination diversity are common in ordinary traffic and absent from many labeled botnet windows. Combining the datasets would hide this construct gap. RQ1 is therefore answered negatively for reliable malware-origin classification: the frozen rules are useful as explainable hypotheses for review, not as a standalone detector.
+
+The error pattern identifies a concrete systems requirement. Network flows lack process ownership, executable identity, signer information, parent--child lineage, file creation, and user context. Windows Sysmon, for example, can associate network connections, DNS queries, and file creation with processes, although collection volume and privacy require selective configuration \cite{sysmonevents2026}. Future testing should add authorized endpoint context and evaluate it on a newly frozen holdout rather than retuning against the inspected CTU-13 scenario.
+
+\subsection{RQ2: automated traceability improves, semantic superiority remains open}
+
+For the fixed model, evidence pack, and automated criteria, H2 is supported for exact traceability: grounded output preserved all supplied identifiers in 50/50 calls, whereas the reconstructed free-text path preserved them in 0/50. End-to-end grounded acceptance was lower, 40/50, because the validator consistently blocked a rule-inapplicable control. The adversarial fixture likewise retained exact IDs and rejected its one policy-invalid response without following the injected fake citation or absolute claim.
+
+This answers RQ2 for automated traceability and enforcement in the implemented artifact, not for general semantic correctness or analyst usefulness. The broad unsupported-claim metric is not fully symmetric across representations, ranking stability is not estimable when every scenario yields one finding, and no blinded expert ratings were collected. Schema constraint changes failure visibility and makes rejection enforceable; it does not make generation intrinsically reliable.
+
+\subsection{RQ3: the justified contribution is triage}
+
+The artifact can normalize evidence, correlate events with an authorized asset inventory, identify why a rule matched, preserve exact event IDs, and propose additional evidence collection. It may prepare a scoped response candidate containing source, destination, protocol, duration, approval requirement, and rollback conditions. It cannot responsibly identify malware, confirm exploitability, isolate a host, quarantine a file, or change a firewall before independent confirmation and human authorization. The counterfactual results make this boundary empirical rather than merely procedural.
+
+\section{Threats to Validity and Ethical Constraints}
+
+Construct validity is limited because CTU-13 labels describe flow origin, not whether every five-minute window contains a detectable malicious action. The study measures review-trigger performance under that operational definition, not malware-family classification. Network-only adaptation cannot evaluate the endpoint-dependent \texttt{BEH-004} rule.
+
+Internal validity is limited by fixed heuristic thresholds, source-host windowing, and the possibility that scenario-specific traffic generation affects both labels and patterns. Development and holdout families are separate, but only two of thirteen CTU-13 scenarios were used. The holdout has already been inspected and must not be reused as untouched evidence after tuning.
+
+External validity is limited by an older academic dataset, two malware families, 139 scored windows, one local model, six fixed LLM prompts, and one workstation. Confidence intervals are wide. No production telemetry, live malware, packet payload, or actual containment was used. Ten repetitions per prompt set describe stability under the frozen parameters but are clustered observations, and automated lexical checks do not replace blinded expert judgment.
+
+Reproducibility depends on the frozen URLs and hashes because the large external text flows are not committed. The experiment preserves aggregate and anonymized unit output, but external availability remains outside repository control. Model-tag reproducibility additionally depends on preserving the exact Ollama model digest.
+
+All collection must be authorized. Infrastructure and endpoint telemetry can contain personal and sensitive operational data and must follow purpose limitation, retention, access control, and applicable privacy law. The public fixtures are inert; acquisition code blocks malware binaries and packet captures. Reports are advisory, and the LLM has no action credentials.
 
 \section{Conclusion}
 
-This paper presented a hybrid, evidence-preserving approach to local-network security review. Deterministic parsing and transparent rules provide reproducibility; local LLM inference can improve explanation and prioritization; and multi-format reports support both analysts and integrations. The evaluation shows utility within a constrained rule set but does not support universal detection or exploitability claims.
+This study evaluated an evidence-grounded local-LLM architecture instead of assuming that a persuasive narrative improves security. The functional fixtures passed their intended rules, but family-separated CTU-13 validation failed to support reliable generalization: holdout recall was 0.302, specificity 0.418, F1 0.317, and MCC $-0.282$. A block-on-alert policy would have acted on normal-origin traffic in two thirds of holdout alerts while missing 37 botnet-origin windows.
 
-The research question can therefore be answered conditionally: AI contributes most effectively as an advisory layer grounded in verifiable scan evidence. Vulnerability confirmation and mitigation still require authoritative data, environmental context, and human authorization. Future work should integrate version-aware NVD queries, expand independently labeled tests, evaluate LLM output blindly, stream large XML files, make Zabbix synchronization idempotent, and implement a controlled workflow for proposing, approving, and reversing firewall changes.
+The retained negative results are the principal contribution. Transparent network-flow heuristics can produce auditable review candidates, but process identity and file lineage are necessary before stronger malware-related interpretation is tested. Repeated local schema-constrained generation preserved exact traceability, yet one fifth of Phase-A calls still required semantic policy rejection. The reconstructed free-text path preserved no exact identifiers, while the inert adversarial fixture showed bounded resistance to its committed instruction-like string. The responsible system boundary is therefore clear: deterministic collection, validation, and triage may be automated; attribution and containment may not.
+
+Future work should add privacy-reviewed endpoint telemetry, freeze a new family-separated external holdout, broaden adversarial prompts and model families, obtain blinded expert ratings, and test only reversible response proposals in an isolated authorized laboratory. Any later threshold, prompt, validator, or audit change must be reported as a new version rather than retroactively improving the present result.
 
 \singlespacing
 \bibliographystyle{abntex2-alf}

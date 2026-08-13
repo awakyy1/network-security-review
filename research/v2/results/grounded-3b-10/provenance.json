@@ -1,0 +1,279 @@
+{
+  "schema_version": "1.0",
+  "preserved_at": "2026-08-13T13:49:29.936212+00:00",
+  "repository_base_commit": "5d93faca99803f5b1a913d422bb86b58404db255",
+  "execution_source_state": "retrospective",
+  "execution_source_state_note": "The execution used an uncommitted source state that was not hashed at launch; the hashes below are a retrospective preservation snapshot and must not be presented as the exact execution state.",
+  "scientific_state_files": [
+    {
+      "path": "src/__init__.py",
+      "bytes": 53,
+      "sha256": "e84b88b3ba4a1cf0a7afddc8cb6ecf33db0c6d8dc87151d75e46faab52755b1e"
+    },
+    {
+      "path": "src/article_tables.py",
+      "bytes": 9000,
+      "sha256": "9f4fb983c531b928785271ddede64cbf44afc35f2509fce2817cd8ce7d9dc953"
+    },
+    {
+      "path": "src/behavior_detector.py",
+      "bytes": 11538,
+      "sha256": "fbceeb4df96d633148e7b42d2b21dbbc71520b0270d6c94204d6d2a9a575fb33"
+    },
+    {
+      "path": "src/ctu13_acquire.py",
+      "bytes": 6545,
+      "sha256": "c12086341267f123586f1a77a019e038ba63f752c965efd4c51b0724137abb24"
+    },
+    {
+      "path": "src/ctu13_experiment.py",
+      "bytes": 18083,
+      "sha256": "6158bdca540bad823e53afd41d0ab6826ccfc7c957457234d997ce5195f16554"
+    },
+    {
+      "path": "src/dashboard.py",
+      "bytes": 6735,
+      "sha256": "a380f53a95295dfbd153efbb80619023b820c637596bf005cafa0ded00f508ad"
+    },
+    {
+      "path": "src/nmap_to_zabbix.py",
+      "bytes": 15211,
+      "sha256": "6b949c3c07f1f57fa4e16ba58f1727fe4a75f8c416c73df6d576bfc135e01eec"
+    },
+    {
+      "path": "src/ollama_advisor.py",
+      "bytes": 13626,
+      "sha256": "c0d4a7afe656796b880d02efc5be4306bde953d07f2ef582e01e045f20e79000"
+    },
+    {
+      "path": "src/ollama_baseline.py",
+      "bytes": 8839,
+      "sha256": "9cb919df3b739ce8cd2a15cc7db094aca3d003d59d4ae5e62462f188dab1e909"
+    },
+    {
+      "path": "src/result_preservation.py",
+      "bytes": 8257,
+      "sha256": "437b36e6c7682a12d9634fe33e47dc4f9157be85d17900226180e877b3c6fedb"
+    },
+    {
+      "path": "src/telemetry.py",
+      "bytes": 6215,
+      "sha256": "4641cac70f6712efddad39b0e2864bc7347f0e52f7aef61cc141a30ee782f803"
+    },
+    {
+      "path": "src/v2_experiment.py",
+      "bytes": 17497,
+      "sha256": "72813b72e91ea6825c67528b6ce26a89445c54c819e189e058591d377ea01cb5"
+    },
+    {
+      "path": "src/v2_repetitions.py",
+      "bytes": 13357,
+      "sha256": "6e2f95ded958327b2ae24bb4e3ddee4a9d49ce1c1f32d193fc1a512c63e3b433"
+    },
+    {
+      "path": "research/v2/adversarial-scenarios.json",
+      "bytes": 460,
+      "sha256": "f4274b9a341cb2a4dce4cc1e5493a5afb2064e3ffe23c0484156eb8dd7108a31"
+    },
+    {
+      "path": "research/v2/ctu13_manifest.json",
+      "bytes": 2004,
+      "sha256": "b880324a33454a79080e44e0b1cad2f6a12481c3eab5ff6ec8669ec578cd709d"
+    },
+    {
+      "path": "research/v2/scenarios.json",
+      "bytes": 1758,
+      "sha256": "260a470889db54a8a317492d08a9f8bf69cfbb5c247500de025e6bb75a0958a6"
+    },
+    {
+      "path": "research/v2/fixtures/benign-updater.jsonl",
+      "bytes": 1698,
+      "sha256": "8743ed799ad5c488607e890af1877402d364cd0c44a991a0c8fca953014274ac"
+    },
+    {
+      "path": "research/v2/fixtures/benign-web.jsonl",
+      "bytes": 1292,
+      "sha256": "8a56986cb8e44fed8185577fdb75ee5badfc953c1eeb5435978aed1455be247a"
+    },
+    {
+      "path": "research/v2/fixtures/emulated-asymmetric-egress.jsonl",
+      "bytes": 272,
+      "sha256": "de1d4d37731c0f2209973b94230cf6c41f723c0eba35ef665955d8fb8df08004"
+    },
+    {
+      "path": "research/v2/fixtures/emulated-beacon.jsonl",
+      "bytes": 1848,
+      "sha256": "bb43a0aa386a80fb47503618e155fb185f1377dc12eb9c80e74a22f206f9841b"
+    },
+    {
+      "path": "research/v2/fixtures/emulated-prompt-injection-beacon.jsonl",
+      "bytes": 2016,
+      "sha256": "7cf964594371c856f12e2d417403b6e7699ddcb6ecf9f6f6958a44476bc55ff8"
+    },
+    {
+      "path": "research/v2/fixtures/emulated-service-discovery.jsonl",
+      "bytes": 2089,
+      "sha256": "b86be37f4c59693ec5d9562e3734503eec3fa8bfb3f02b55f291e744a42c67a3"
+    },
+    {
+      "path": "research/v2/fixtures/emulated-tool-transfer.jsonl",
+      "bytes": 473,
+      "sha256": "b027870c4e83f65ede355192c99c4dedde52b7b36ba1340478e77b9ad5c415ee"
+    },
+    {
+      "path": "examples/nmap/synthetic-enterprise.xml",
+      "bytes": 3846,
+      "sha256": "a7d083fbe22e3f415765a66df95e9c63441189f9481b269fa810aa4e71472762"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 32,
+      "sha256": "380c8f12c547d8f88a290289b1221b88b1d3c26dd2b63572339ac3c411ecac8c"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "bytes": 14,
+      "sha256": "fe660099e1bd0cf92eed7dc210df7950df3dc888e16aea6519cf2d033622f825"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 225,
+      "sha256": "b20c25f8b375b93aa8178056c1555afb99918d5ece675d127512fa414e9512c5"
+    }
+  ],
+  "raw_artifacts": [
+    {
+      "source": "output/v2-grounded-10/run-001/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-001.json",
+      "bytes": 27920,
+      "sha256": "4475181cb189d84162a04ea14a0d59ae252842d76e0089efba7860c3ba1244bd"
+    },
+    {
+      "source": "output/v2-grounded-10/run-001/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-001.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-002/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-002.json",
+      "bytes": 27855,
+      "sha256": "1c63963f0055da9226742603d8035e701c33cf3bfd6586009c983b7a948a5eba"
+    },
+    {
+      "source": "output/v2-grounded-10/run-002/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-002.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-003/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-003.json",
+      "bytes": 27856,
+      "sha256": "37b389d0cef9dd5adfd04727a4ca7aeb9c701f4a7592685bb83ac0d137814f0a"
+    },
+    {
+      "source": "output/v2-grounded-10/run-003/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-003.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-004/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-004.json",
+      "bytes": 27854,
+      "sha256": "3af7c666b157cc72757fab7aea0d28d2466f8253668851e832590f97f3ae38f2"
+    },
+    {
+      "source": "output/v2-grounded-10/run-004/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-004.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-005/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-005.json",
+      "bytes": 27855,
+      "sha256": "6b0031f80bc468b435aeeed2ddf45a0d3d1c854eebb27ead83ac9205dd260ae3"
+    },
+    {
+      "source": "output/v2-grounded-10/run-005/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-005.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-006/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-006.json",
+      "bytes": 27855,
+      "sha256": "35f5215304d54ae974075da7b3063e975a3e41c92fe7b429a9c9a5237efc4539"
+    },
+    {
+      "source": "output/v2-grounded-10/run-006/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-006.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-007/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-007.json",
+      "bytes": 27855,
+      "sha256": "116074222b895bd5ae827f8cedcaaf5a274a8ade6eba7a301c5ccb357e576611"
+    },
+    {
+      "source": "output/v2-grounded-10/run-007/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-007.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-008/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-008.json",
+      "bytes": 27856,
+      "sha256": "2429f58b1d27b5fab102d026ec0c2b160d722658de92f7c000ceeaa06c813354"
+    },
+    {
+      "source": "output/v2-grounded-10/run-008/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-008.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-009/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-009.json",
+      "bytes": 27856,
+      "sha256": "67472c3273741c80e8a3aac61b5c4071dc60dd9d5859ecf666a34c9d981e9c98"
+    },
+    {
+      "source": "output/v2-grounded-10/run-009/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-009.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/run-010/benchmark.json",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-010.json",
+      "bytes": 27855,
+      "sha256": "fd1a31fcf9803dd67a391f1cdaa17db3a83add043522207698ac924fe0ceda8e"
+    },
+    {
+      "source": "output/v2-grounded-10/run-010/benchmark.md",
+      "preserved": "research/v2/results/grounded-3b-10/runs/run-010.md",
+      "bytes": 1689,
+      "sha256": "22a9a5d87d6d1a0e56909e2e9efb2abe73de3f4e1474c987dc7a219af0917a64"
+    },
+    {
+      "source": "output/v2-grounded-10/summary.json",
+      "preserved": "research/v2/results/grounded-3b-10/original-summary.json",
+      "bytes": 1543,
+      "sha256": "cf9cd42851b0c56f204be15fd285abf65ebea8236fae5bd782a7e346a9a9bc77"
+    },
+    {
+      "source": "output/v2-grounded-10/summary.md",
+      "preserved": "research/v2/results/grounded-3b-10/original-summary.md",
+      "bytes": 599,
+      "sha256": "abfa8bc8949ea26519059d6b06c79fcb13d3da2f49cfe3d4995be42e94a1ca72"
+    }
+  ],
+  "accounting_note": "The original aggregate counted deterministic validation rejection as lack of API/JSON/schema success. The corrected projection separates received API responses, JSON parsing, schema validity, and final semantic grounding acceptance. Raw run records are preserved byte-for-byte."
+}

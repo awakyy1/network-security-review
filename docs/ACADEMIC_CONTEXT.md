@@ -27,6 +27,7 @@ How can artificial intelligence support the identification and prioritization of
 | `dd63d4c` — 2025-11-17 | Pre-defense artifact | Dashboard, optional Ollama analysis, static CVE associations, risk/compliance heuristics and optional Zabbix export |
 | `b191269` — 2026-08-01 | Hardened implementation | Authorized inventory, transparent review rules, reports and explicit Zabbix export |
 | `9dd9026` — 2026-08-03 | Audited base | Security documentation added to the hardened core |
+| `5d93fac` — 2026-08-03 | Published documentation base | Professional repository structure and simplified usage flow |
 
 No inspected version contained operational code for applying vendor firewall rules. Firewall automation is an architectural proposal, not an implemented result.
 

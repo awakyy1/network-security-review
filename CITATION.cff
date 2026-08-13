@@ -14,13 +14,16 @@ repository-code: "https://github.com/awakyy1/network-security-review"
 url: "https://github.com/awakyy1/network-security-review"
 abstract: >-
   Defensive Python artifact that parses authorized Nmap XML output, preserves
-  observable evidence, produces transparent configuration-review prompts and
-  optionally exports discovered hosts to Zabbix.
+  observable evidence, produces transparent configuration and behavior-review
+  prompts, supports evidence-grounded local-model research, and optionally
+  exports discovered hosts to Zabbix.
 keywords:
   - network security
   - Nmap
   - security review
   - artificial intelligence
+  - behavioral telemetry
+  - local language models
   - Zabbix
   - research software
 preferred-citation:

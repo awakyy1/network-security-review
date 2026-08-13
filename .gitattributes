@@ -5,5 +5,9 @@
 *.jpg binary
 *.jpeg binary
 
+# Preserved experiment evidence must retain its original bytes so provenance
+# hashes survive clones on every platform. These files may contain CRLF.
+research/v2/results/** -text -eol whitespace=-trailing-space
+
 # Academic sources are documentation rather than the implementation language.
 academic/** linguist-documentation
