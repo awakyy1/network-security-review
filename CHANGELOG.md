@@ -4,6 +4,8 @@ This file records meaningful changes to the research artifact. Commit hashes ide
 
 ## Unreleased
 
+- Make English the canonical repository README and retain Portuguese as
+  `README.pt-BR.md`.
 - Freeze the post-approval scientific article as V1.0 with a named PDF snapshot
   and an explicit future-version policy.
 
