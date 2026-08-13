@@ -2,47 +2,69 @@
 
 [![CI](https://github.com/awakyy1/network-security-review/actions/workflows/ci.yml/badge.svg)](https://github.com/awakyy1/network-security-review/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![TCC](https://img.shields.io/badge/TCC-aprovado-2E7D32)
-[![Licença: MIT](https://img.shields.io/badge/código-MIT-2F74C0)](LICENSE)
-![Uso](https://img.shields.io/badge/uso-defensivo-5B5B5B)
+![Thesis](https://img.shields.io/badge/thesis-approved-2E7D32)
+[![License: MIT](https://img.shields.io/badge/code-MIT-2F74C0)](LICENSE)
+![Scope](https://img.shields.io/badge/use-defensive-5B5B5B)
 
-Artefato acadêmico defensivo para transformar XMLs do Nmap em inventário verificável, apontamentos transparentes de revisão de configuração e relatórios em Markdown, JSON e HTML. A exportação de hosts para o Zabbix existe, mas só é executada por opção explícita.
+An academic defensive-security artifact that converts authorized Nmap XML output into a verifiable network inventory, transparent configuration-review prompts, and portable Markdown, JSON, and HTML reports. Zabbix host export is available only through an explicit command-line option.
 
-> **TCC aprovado em 19 de novembro de 2025** no curso de Engenharia de Software do Centro Universitário UniOpet, em Curitiba. Autores: João Vitor Ielen e Vinicius Mota Favaro.
+> **Undergraduate thesis approved on 19 November 2025** in the Software Engineering program at Centro Universitário UniOpet, Curitiba, Brazil. Authors: João Vitor Ielen and Vinicius Mota Favaro.
 
-[English version](README.en.md) · [Monografia oficial](academic/monografia/monografia-aprovada-2025.pdf) · [Artigo científico](academic/artigo/main.pdf) · [Como citar](CITATION.cff)
+[Português](README.pt-BR.md) · [Approved monograph](academic/monografia/monografia-aprovada-2025.pdf) · [Scientific article](academic/artigo/main.pdf) · [Citation metadata](CITATION.cff)
 
-## Visão geral
+## Overview
 
-O projeto preserva uma fronteira simples: evidências observadas pelo Nmap são inventário; correspondências com regras são pedidos de revisão; vulnerabilidades só podem ser confirmadas por uma avaliação independente e contextualizada.
+The project preserves a simple boundary: evidence observed by Nmap is
+inventory; transparent rule matches are review prompts; vulnerabilities require
+independent, contextual confirmation.
 
-### Fluxo de uso
+### Usage flow
 
-1. **Entrada autorizada:** o sistema recebe um XML já produzido pelo Nmap; ele não executa a varredura.
-2. **Leitura das evidências:** o parser normaliza hosts, endereços, serviços, portas e fingerprints observados.
-3. **Produção dos resultados:** regras transparentes geram pedidos de revisão e relatórios em Markdown, JSON e HTML.
-4. **Decisão humana:** os resultados apoiam a análise, mas não confirmam vulnerabilidades automaticamente.
+1. **Authorized input:** the system receives XML previously produced by Nmap;
+   it does not execute the scan.
+2. **Evidence parsing:** the parser normalizes observed hosts, addresses,
+   services, ports, and fingerprints.
+3. **Result production:** transparent rules generate review prompts and
+   Markdown, JSON, and HTML reports.
+4. **Human decision:** results support analysis but do not automatically
+   confirm vulnerabilities.
 
-A exportação para o Zabbix é uma etapa opcional e separada, ativada somente pelo argumento `--zabbix`.
+Zabbix export is an optional, separate step enabled only through `--zabbix`.
 
-### O que o sistema faz
+### What the system does
 
-- extrai hosts ativos, endereços, nomes, palpites de sistema operacional e portas abertas;
-- conserva os fingerprints de serviço relatados pelo Nmap;
-- aplica um conjunto pequeno e documentado de regras de revisão;
-- marca todo apontamento com `confirmed_vulnerability: false`;
-- gera relatórios portáveis e um dashboard HTML autocontido;
-- escapa dados controlados pelo XML antes de renderizá-los em HTML;
-- exporta hosts ao Zabbix somente com `--zabbix` e credenciais no ambiente;
-- possui testes determinísticos que não exigem varredura real nem instância Zabbix.
+- extracts live hosts, addresses, names, operating-system guesses, and open
+  ports;
+- preserves service fingerprints reported by Nmap;
+- applies a small, documented set of review rules;
+- marks every review item with `confirmed_vulnerability: false`;
+- generates portable reports and a self-contained HTML dashboard;
+- escapes XML-controlled data before rendering HTML;
+- exports hosts to Zabbix only with `--zabbix` and environment credentials;
+- processes inert normalized telemetry with four transparent behavioral rules;
+- optionally asks a loopback Ollama model to prioritize supplied evidence under
+  a closed JSON schema and deterministic validation;
+- reproduces the synthetic benchmark and the offline CTU-13 evaluation;
+- provides deterministic tests that require neither a real scan nor a Zabbix
+  instance.
 
-### O que o sistema não afirma
+### What the system does not claim
 
-Porta aberta não equivale a vulnerabilidade. A versão atual não executa Nmap, não explora serviços, não calcula CVSS, não associa CVEs, não certifica conformidade e não altera regras de firewall. Consulte o [modelo de segurança](docs/SECURITY_MODEL.md) para a semântica completa.
+The project deliberately separates three concepts:
 
-## Execução rápida
+1. Nmap observations become inventory records.
+2. Transparent rule matches become configuration-review prompts.
+3. A vulnerability requires independent, contextual confirmation.
 
-Requisito: Python 3.10 ou superior.
+An open port is not a vulnerability. The current implementation does not run
+Nmap, exploit services, calculate CVSS, map CVEs, certify compliance, or change
+firewall rules. It also does not confirm malware or turn model output into an
+automatic response. See the [security model](docs/SECURITY_MODEL.md) for the
+complete semantics.
+
+## Quick start
+
+Python 3.10 or newer is required.
 
 ```sh
 python -m venv .venv
@@ -50,70 +72,72 @@ python -m venv .venv
 .venv/Scripts/python src/nmap_to_zabbix.py
 ```
 
-Em Linux ou macOS, use `.venv/bin/python`. A configuração padrão processa o exemplo explicitamente sintético em `examples/nmap/synthetic-enterprise.xml` e grava os resultados em `output/`.
+Use `.venv/bin/python` on Linux or macOS. The default configuration processes the explicitly synthetic fixture at `examples/nmap/synthetic-enterprise.xml` and writes reports to `output/`.
 
 ```sh
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-O guia completo está em [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
+See [Getting started](docs/GETTING_STARTED.md) for CLI and Zabbix examples.
 
-## Estrutura do repositório
+## Repository structure
 
 ```text
 .
-├── academic/              # monografia, artigo, bibliografia e PDFs finais
-├── config/                # configuração padrão sem credenciais
-├── docs/                  # arquitetura, método, reprodução e segurança
-├── examples/nmap/         # XMLs exclusivamente sintéticos
-├── src/                   # implementação Python auditada
-├── tests/                 # testes unitários e fixtures controladas
-├── .github/               # CI, Dependabot e templates de colaboração
-├── CITATION.cff           # citação acadêmica legível pelo GitHub
-└── README.en.md           # apresentação internacional
+├── academic/              # monograph, article, bibliography, and final PDFs
+├── config/                # credential-free default configuration
+├── docs/                  # architecture, method, reproducibility, and security
+├── examples/nmap/         # explicitly synthetic XML fixtures
+├── research/v2/           # safe behavioral laboratory and preserved results
+├── src/                   # audited Python implementation
+├── tests/                 # unit tests and controlled fixtures
+├── .github/               # CI, Dependabot, and collaboration templates
+├── CITATION.cff           # GitHub-readable academic citation metadata
+└── README.pt-BR.md        # Portuguese presentation
 ```
 
-## Relação entre pesquisa e implementação
+## Research-to-code traceability
 
-O commit pré-banca `dd63d4c` contém o protótipo de 2025, incluindo análise opcional com Ollama, dashboard, heurísticas e integração opcional ao Zabbix. O núcleo atual, endurecido em `b191269`, mantém inventário, regras verificáveis, relatórios e Zabbix, removendo componentes que não possuíam validação experimental suficiente. Essa diferença é documentada em [docs/ACADEMIC_CONTEXT.md](docs/ACADEMIC_CONTEXT.md) e no [histórico](CHANGELOG.md).
+The pre-defense commit `dd63d4c` records the 2025 prototype, including optional Ollama analysis, dashboard heuristics, and optional Zabbix integration. The current hardened core, introduced in `b191269`, preserves inventory, transparent review rules, reports, and Zabbix while removing paths that lacked sufficient experimental validation.
 
-### Extensão científica V2
+The [academic context](docs/ACADEMIC_CONTEXT.md), [document policy](docs/DOCUMENT_POLICY.md), [methodology](docs/METHODOLOGY.md), [architecture](docs/ARCHITECTURE.md), [current-system map](docs/CURRENT_SYSTEM.md), [reproducibility guide](docs/REPRODUCIBILITY.md), and [security model](docs/SECURITY_MODEL.md) document that distinction. The approved monograph is an immutable historical artifact; only the article remains open to post-defense scientific refinement.
 
-O artigo pós-aprovação acrescenta, sem modificar a monografia, um caminho de
-pesquisa separado para telemetria comportamental e priorização local com
-Ollama. As regras são transparentes, o modelo cita identificadores de evidência
-sob esquema JSON fechado e nenhuma resposta automática é executada.
+### V2 scientific extension
 
-Na comparação automatizada repetida, o protocolo grounded preservou os
-identificadores exatos de achados e evidências em 50/50 chamadas, contra 0/50
-na reconstrução histórica em texto livre. Esse resultado demonstra
-rastreabilidade e validação determinística no artefato fixo; não demonstra
-superioridade semântica geral nem substitui avaliação humana cega.
+The post-approval article adds a separate research path for behavioral
+telemetry and local Ollama prioritization without changing the approved
+monograph. Rules are transparent, model output cites evidence identifiers under
+a closed JSON schema, and no automatic response is executed.
 
-A validação externa preserva também o resultado negativo: no holdout CTU-13,
-as regras de fluxo obtiveram F1 de 0,317 e MCC de -0,282. Portanto, o sistema é
-apresentado como apoio à triagem humana, não como detector confiável de malware
-ou mecanismo autônomo de bloqueio. Consulte o
-[protocolo V2](docs/V2_RESEARCH_PROTOCOL.md), a
-[validação CTU-13](docs/CTU13_EXTERNAL_VALIDATION.md) e os
-[resultados preservados](research/v2/results/README.md).
+In the repeated automated comparison, the grounded protocol preserved exact
+finding and evidence identifiers in 50/50 calls, versus 0/50 for the
+reconstructed historical free-text path. This demonstrates traceability and
+deterministic enforcement in the fixed artifact; it does not establish general
+semantic superiority or replace blinded human evaluation.
 
-## Documentação
+The external evaluation retains its negative result: the CTU-13 holdout yielded
+F1 0.317 and MCC -0.282. The artifact is therefore presented as human-review
+triage, not as reliable malware detection or autonomous blocking. See the
+[V2 protocol](docs/V2_RESEARCH_PROTOCOL.md),
+[CTU-13 validation](docs/CTU13_EXTERNAL_VALIDATION.md), and
+[preserved results](research/v2/results/README.md).
 
-- [Contexto acadêmico e banca](docs/ACADEMIC_CONTEXT.md)
-- [Arquitetura e fluxo de dados](docs/ARCHITECTURE.md)
-- [Estado atual do sistema](docs/CURRENT_SYSTEM.md)
-- [Metodologia e limites das evidências](docs/METHODOLOGY.md)
-- [Protocolo científico V2](docs/V2_RESEARCH_PROTOCOL.md)
-- [Validação externa CTU-13](docs/CTU13_EXTERNAL_VALIDATION.md)
-- [Guia de reprodução](docs/REPRODUCIBILITY.md)
-- [Política dos documentos acadêmicos](docs/DOCUMENT_POLICY.md)
-- [Modelo de segurança](docs/SECURITY_MODEL.md)
-- [Política de segurança](SECURITY.md)
-- [Como contribuir](CONTRIBUTING.md)
+## Documentation
 
-## Uso responsável e licença
+- [Academic and defense context](docs/ACADEMIC_CONTEXT.md)
+- [Architecture and data flow](docs/ARCHITECTURE.md)
+- [Current system state](docs/CURRENT_SYSTEM.md)
+- [Methodology and evidence limits](docs/METHODOLOGY.md)
+- [V2 scientific protocol](docs/V2_RESEARCH_PROTOCOL.md)
+- [CTU-13 external validation](docs/CTU13_EXTERNAL_VALIDATION.md)
+- [Reproducibility guide](docs/REPRODUCIBILITY.md)
+- [Academic-document policy](docs/DOCUMENT_POLICY.md)
+- [Security model](docs/SECURITY_MODEL.md)
+- [Security policy](SECURITY.md)
+- [Contributing guide](CONTRIBUTING.md)
 
-Use somente dados obtidos com autorização explícita. XMLs e relatórios podem revelar informações sensíveis; não publique inventários reais. Os arquivos em `examples/` e `tests/` são fixtures sintéticas.
+## Responsible use and licensing
 
-O código, os testes, os exemplos sintéticos, as automações e a documentação técnica são disponibilizados sob a [licença MIT](LICENSE). Os documentos em [`academic/`](academic/) estão excluídos dessa licença e permanecem com [todos os direitos reservados](academic/LICENSE.md). A divisão completa está em [LICENSING.md](LICENSING.md); a autoria e a citação recomendada, em [CITATION.cff](CITATION.cff).
+Process only scan data collected under explicit authorization. Nmap XML and generated reports can expose sensitive infrastructure details; never publish real inventories. All repository examples are synthetic fixtures.
+
+Source code, tests, synthetic examples, automation and technical documentation are available under the [MIT License](LICENSE). Documents under [`academic/`](academic/) are excluded and remain [all rights reserved](academic/LICENSE.md). See [LICENSING.md](LICENSING.md) for the complete boundary and [CITATION.cff](CITATION.cff) for authorship and citation guidance.
