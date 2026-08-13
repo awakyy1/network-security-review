@@ -42,6 +42,9 @@ jobs:
       - name: Lint
         run: ruff check --output-format=github .
 
+      - name: Check formatting
+        run: ruff format --check .
+
       - name: Run unit tests
         run: python -m unittest discover -s tests -p "test_*.py" -v
 
@@ -51,12 +54,17 @@ jobs:
           --input examples/nmap/synthetic-enterprise.xml
           --output-dir output/ci
 
+      - name: Run deterministic V2 smoke test
+        run: python -m src.v2_experiment --output-dir output/ci-v2
+
       - name: Verify generated artifacts
         shell: bash
         run: |
           test -s output/ci/network-review.md
           test -s output/ci/network-review.json
           test -s output/ci/dashboard.html
+          test -s output/ci-v2/benchmark.md
+          test -s output/ci-v2/benchmark.json
 
   required-status:
     name: test

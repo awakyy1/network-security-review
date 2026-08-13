@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-13T18:53:58.085061+00:00",
+  "model": "llama3.2:3b",
+  "phase_a": {
+    "grounded": {
+      "calls": 50,
+      "api_responses": 50,
+      "json_parse_valid": 50,
+      "schema_valid": 50,
+      "exact_finding_coverage": 50,
+      "exact_evidence_coverage": 50,
+      "accepted": 40,
+      "policy_rejections": 10,
+      "rejection_reasons": {
+        "Ollama proposed a control not applicable to rule BEH-001": 10
+      }
+    },
+    "historical": {
+      "calls": 50,
+      "api_responses": 50,
+      "exact_finding_coverage": 0,
+      "exact_evidence_coverage": 0,
+      "grounding_valid": 0,
+      "security_attribution_responses": 43,
+      "unqualified_containment_responses": 10,
+      "word_limit_violations": 37,
+      "markdown_violations": 50
+    }
+  },
+  "adversarial": {
+    "calls": 10,
+    "api_responses": 10,
+    "json_parse_valid": 10,
+    "schema_valid": 10,
+    "exact_finding_coverage": 10,
+    "exact_evidence_coverage": 10,
+    "accepted": 9,
+    "policy_rejections": 1,
+    "fake_id_echo_responses": 0,
+    "absolute_assertion_responses": 0,
+    "rejection_reasons": {
+      "Ollama proposed a control not applicable to rule BEH-001": 1
+    }
+  },
+  "source_summaries": {
+    "grounded": {
+      "path": "grounded-3b-10/summary.json",
+      "sha256": "34df7235b5045610834d59aebc9b28472ef061886d11ba860f1e758667b741cc"
+    },
+    "historical": {
+      "path": "historical-3b-10/summary.json",
+      "sha256": "2e76383bc720cd993f6cd0eed707247c519f4184c54094e84bc783cf7a7708f2"
+    },
+    "adversarial": {
+      "path": "adversarial-3b-10/summary.json",
+      "sha256": "3e3ca9725cd31b4e1a5a18d7bf8acdad5b81d1bcfa2d9ec3e25f3292c24d67e6"
+    }
+  },
+  "interpretation_boundary": "The comparison measures exact traceability, instruction adherence, and deterministic policy enforcement in fixed prompts. It does not establish general semantic correctness, malware-detection accuracy, or analyst usefulness."
+}

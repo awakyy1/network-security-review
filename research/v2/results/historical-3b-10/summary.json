@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.1",
+  "generated_at": "2026-08-13T15:27:09.349948+00:00",
+  "protocol": "historical",
+  "repetitions": 10,
+  "detector_stable_across_repetitions": true,
+  "detector_metrics": {
+    "true_positive": 4,
+    "false_positive": 1,
+    "false_negative": 0,
+    "true_negative": 19,
+    "precision": 0.8,
+    "recall": 1.0,
+    "f1": 0.888889,
+    "specificity": 0.95
+  },
+  "ollama": {
+    "attempts": 50,
+    "api_successes": 50,
+    "accepted": 0,
+    "api_failures": 0,
+    "validation_failures": 0,
+    "json_parse_valid": 0,
+    "schema_valid": 0,
+    "unknown_finding_citations": 0,
+    "unknown_evidence_citations": 0,
+    "unsupported_cve_mentions": 0,
+    "absolute_assertions": 0,
+    "unsupported_security_attribution_mentions": 58,
+    "containment_action_mentions": 11,
+    "unqualified_containment_actions": 10,
+    "word_limit_violations": 37,
+    "markdown_format_violations": 50,
+    "api_success_rate": 1.0,
+    "json_parse_rate": 0.0,
+    "schema_valid_rate": 0.0,
+    "accepted_grounding_rate": 0.0,
+    "mean_finding_coverage": 0.0,
+    "mean_evidence_coverage": 0.0,
+    "latency_ms": {
+      "observations": 50,
+      "minimum": 50468.512,
+      "q1": 74625.713,
+      "median": 95936.133,
+      "q3": 114361.136,
+      "maximum": 184869.588
+    },
+    "ranking_stability": {},
+    "ranking_interpretation": "Not estimable when each scenario yields at most one finding."
+  },
+  "measurement_note": "Schema 1.1 counts every received response as an API success, including output rejected later by the deterministic validator; acceptance is reported separately.",
+  "model": "llama3.2:3b",
+  "manifest": "/home/ielen/projetos/TCC-network-security-review/research/v2/scenarios.json",
+  "preservation": {
+    "preserved_at": "2026-08-13T15:27:09.352780+00:00",
+    "provenance_file": "provenance.json",
+    "raw_runs_preserved": 10,
+    "execution_source_state": "exact"
+  }
+}

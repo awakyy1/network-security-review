@@ -44,7 +44,27 @@ See [Getting started](docs/GETTING_STARTED.md) for CLI and Zabbix examples.
 
 The pre-defense commit `dd63d4c` records the 2025 prototype, including optional Ollama analysis, dashboard heuristics, and optional Zabbix integration. The current hardened core, introduced in `b191269`, preserves inventory, transparent review rules, reports, and Zabbix while removing paths that lacked sufficient experimental validation.
 
-The [academic context](docs/ACADEMIC_CONTEXT.md), [document policy](docs/DOCUMENT_POLICY.md), [methodology](docs/METHODOLOGY.md), [architecture](docs/ARCHITECTURE.md), [reproducibility guide](docs/REPRODUCIBILITY.md), and [security model](docs/SECURITY_MODEL.md) document that distinction. The approved monograph is an immutable historical artifact; only the article remains open to post-defense scientific refinement.
+The [academic context](docs/ACADEMIC_CONTEXT.md), [document policy](docs/DOCUMENT_POLICY.md), [methodology](docs/METHODOLOGY.md), [architecture](docs/ARCHITECTURE.md), [current-system map](docs/CURRENT_SYSTEM.md), [reproducibility guide](docs/REPRODUCIBILITY.md), and [security model](docs/SECURITY_MODEL.md) document that distinction. The approved monograph is an immutable historical artifact; only the article remains open to post-defense scientific refinement.
+
+### V2 scientific extension
+
+The post-approval article adds a separate research path for behavioral
+telemetry and local Ollama prioritization without changing the approved
+monograph. Rules are transparent, model output cites evidence identifiers under
+a closed JSON schema, and no automatic response is executed.
+
+In the repeated automated comparison, the grounded protocol preserved exact
+finding and evidence identifiers in 50/50 calls, versus 0/50 for the
+reconstructed historical free-text path. This demonstrates traceability and
+deterministic enforcement in the fixed artifact; it does not establish general
+semantic superiority or replace blinded human evaluation.
+
+The external evaluation retains its negative result: the CTU-13 holdout yielded
+F1 0.317 and MCC -0.282. The artifact is therefore presented as human-review
+triage, not as reliable malware detection or autonomous blocking. See the
+[V2 protocol](docs/V2_RESEARCH_PROTOCOL.md),
+[CTU-13 validation](docs/CTU13_EXTERNAL_VALIDATION.md), and
+[preserved results](research/v2/results/README.md).
 
 ## Responsible use and licensing
 

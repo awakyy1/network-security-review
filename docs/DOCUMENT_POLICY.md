@@ -22,6 +22,18 @@ The English article is a derivative research output. It may be refined to improv
 
 The article never replaces or retroactively modifies the approved monograph.
 
+### Article versioning
+
+- V1.0 was frozen on 13 August 2026 and is identified by
+  `academic/artigo/VERSION`;
+- the named snapshot is `academic/artigo/releases/article-v1.pdf`;
+- `academic/artigo/main.pdf` is the working build of the version declared in
+  `VERSION`;
+- later scientific changes must increment the version, create a new named PDF
+  snapshot and retain earlier snapshots and Git history;
+- a version label records an internal research-artifact state and does not
+  imply journal submission, peer review or acceptance.
+
 ## Copyright boundary
 
 All files under `academic/` are excluded from the repository's MIT License and

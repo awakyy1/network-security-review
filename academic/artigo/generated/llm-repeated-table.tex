@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Repeated Phase-C automated traceability comparison.}
+\label{tab:llm-repeated}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+Protocol & Calls & API responses & Exact findings & Exact evidence & System accepted & Policy rejected \\
+\midrule
+Grounded schema 1.1 & 50 & 50 & 50 & 50 & 40 & 10 \\
+Reconstructed free text & 50 & 50 & 0 & 0 & 0 & -- \\
+\bottomrule
+\end{tabular}%
+}
+\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Note:} Free text was not asked to emit JSON; its system-accepted count applies the common exact-ID grounding criterion. Grounded policy rejections retained complete citations but selected a rule-inapplicable control.}
+\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Prepared by the authors from 100 preserved local Ollama calls (2026).}
+\end{table}

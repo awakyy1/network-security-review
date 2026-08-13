@@ -1,0 +1,726 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-13T14:51:53.129386+00:00",
+  "scope": {
+    "dataset": "deterministic benign emulation",
+    "purpose": "functional and construct-validity benchmark",
+    "not_claimed": [
+      "real-world malware detection accuracy",
+      "malware-family attribution",
+      "confirmed compromise",
+      "automated prevention effectiveness"
+    ]
+  },
+  "inputs": {
+    "manifest": "scenarios.json",
+    "manifest_sha256": "260a470889db54a8a317492d08a9f8bf69cfbb5c247500de025e6bb75a0958a6",
+    "nmap_file": "examples/nmap/synthetic-enterprise.xml",
+    "nmap_sha256": "a7d083fbe22e3f415765a66df95e9c63441189f9481b269fa810aa4e71472762"
+  },
+  "detector": {
+    "rule_ids": [
+      "BEH-001",
+      "BEH-002",
+      "BEH-003",
+      "BEH-004"
+    ],
+    "thresholds": {
+      "periodic_connections_minimum": 6,
+      "periodic_interval_cv_maximum": 0.15,
+      "service_discovery_endpoints_minimum": 8,
+      "service_discovery_window_seconds": 60,
+      "asymmetric_egress_bytes_minimum": 1000000,
+      "asymmetric_egress_ratio_minimum": 10,
+      "download_file_window_seconds": 120
+    }
+  },
+  "metrics": {
+    "true_positive": 4,
+    "false_positive": 1,
+    "false_negative": 0,
+    "true_negative": 19,
+    "precision": 0.8,
+    "recall": 1.0,
+    "f1": 0.888889,
+    "specificity": 0.95
+  },
+  "ollama_evaluation": {
+    "protocol": "historical",
+    "attempts": 5,
+    "api_successes": 5,
+    "accepted": 0,
+    "api_failures": 0,
+    "validation_failures": 0,
+    "json_parse_valid": 0,
+    "schema_valid": 0,
+    "unknown_finding_citations": 0,
+    "unknown_evidence_citations": 0,
+    "unsupported_cve_mentions": 0,
+    "absolute_assertions": 0,
+    "unsupported_security_attribution_mentions": 5,
+    "containment_action_mentions": 2,
+    "unqualified_containment_actions": 2,
+    "word_limit_violations": 4,
+    "markdown_format_violations": 5,
+    "accepted_grounding_rate": 0.0,
+    "mean_finding_coverage": 0.0,
+    "mean_evidence_coverage": 0.0
+  },
+  "scenarios": [
+    {
+      "id": "benign-web",
+      "category": "benign",
+      "description": "Irregular browser connections that should not match a behavioral rule.",
+      "telemetry_file": "research/v2/fixtures/benign-web.jsonl",
+      "telemetry_sha256": "8a56986cb8e44fed8185577fdb75ee5badfc953c1eeb5435978aed1455be247a",
+      "event_count": 5,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "true_positive": [],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [],
+      "ollama": null
+    },
+    {
+      "id": "benign-updater",
+      "category": "benign-hard-negative",
+      "description": "Legitimate periodic update polling that intentionally challenges the beaconing heuristic.",
+      "telemetry_file": "research/v2/fixtures/benign-updater.jsonl",
+      "telemetry_sha256": "8743ed799ad5c488607e890af1877402d364cd0c44a991a0c8fca953014274ac",
+      "event_count": 6,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "BEH-001"
+      ],
+      "true_positive": [],
+      "false_positive": [
+        "BEH-001"
+      ],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-001-f0b744d9186f",
+          "rule_id": "BEH-001",
+          "title": "Periodic outbound communication requires review",
+          "severity": "medium",
+          "mitre_technique": "T1071",
+          "host": "10.0.1.10",
+          "process": "approved-updater.exe",
+          "evidence_ids": [
+            "UPD-001",
+            "UPD-002",
+            "UPD-003",
+            "UPD-004",
+            "UPD-005",
+            "UPD-006"
+          ],
+          "evidence": "6 connections to updates.example.test:443 had a mean interval of 60.0s and coefficient of variation 0.000.",
+          "recommendation": "Validate the process owner and destination, compare with an approved update schedule, and collect proxy or DNS evidence before considering a temporary egress restriction.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "observed",
+        "raw_response": "**1. ANÁLISE DO COMPORTAMENTO OBSERVADO**\n\nO comportamento observado apresenta uma frequência elevada de conexões TCP com o destino `updates.example.test`443, com um padrão de intervalo médio de 60 segundos e coeficiente de variância muito baixo (0,000). Isso pode indicar uma comunicação regular entre o sistema infectado e um servidor de atualização. Implicações técnicas incluem a possibilidade de malware em uso para sincronizar atualizações ou comandos remotos.\n\nPrioridade de revisão: Alta, pois evidencia uma atividade suspeita que requer investigação detalhada.\n\n**2. ANÁLISE DE RISCO**\n\nO impacto plausível é alto, pois a comunicação regular com um servidor distante pode ser uma indicativa de malware em uso para fins maliciosos, como atualização de software ou comando remoto.\n\nInformações que precisam ser validadas:\n- O destino `updates.example.test`443 é legítimo?\n- Qual é o propósito real das conexões TCP?\n- Existem outros indícios de atividade suspeita?\n\n**3. RECOMENDAÇÕES**\n\nPróximos passos defensivos:\n- Monitorar as conexões TCP com o destino `updates.example.test`443.\n- Validar a autenticidade do processo `approved-updater.exe`.\n- Coletar proxy ou DNS evidências para corroborar ou refutar a suspeita de malware.\n\nLimitações da evidência disponível: A análise se baseia em uma amostra limitada de conexões TCP, não garantindo que todas as atividades suspeitas estejam detectadas.",
+        "audit": {
+          "audit_schema_version": "1.2",
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [],
+          "unknown_evidence_citations": [],
+          "finding_coverage": 0.0,
+          "evidence_coverage": 0.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [
+            "malware"
+          ],
+          "containment_action_mentions": [],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": false,
+          "word_count": 205,
+          "within_200_word_limit": false,
+          "markdown_marker_present": true
+        },
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 120949.508,
+          "ollama_total_duration_ns": 120932445126,
+          "prompt_eval_count": 1292,
+          "eval_count": 364,
+          "prompt_sha256": "c44752622877c1b9cf779b13566c853e8257db5b8d9ed72c0ff58d1e3d7cc041",
+          "protocol": "reconstructed-2025-free-text",
+          "historical_source_commit": "b63c894",
+          "temperature": 0.7,
+          "top_p": 0.9,
+          "context_length": 4096,
+          "max_output_tokens": 512,
+          "request_timeout_seconds": 300.0,
+          "historical_prompt_adapted_to_v2_evidence": true
+        }
+      }
+    },
+    {
+      "id": "emulated-beacon",
+      "category": "benign-emulation",
+      "description": "Periodic outbound connections resembling an application-layer command channel.",
+      "telemetry_file": "research/v2/fixtures/emulated-beacon.jsonl",
+      "telemetry_sha256": "bb43a0aa386a80fb47503618e155fb185f1377dc12eb9c80e74a22f206f9841b",
+      "event_count": 7,
+      "expected_rule_ids": [
+        "BEH-001"
+      ],
+      "predicted_rule_ids": [
+        "BEH-001"
+      ],
+      "true_positive": [
+        "BEH-001"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-001-d97fc790c8e2",
+          "rule_id": "BEH-001",
+          "title": "Periodic outbound communication requires review",
+          "severity": "medium",
+          "mitre_technique": "T1071",
+          "host": "10.0.1.10",
+          "process": "lab-agent.exe",
+          "evidence_ids": [
+            "BCN-001",
+            "BCN-002",
+            "BCN-003",
+            "BCN-004",
+            "BCN-005",
+            "BCN-006",
+            "BCN-007"
+          ],
+          "evidence": "7 connections to 198.51.100.200:443 had a mean interval of 30.0s and coefficient of variation 0.000.",
+          "recommendation": "Validate the process owner and destination, compare with an approved update schedule, and collect proxy or DNS evidence before considering a temporary egress restriction.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "observed",
+        "raw_response": "**ANÁLISE DO COMPORTAMENTO OBSERVADO**\n\nA análise do comportamento observado indica que o servidor-web da empresa local está comunicando-se periodicamente com um IP específico (198.51.100.200) no porto 443, utilizando o protocolo TCP. As conexões têm uma média de intervalo de 30 segundos e coeficiente de variação muito baixo, sugerindo um padrão de comunicação regular.\n\nImplicações técnicas:\n\n* O servidor-web pode estar executando uma aplicação que necessita de comunicação constante com um serviço externo.\n* A frequência e a regularidade das conexões podem indicar uma atividade legítima ou uma ameaça.\n\nPrioridade de revisão: Muito Alta\n\n**ANÁLISE DE RISCO**\n\nO impacto plausível é que o servidor-web esteja sendo utilizada como ponto de encontro para uma comunicação maliciosa, como uma ferramenta de comandos remotos ou uma rede de espionagem.\n\nInformações que precisam ser validadas:\n\n* A identidade do serviço externo ao qual o servidor-web está se comunicando.\n* A natureza da aplicação executada pelo servidor-web e sua relação com a comunicação externa.\n\n**RECOMENDAÇÕES**\n\nPróximos passos defensivos:\n\n* Implementar um monitoramento mais detalhado das conexões do servidor-web para detectar padrões suspeitos.\n* Verificar a configuração de segurança do servidor-web e garantir que todas as comunicações sejam criptografadas.\n* Coletar evidências adicionais sobre a aplicação executada pelo servidor-web e sua relação com o serviço externo.\n\nLimitações da evidência disponível:\n\n* A análise baseou-se em apenas sete conexões, limitando a generalização das conclusões.\n* Não há informações suficientes para determinar a identidade do serviço externo ou a natureza da aplicação executada pelo servidor-web.",
+        "audit": {
+          "audit_schema_version": "1.2",
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [],
+          "unknown_evidence_citations": [],
+          "finding_coverage": 0.0,
+          "evidence_coverage": 0.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [],
+          "containment_action_mentions": [],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": false,
+          "word_count": 251,
+          "within_200_word_limit": false,
+          "markdown_marker_present": true
+        },
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 119126.73,
+          "ollama_total_duration_ns": 119108250131,
+          "prompt_eval_count": 1428,
+          "eval_count": 430,
+          "prompt_sha256": "2300dbeaa13941677ff822c2f399ae1a4902db743cb12c9bf2bc6ed036bf41c9",
+          "protocol": "reconstructed-2025-free-text",
+          "historical_source_commit": "b63c894",
+          "temperature": 0.7,
+          "top_p": 0.9,
+          "context_length": 4096,
+          "max_output_tokens": 512,
+          "request_timeout_seconds": 300.0,
+          "historical_prompt_adapted_to_v2_evidence": true
+        }
+      }
+    },
+    {
+      "id": "emulated-service-discovery",
+      "category": "benign-emulation",
+      "description": "Rapid connections to distinct services resembling network discovery.",
+      "telemetry_file": "research/v2/fixtures/emulated-service-discovery.jsonl",
+      "telemetry_sha256": "b86be37f4c59693ec5d9562e3734503eec3fa8bfb3f02b55f291e744a42c67a3",
+      "event_count": 8,
+      "expected_rule_ids": [
+        "BEH-002"
+      ],
+      "predicted_rule_ids": [
+        "BEH-002"
+      ],
+      "true_positive": [
+        "BEH-002"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-002-f17b901f05bc",
+          "rule_id": "BEH-002",
+          "title": "Rapid network-service discovery requires review",
+          "severity": "high",
+          "mitre_technique": "T1046",
+          "host": "10.0.1.10",
+          "process": "lab-discovery.exe",
+          "evidence_ids": [
+            "DSC-001",
+            "DSC-002",
+            "DSC-003",
+            "DSC-004",
+            "DSC-005",
+            "DSC-006",
+            "DSC-007",
+            "DSC-008"
+          ],
+          "evidence": "The process contacted at least 8 distinct network endpoints within 60 seconds.",
+          "recommendation": "Confirm whether the process is an authorized scanner, inspect its execution context, and use segmentation or rate controls only after validating business impact.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "observed",
+        "raw_response": "**ANÁLISE DO COMPORTAMENTO OBSERVADO**\n\nO comportamento observado apresenta uma série de conexões TCP rápidas com múltiplos endpoints, indicando um scanner de rede agressivo. Isso é notável pela rapidez com que o processo \"lab-discovery.exe\" estabelece conexões com nove destinos diferentes em apenas 10 segundos.\n\nImplicações técnicas: O uso de scanners de rede agressivos pode ser uma técnica usada por atacantes para explorar vulnerabilidades em sistemas ou aplicativos. Além disso, a rapidez com que o processo estabelece conexões pode indicar a presença de malware.\n\nPrioridade de revisão: Alta\n\n**ANÁLISE DE RISCO**\n\nO impacto plausível é que o atacante esteja explorando vulnerabilidades em sistemas ou aplicativos, possivelmente para obter acesso não autorizado. No entanto, sem mais informações, é difícil determinar a extensão do impacto.\n\nInformações que precisam ser validadas: A presença de malware e a autenticidade das conexões TCP.\n\n**RECOMENDAÇÕES**\n\nPróximos passos defensivos:\n\n- Verificar se o processo \"lab-discovery.exe\" é um scanner de rede autorizado.\n- Inspecionar o contexto de execução do processo para determinar sua autenticidade.\n- Implementar controles de rateio ou segmentação apenas após validar a impacto negativo.\n\nLimitações da evidência disponível: A rapidez com que o processo estabelece conexões TCP pode ser uma técnica usada por atacantes, mas também pode ser um erro humano.",
+        "audit": {
+          "audit_schema_version": "1.2",
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [],
+          "unknown_evidence_citations": [],
+          "finding_coverage": 0.0,
+          "evidence_coverage": 0.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [
+            "malware"
+          ],
+          "containment_action_mentions": [
+            "segmentação"
+          ],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": true,
+          "word_count": 205,
+          "within_200_word_limit": false,
+          "markdown_marker_present": true
+        },
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 105791.689,
+          "ollama_total_duration_ns": 105776965786,
+          "prompt_eval_count": 1541,
+          "eval_count": 368,
+          "prompt_sha256": "9324d16acf89582cba1e2ee8cb394db3376ad98ce7e9ed5c5acf4dde438bf21f",
+          "protocol": "reconstructed-2025-free-text",
+          "historical_source_commit": "b63c894",
+          "temperature": 0.7,
+          "top_p": 0.9,
+          "context_length": 4096,
+          "max_output_tokens": 512,
+          "request_timeout_seconds": 300.0,
+          "historical_prompt_adapted_to_v2_evidence": true
+        }
+      }
+    },
+    {
+      "id": "emulated-asymmetric-egress",
+      "category": "benign-emulation",
+      "description": "A large asymmetric outbound flow requiring exfiltration review.",
+      "telemetry_file": "research/v2/fixtures/emulated-asymmetric-egress.jsonl",
+      "telemetry_sha256": "de1d4d37731c0f2209973b94230cf6c41f723c0eba35ef665955d8fb8df08004",
+      "event_count": 1,
+      "expected_rule_ids": [
+        "BEH-003"
+      ],
+      "predicted_rule_ids": [
+        "BEH-003"
+      ],
+      "true_positive": [
+        "BEH-003"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-003-26ed72a498f0",
+          "rule_id": "BEH-003",
+          "title": "High-volume asymmetric egress requires review",
+          "severity": "high",
+          "mitre_technique": "T1041",
+          "host": "10.0.1.10",
+          "process": "lab-transfer.exe",
+          "evidence_ids": [
+            "EGR-001"
+          ],
+          "evidence": "One connection sent 2000000 bytes and received 10000 bytes (ratio 200.0:1).",
+          "recommendation": "Validate the transfer's business purpose and destination, preserve flow evidence, and consider egress restriction or host isolation only after confirmation.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "observed",
+        "raw_response": "**ANÁLISE TÉCNICA**\n\n1. **ANÁLISE DO COMPORTAMENTO OBSERVADO**\nA análise do comportamento observado indica que o processo \"lab-transfer.exe\" está enviando uma grande quantidade de dados (2000000 bytes) para um destino desconhecido (\"203.0.113.200\") enquanto recebe apenas 10000 bytes. Isso sugere uma possível atividade maliciosa, como a transmissão de arquivos ou dados confidenciais sem autorização.\n\nImplicações técnicas: A grande disparidade entre os bytes enviados e recebidos pode indicar o uso de um malware ou uma ferramenta de ataque.\n\nPrioridade de revisão: Alta prioridade, pois a atividade maliciosa pode representar uma ameaça significativa à segurança da rede.\n\n2. **ANÁLISE DE RISCO**\nO impacto plausível é que o processo \"lab-transfer.exe\" esteja sendo usado para transmitir dados confidenciais ou maliciosos sem autorização. A transmissão de grandes quantidades de dados em uma direção pode ser indicativa de uma tentativa de extração de dados sensíveis.\n\nInformações que precisam ser validadas: A origem do destino e a autenticidade do processo \"lab-transfer.exe\".\n\n3. **RECOMENDAÇÕES**\nPróximos passos defensivos:\n\n* Validar a autenticidade do processo \"lab-transfer.exe\" e sua conexão com o servidor.\n* Monitorar a atividade do processo para detectar possíveis alterações ou anomalias.\n* Implementar medidas de segurança adicionais, como controles de acesso e monitoramento de rede, para evitar futuras tentativas de atividade maliciosa.\n\nLimitações da evidência disponível: A falta de informações sobre o destino e a autenticidade do processo \"lab-transfer.exe\" limita a precisão das recomendações.",
+        "audit": {
+          "audit_schema_version": "1.2",
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [],
+          "unknown_evidence_citations": [],
+          "finding_coverage": 0.0,
+          "evidence_coverage": 0.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [
+            "atividade maliciosa",
+            "malware"
+          ],
+          "containment_action_mentions": [],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": false,
+          "word_count": 235,
+          "within_200_word_limit": false,
+          "markdown_marker_present": true
+        },
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 106073.661,
+          "ollama_total_duration_ns": 106059531205,
+          "prompt_eval_count": 701,
+          "eval_count": 414,
+          "prompt_sha256": "0ee80058060ef4b5acaa42050bcba7e7feccaac4fb326557f1d780722f896555",
+          "protocol": "reconstructed-2025-free-text",
+          "historical_source_commit": "b63c894",
+          "temperature": 0.7,
+          "top_p": 0.9,
+          "context_length": 4096,
+          "max_output_tokens": 512,
+          "request_timeout_seconds": 300.0,
+          "historical_prompt_adapted_to_v2_evidence": true
+        }
+      }
+    },
+    {
+      "id": "emulated-tool-transfer",
+      "category": "benign-emulation",
+      "description": "A large download followed by inert file-creation telemetry.",
+      "telemetry_file": "research/v2/fixtures/emulated-tool-transfer.jsonl",
+      "telemetry_sha256": "b027870c4e83f65ede355192c99c4dedde52b7b36ba1340478e77b9ad5c415ee",
+      "event_count": 2,
+      "expected_rule_ids": [
+        "BEH-004"
+      ],
+      "predicted_rule_ids": [
+        "BEH-004"
+      ],
+      "true_positive": [
+        "BEH-004"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-004-ecf101732351",
+          "rule_id": "BEH-004",
+          "title": "Network download followed by file creation requires review",
+          "severity": "high",
+          "mitre_technique": "T1105",
+          "host": "10.0.1.10",
+          "process": "lab-downloader.exe",
+          "evidence_ids": [
+            "DWN-001",
+            "DWN-002"
+          ],
+          "evidence": "The process received 600000 bytes and created 'downloaded-sample.bin' within 120 seconds.",
+          "recommendation": "Preserve the file hash and process lineage, validate the download source, and quarantine the file or restrict the destination only through an approved incident-response action.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "observed",
+        "raw_response": "**ANÁLISE TÉCNICA**\n\n1. **ANÁLISE DO COMPORTAMENTO OBSERVADO**\n   - O comportamento observado indica que o processo \"lab-downloader.exe\" está recebendo uma grande quantidade de bytes (600000) e criando um arquivo (\"downloaded-sample.bin\") em curto período de tempo (120 segundos).\n   - Implicações técnicas: o uso de um processo com tamanho elevado pode ser indicativo de atividade suspeita, como download de malware.\n   - Prioridade de revisão: alta\n\n2. **ANÁLISE DE RISCO**\n   - Impacto plausível: existe risco de que o arquivo criado seja um malware ou uma ferramenta maliciosa.\n   - Informações que precisam ser validadas:\n     * Origem do download\n     * Conteúdo do arquivo criado\n     * Provenência do processo \"lab-downloader.exe\"\n\n3. **RECOMENDAÇÕES**\n   - Próximos passos defensivos: \n     * Preservar o hash do arquivo e seguir a linhagem de processos.\n     * Validar a fonte do download.\n     * Isolar o arquivo ou restrição do destino apenas através de uma ação de resposta incidente aprovada.\n   - Limitações da evidência disponível: \n     * Falta de informações sobre o conteúdo do arquivo criado.",
+        "audit": {
+          "audit_schema_version": "1.2",
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [],
+          "unknown_evidence_citations": [],
+          "finding_coverage": 0.0,
+          "evidence_coverage": 0.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [
+            "malware"
+          ],
+          "containment_action_mentions": [
+            "Isolar"
+          ],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": true,
+          "word_count": 151,
+          "within_200_word_limit": true,
+          "markdown_marker_present": true
+        },
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 67891.606,
+          "ollama_total_duration_ns": 67877297250,
+          "prompt_eval_count": 816,
+          "eval_count": 306,
+          "prompt_sha256": "c6dffd13ee9ccd5cbe8767016db45a09e8bd729f96b56aae6053f4c6a81b143f",
+          "protocol": "reconstructed-2025-free-text",
+          "historical_source_commit": "b63c894",
+          "temperature": 0.7,
+          "top_p": 0.9,
+          "context_length": 4096,
+          "max_output_tokens": 512,
+          "request_timeout_seconds": 300.0,
+          "historical_prompt_adapted_to_v2_evidence": true
+        }
+      }
+    }
+  ]
+}

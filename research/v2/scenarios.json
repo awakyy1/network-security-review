@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "nmap_input": "../../examples/nmap/synthetic-enterprise.xml",
+  "scenarios": [
+    {
+      "id": "benign-web",
+      "category": "benign",
+      "description": "Irregular browser connections that should not match a behavioral rule.",
+      "telemetry": "fixtures/benign-web.jsonl",
+      "expected_rule_ids": []
+    },
+    {
+      "id": "benign-updater",
+      "category": "benign-hard-negative",
+      "description": "Legitimate periodic update polling that intentionally challenges the beaconing heuristic.",
+      "telemetry": "fixtures/benign-updater.jsonl",
+      "expected_rule_ids": []
+    },
+    {
+      "id": "emulated-beacon",
+      "category": "benign-emulation",
+      "description": "Periodic outbound connections resembling an application-layer command channel.",
+      "telemetry": "fixtures/emulated-beacon.jsonl",
+      "expected_rule_ids": ["BEH-001"]
+    },
+    {
+      "id": "emulated-service-discovery",
+      "category": "benign-emulation",
+      "description": "Rapid connections to distinct services resembling network discovery.",
+      "telemetry": "fixtures/emulated-service-discovery.jsonl",
+      "expected_rule_ids": ["BEH-002"]
+    },
+    {
+      "id": "emulated-asymmetric-egress",
+      "category": "benign-emulation",
+      "description": "A large asymmetric outbound flow requiring exfiltration review.",
+      "telemetry": "fixtures/emulated-asymmetric-egress.jsonl",
+      "expected_rule_ids": ["BEH-003"]
+    },
+    {
+      "id": "emulated-tool-transfer",
+      "category": "benign-emulation",
+      "description": "A large download followed by inert file-creation telemetry.",
+      "telemetry": "fixtures/emulated-tool-transfer.jsonl",
+      "expected_rule_ids": ["BEH-004"]
+    }
+  ]
+}
