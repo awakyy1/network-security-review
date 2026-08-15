@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.1",
+  "status": "frozen-functional-fixtures",
+  "nmap_input": "../../examples/nmap/synthetic-enterprise.xml",
+  "scenarios": [
+    {"id": "same-process-within-window", "telemetry": "fixtures/endpoint-positive.jsonl", "expected_beh_004": true},
+    {"id": "received-bytes-below-threshold", "telemetry": "fixtures/endpoint-below-bytes.jsonl", "expected_beh_004": false},
+    {"id": "different-processes", "telemetry": "fixtures/endpoint-wrong-process.jsonl", "expected_beh_004": false},
+    {"id": "file-after-time-window", "telemetry": "fixtures/endpoint-late-file.jsonl", "expected_beh_004": false},
+    {"id": "non-executable-like-suffix", "telemetry": "fixtures/endpoint-nonexecutable.jsonl", "expected_beh_004": false}
+  ]
+}

@@ -4,8 +4,11 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+.tools/
 .pytest_cache/
 .ruff_cache/
+.cache/
+.tmp/
 .coverage
 coverage.xml
 htmlcov/
@@ -44,9 +47,11 @@ config.local.json
 *.out
 *.synctex.gz
 *.toc
+academic/artigo/build*/
 
 # Raw Nmap output can expose sensitive infrastructure. Only reviewed,
 # explicitly synthetic fixtures under examples/ and tests/ belong in Git.
 *.xml
 !examples/**/*.xml
 !tests/fixtures/**/*.xml
+!research/v1.1/fixtures/adversarial-nmap.xml

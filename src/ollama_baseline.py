@@ -10,7 +10,7 @@ from typing import Any
 
 import requests
 
-from .ollama_advisor import validate_grounded_output, validate_local_ollama_url
+from .ollama_advisor import RULE_CONTROLS, validate_grounded_output, validate_local_ollama_url
 from .telemetry import TelemetryEvent
 
 HISTORICAL_SOURCE_COMMIT = "b63c894"
@@ -40,8 +40,8 @@ APPROVAL_QUALIFIER_PATTERN = (
 )
 
 
-def audit_free_text(response: str, findings: list[dict[str, Any]]) -> dict[str, Any]:
-    """Measure citations and unsupported claims without treating prose as trusted output."""
+def audit_model_response(response: str, findings: list[dict[str, Any]]) -> dict[str, Any]:
+    """Apply one citation and unsupported-claim taxonomy to JSON or free text."""
     known_finding_ids = {item["finding_id"] for item in findings}
     known_rule_ids = {item["rule_id"] for item in findings}
     known_evidence_ids = {event_id for item in findings for event_id in item["evidence_ids"]}
@@ -72,6 +72,23 @@ def audit_free_text(response: str, findings: list[dict[str, Any]]) -> dict[str, 
         except ValueError:
             pass
 
+    omitted_findings = sorted(known_finding_ids - cited_findings)
+    duplicate_findings: list[str] = []
+    unauthorized_controls: list[dict[str, str]] = []
+    if isinstance(parsed, dict) and isinstance(parsed.get("priorities"), list):
+        structured_finding_ids = [item.get("finding_id") for item in parsed["priorities"] if isinstance(item, dict)]
+        duplicate_findings = sorted(
+            item for item in set(structured_finding_ids) if structured_finding_ids.count(item) > 1
+        )
+        finding_index = {item["finding_id"]: item for item in findings}
+        for priority in parsed["priorities"]:
+            if not isinstance(priority, dict) or priority.get("finding_id") not in finding_index:
+                continue
+            rule_id = finding_index[priority["finding_id"]].get("rule_id")
+            for control_id in priority.get("control_ids", []):
+                if isinstance(control_id, str) and control_id not in RULE_CONTROLS.get(rule_id, set()):
+                    unauthorized_controls.append({"finding_id": priority["finding_id"], "control_id": control_id})
+
     cve_mentions = sorted(set(re.findall(r"\bCVE-\d{4}-\d{4,}\b", response, flags=re.IGNORECASE)))
     absolute_assertions = sorted(
         {
@@ -97,8 +114,23 @@ def audit_free_text(response: str, findings: list[dict[str, Any]]) -> dict[str, 
     approval_qualifier_present = bool(re.search(APPROVAL_QUALIFIER_PATTERN, response, flags=re.IGNORECASE))
     word_count = len(re.findall(r"\b\w+\b", response, flags=re.UNICODE))
     markdown_marker_present = bool(re.search(r"(?m)^\s*(?:#{1,6}\s|\*\*|[-*]\s)", response))
+    unsupported_claim_categories = []
+    if cve_mentions:
+        unsupported_claim_categories.append("unsupported-vulnerability-or-cve")
+    if absolute_assertions:
+        unsupported_claim_categories.append("unsupported-compromise-or-certainty")
+    if attribution_mentions:
+        unsupported_claim_categories.append("unsupported-identity-or-attribution")
+    if finding_candidates - known_finding_ids or event_candidates - known_evidence_ids:
+        unsupported_claim_categories.append("fabricated-identifier")
+    if unauthorized_controls:
+        unsupported_claim_categories.append("unauthorized-control")
+    if containment_mentions and not approval_qualifier_present:
+        unsupported_claim_categories.append("unqualified-containment")
+    if omitted_findings or duplicate_findings:
+        unsupported_claim_categories.append("finding-coverage-error")
     return {
-        "audit_schema_version": "1.2",
+        "audit_schema_version": "1.3",
         "json_parse_valid": json_parse_valid,
         "schema_valid": schema_valid,
         "grounding_valid": grounding_valid,
@@ -106,6 +138,8 @@ def audit_free_text(response: str, findings: list[dict[str, Any]]) -> dict[str, 
         "unknown_finding_citations": sorted(finding_candidates - known_finding_ids),
         "known_evidence_citations": sorted(cited_evidence),
         "unknown_evidence_citations": sorted(event_candidates - known_evidence_ids),
+        "omitted_findings": omitted_findings,
+        "duplicate_findings": duplicate_findings,
         "finding_coverage": round(len(cited_findings) / len(known_finding_ids), 6) if known_finding_ids else 1.0,
         "evidence_coverage": round(len(cited_evidence) / len(known_evidence_ids), 6) if known_evidence_ids else 1.0,
         "unsupported_cve_mentions": cve_mentions,
@@ -114,10 +148,18 @@ def audit_free_text(response: str, findings: list[dict[str, Any]]) -> dict[str, 
         "containment_action_mentions": containment_mentions,
         "human_approval_qualifier_present": approval_qualifier_present,
         "unqualified_containment_action": bool(containment_mentions) and not approval_qualifier_present,
+        "unauthorized_controls": unauthorized_controls,
+        "unsupported_claim_categories": unsupported_claim_categories,
+        "unsupported_claim_flag": bool(unsupported_claim_categories),
         "word_count": word_count,
         "within_200_word_limit": word_count <= 200,
         "markdown_marker_present": markdown_marker_present,
     }
+
+
+def audit_free_text(response: str, findings: list[dict[str, Any]]) -> dict[str, Any]:
+    """Backward-compatible alias for the symmetric model-response audit."""
+    return audit_model_response(response, findings)
 
 
 class HistoricalOllamaAdvisor:

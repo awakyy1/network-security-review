@@ -1,0 +1,260 @@
+{
+  "schema_version": "1.0",
+  "seed": 20260815,
+  "recovery_substitutions": 5,
+  "recovery_map_sha256": "112f921318afdc4a31bb336e2cd9062b9b36d2e0ae18ebc9fc2f9cb3bdee1389",
+  "mapping": [
+    {
+      "item_id": "2bd00ab071171224",
+      "source_key": "gemma3:4b|checklist-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:gemma3-4b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "8a6013bd0e1fc5b7",
+      "source_key": "llama3.2:3b|contract-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:llama3-2-3b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "1f416f16711b5059",
+      "source_key": "llama3.2:3b|checklist-v1|benign-updater-hard-negative",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:llama3-2-3b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "cb7279aa357af449",
+      "source_key": "qwen3:8b|evidence-first-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:qwen3-8b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "a557222caab00d3b",
+      "source_key": "qwen3:8b|contract-v1|endpoint-lineage",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "availability-recovery:results/llm-human-recovery-endpoint-2026-08-15/qwen3-8b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "4c02de035cba6ac0",
+      "source_key": "gemma3:4b|evidence-first-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "3a2839e177249dd9",
+      "source_key": "gemma3:4b|contract-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:gemma3-4b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "d17af7a17ce59ccd",
+      "source_key": "gemma3:4b|checklist-v1|benign-updater-hard-negative",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "33ef7eee3da4db3e",
+      "source_key": "gemma3:4b|evidence-first-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:gemma3-4b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "f3ee4e144e6de687",
+      "source_key": "qwen3:8b|contract-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:qwen3-8b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "71d3f76d3cc8c13b",
+      "source_key": "gemma3:4b|evidence-first-v1|endpoint-lineage",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "4ca199a1ee8a0580",
+      "source_key": "gemma3:4b|contract-v1|endpoint-lineage",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "41bb0391199ef16f",
+      "source_key": "llama3.2:3b|contract-v1|benign-updater-hard-negative",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:llama3-2-3b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "64e4dffab1c7c4e5",
+      "source_key": "llama3.2:3b|checklist-v1|endpoint-lineage",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:llama3-2-3b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "19b8c9c56b359f55",
+      "source_key": "qwen3:8b|checklist-v1|endpoint-lineage",
+      "primary_response_status": "api-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "availability-recovery:results/llm-availability-recovery-retry1-2026-08-15/benchmark.json"
+    },
+    {
+      "item_id": "d85343908047ef77",
+      "source_key": "gemma3:4b|contract-v1|benign-updater-hard-negative",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "e1c7d3d2bef01a34",
+      "source_key": "qwen3:8b|checklist-v1|benign-updater-hard-negative",
+      "primary_response_status": "api-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "availability-recovery:results/llm-availability-recovery-retry1-2026-08-15/benchmark.json"
+    },
+    {
+      "item_id": "e1db4e49149bca6f",
+      "source_key": "llama3.2:3b|checklist-v1|incomplete-single-observation",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:llama3-2-3b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "d4d7cc2304e981cf",
+      "source_key": "qwen3:8b|contract-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:qwen3-8b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "026f331a224ce864",
+      "source_key": "llama3.2:3b|evidence-first-v1|endpoint-lineage",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:llama3-2-3b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "0b60099edef8a301",
+      "source_key": "qwen3:8b|evidence-first-v1|endpoint-lineage",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:qwen3-8b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "b065a5887ecb2d73",
+      "source_key": "qwen3:8b|checklist-v1|multi-finding-mixed-rules",
+      "primary_response_status": "api-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "availability-recovery:results/llm-availability-recovery-retry1-2026-08-15/benchmark.json"
+    },
+    {
+      "item_id": "4a70242be5120400",
+      "source_key": "llama3.2:3b|contract-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:llama3-2-3b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "b1f9a963ed5fa143",
+      "source_key": "gemma3:4b|evidence-first-v1|benign-updater-hard-negative",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:gemma3-4b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "9fa8bf20e45a2b61",
+      "source_key": "llama3.2:3b|evidence-first-v1|benign-updater-hard-negative",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:llama3-2-3b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "7626f72b99e2bfcc",
+      "source_key": "qwen3:8b|checklist-v1|incomplete-single-observation",
+      "primary_response_status": "api-failure",
+      "selected_response_status": "accepted",
+      "response_source": "availability-recovery:results/llm-availability-recovery-retry1-2026-08-15/benchmark.json"
+    },
+    {
+      "item_id": "3fdca1ceadc4e15a",
+      "source_key": "llama3.2:3b|evidence-first-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:llama3-2-3b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "2db631918917f243",
+      "source_key": "llama3.2:3b|evidence-first-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:llama3-2-3b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "b3b56f9495178b50",
+      "source_key": "llama3.2:3b|checklist-v1|multi-finding-mixed-rules",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:llama3-2-3b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "bf764172eb92fe2f",
+      "source_key": "gemma3:4b|checklist-v1|endpoint-lineage",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:gemma3-4b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "e8f835c0bb044fea",
+      "source_key": "qwen3:8b|evidence-first-v1|benign-updater-hard-negative",
+      "primary_response_status": "validation-failure",
+      "selected_response_status": "validation-failure",
+      "response_source": "primary:qwen3-8b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "1aaddc1cbf9833b6",
+      "source_key": "llama3.2:3b|contract-v1|endpoint-lineage",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:llama3-2-3b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "6bdf5a5499ba703c",
+      "source_key": "qwen3:8b|contract-v1|benign-updater-hard-negative",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:qwen3-8b/contract-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "9fc51f84d54ff246",
+      "source_key": "qwen3:8b|evidence-first-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:qwen3-8b/evidence-first-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "13c93ef5132aecf8",
+      "source_key": "gemma3:4b|checklist-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/checklist-v1/run-001/benchmark.json"
+    },
+    {
+      "item_id": "4dee44c58e04c4ea",
+      "source_key": "gemma3:4b|contract-v1|incomplete-single-observation",
+      "primary_response_status": "accepted",
+      "selected_response_status": "accepted",
+      "response_source": "primary:gemma3-4b/contract-v1/run-001/benchmark.json"
+    }
+  ]
+}

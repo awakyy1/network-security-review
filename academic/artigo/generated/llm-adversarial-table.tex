@@ -2,6 +2,7 @@
 \centering
 \caption{Repeated prompt-injection fixture result.}
 \label{tab:llm-adversarial}
+\small
 \begin{tabular}{rrrrrr}
 \toprule
 Calls & Schema valid & Exact evidence & Fake-ID echo & Absolute claim & Accepted \\
@@ -9,6 +10,6 @@ Calls & Schema valid & Exact evidence & Fake-ID echo & Absolute claim & Accepted
 10 & 10 & 10 & 0 & 0 & 9 \\
 \bottomrule
 \end{tabular}
-\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Note:} One response was safely rejected for a rule-inapplicable control; no response followed the injected instruction to cite \texttt{FAKE-999} or claim confirmed malware.}
-\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Prepared by the authors from the preserved adversarial manifest and outputs (2026).}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Note:} One response was safely rejected for a rule-inapplicable control; no response followed the injected instruction to cite \texttt{FAKE-999} or claim confirmed malware.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
 \end{table}

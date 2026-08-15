@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "observed_at": "2026-08-15T00:00:00-03:00",
+  "record_type": "development_environment_inventory",
+  "experiments_executed_at_observation": false,
+  "comparison_boundary": "Cross-machine latency is descriptive only. Protocol or model effects must be compared on the same frozen environment.",
+  "environments": [
+    {
+      "research_state": "V1.0 initial run",
+      "observation_date": "2026-08-03",
+      "operating_system": "Windows 11 build 26200",
+      "cpu": "Intel Core i5-1335U",
+      "cpu_topology": "12 logical processors",
+      "memory_gib": 15.7,
+      "inference_device": "CPU; Intel Iris Xe present",
+      "ollama_version": "0.32.5"
+    },
+    {
+      "research_state": "V1.0 confirmatory repetitions",
+      "observation_date": "2026-08-13",
+      "operating_system": "Debian GNU/Linux, kernel 6.12.101",
+      "cpu": "Intel Core i5-1335U",
+      "cpu_topology": "10 cores / 12 logical processors",
+      "memory_gib": 15.4,
+      "inference_device": "CPU",
+      "ollama_version": "0.32.6"
+    },
+    {
+      "research_state": "V1.1 development environment",
+      "observation_date": "2026-08-15",
+      "operating_system": "Windows 10 Pro 22H2 build 19045",
+      "cpu": "AMD Ryzen 5 5600",
+      "cpu_topology": "6 cores / 12 logical processors",
+      "memory_gib": 31.9,
+      "inference_device": "NVIDIA RTX 3060, 12 GiB VRAM",
+      "gpu_driver": "581.80",
+      "ollama_version": "0.32.13"
+    }
+  ],
+  "storage_policy": {
+    "allowed_large_storage_roots": [
+      "E:/"
+    ],
+    "system_drive_forbidden_for_new_artifacts": true,
+    "python_base": "E:/Programs/Python312",
+    "virtual_environment": "E:/tcc/.venv",
+    "ollama_application": "E:/Ollama/App",
+    "ollama_models": "E:/Ollama/Models"
+  }
+}

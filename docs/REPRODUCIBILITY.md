@@ -19,11 +19,32 @@
 - Python 3.10 or newer;
 - dependencies pinned in `requirements.txt`;
 - no live Nmap or Zabbix instance required for unit tests;
-- XeLaTeX, BibTeX, Arial and `abntex2` are the submission environment; the
-  source also compiles reproducibly with Tectonic and Liberation Sans as an
-  explicit Linux fallback when Arial is unavailable.
+- LaTeX, BibTeX and the one-column `IEEEtran`-based preprint class are the V1.1
+  development-document environment. If publication is ever pursued, the
+  chosen venue's exact template will supersede this generic layout.
 
 ## Software verification
+
+For V1.1, the default one-command verification runs tests and static checks,
+regenerates inert deterministic outputs, tables and figures, and compiles the
+development PDF. It reads preserved LLM results and performs no model inference:
+
+```powershell
+python -m src.v1_1_reproduce
+```
+
+The command creates a new timestamped directory under `output/` and writes a
+machine-readable `verification-report.json`; it never overwrites
+`research/v1.1/`. To verify/download the frozen CTU-13 text flows and replay the
+large deterministic sources, use explicit options:
+
+```powershell
+python -m src.v1_1_reproduce --download-ctu13 --run-ctu13 --run-second-dataset
+```
+
+On Windows the command refuses data and output roots on `C:`. Confirmatory
+holdout and LLM calls are intentionally not rerun by this release verifier;
+their frozen manifests, raw outputs and validation tests are checked instead.
 
 ```sh
 python -m pip install --requirement requirements.txt --requirement requirements-dev.txt
@@ -41,6 +62,17 @@ Its committed fixtures execute no network activity or malware. To enable the
 optional local advisor, append `--ollama-model MODEL_NAME`; the model must
 already be installed in a loopback Ollama instance. See the
 [V2 protocol](V2_RESEARCH_PROTOCOL.md) before interpreting its metrics.
+
+After acquiring and verifying the frozen CTU-13 text flows, the V1.1
+retrospective detector diagnostics can be generated entirely on `E:`:
+
+```powershell
+python -m src.ctu13_acquire --data-dir E:\tcc\data\ctu13 --download
+python -m src.ctu13_analysis --data-dir E:\tcc\data\ctu13 --output-dir E:\tcc\output\v1.1-ctu13-analysis --window-seconds 60 300 600
+```
+
+Scenario 12 is an inspected historical holdout in this diagnostic command; the
+output must not be described as a new confirmatory holdout result.
 
 For the protocol comparison, run both configurations with the same model and
 manifest. The repetition runner preserves every per-run JSON response and
@@ -84,16 +116,16 @@ article from `academic/artigo/`:
 ```sh
 python -m src.article_tables
 cd academic/artigo
-xelatex main.tex
+pdflatex main.tex
 bibtex main
-xelatex main.tex
-xelatex main.tex
+pdflatex main.tex
+pdflatex main.tex
 ```
 
 Run the table generator from the repository root, or pass the repository root
 explicitly. The official monograph contains 27 pages and must not change. The
-current post-approval article contains 12 pages; its pagination can change when
-a journal template is applied.
+V1.0 contains 12 pages. V1.1 pagination can change under the IEEE development
+class and again when the selected periodical's exact template is applied.
 
 ## Data policy
 

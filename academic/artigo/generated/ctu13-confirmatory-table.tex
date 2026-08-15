@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering
+\caption{Prospective V1.1 development selection and single confirmatory CTU-13 holdout.}
+\label{tab:ctu13-confirmatory}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrrrrrr}
+\toprule
+Role & Family & Units & TP & FP & FN & TN & Precision & Recall & F1 & Specificity & MCC \\
+\midrule
+Development & RBot & 18 & 0 & 2 & 3 & 13 & 0.000 & 0.000 & 0.000 & 0.867 & -0.158 \\
+Confirmatory holdout & DonBot & 105 & 24 & 29 & 3 & 49 & 0.453 & 0.889 & 0.600 & 0.628 & 0.452 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} The 243-configuration grid was evaluated only on RBot. The selected configuration and scientific source hashes were frozen before the DonBot file was parsed once. Development and holdout metrics are not pooled.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

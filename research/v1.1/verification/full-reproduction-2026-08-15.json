@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "created_at_utc": "2026-08-15T21:58:55.051834+00:00",
+  "repository_root": "E:\\tcc",
+  "output_root": "E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final",
+  "llm_inference_performed": false,
+  "external_options": {
+    "download_ctu13": false,
+    "run_ctu13": false,
+    "run_second_dataset": false
+  },
+  "commands": [
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": ".................................................................. [ 79%]\n.................                                                        [100%]\n83 passed, 6 subtests passed in 1.38s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "59 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "src/nmap_to_zabbix.py",
+        "--input",
+        "examples/nmap/synthetic-enterprise.xml",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\synthetic-report"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "Parsed 4 live hosts and produced 14 review findings.\nReports: E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\synthetic-report\\network-review.md, E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\synthetic-report\\network-review.json, E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\synthetic-report\\dashboard.html\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.v2_experiment",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\phase-a"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "V2 benchmark: TP=4 FP=1 FN=0 F1=0.889\nReports: E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\phase-a\\benchmark.md, E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\phase-a\\benchmark.json\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.endpoint_experiment",
+        "--manifest",
+        "research/v1.1/endpoint-scenarios.json",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\endpoint"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "{\"false_negative\": 0, \"false_positive\": 0, \"true_negative\": 4, \"true_positive\": 1}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.counterfactual_policies",
+        "--repository-root",
+        "E:\\tcc",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-reproduction-2026-08-15-final\\counterfactual"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "{\"confirmatory-donbot\": {\"negative\": 78, \"negative_alerted\": 29, \"negative_multi_rule\": 5, \"positive\": 27, \"positive_alerted\": 24, \"positive_multi_rule\": 6}, \"historical-nsis-ay\": {\"negative\": 55, \"negative_alerted\": 32, \"negative_multi_rule\": 15, \"positive\": 53, \"positive_alerted\": 16, \"positive_multi_rule\": 0}, \"synthetic-implementation-transfer\": {\"negative\": 432, \"negative_alerted\": 48, \"negative_multi_rule\": 0, \"positive\": 97, \"positive_alerted\": 96, \"positive_multi_rule\": 0}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.article_tables"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "E:\\tcc\\academic\\artigo\\generated\\phase-a-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-metrics-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-rules-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-exploratory-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-repeated-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-adversarial-table.tex\nE:\\tcc\\academic\\artigo\\generated\\environment-comparison-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-window-analysis-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-threshold-diagnostics-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-error-examples-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-confirmatory-table.tex\nE:\\tcc\\academic\\artigo\\generated\\second-dataset-transfer-table.tex\nE:\\tcc\\academic\\artigo\\generated\\endpoint-beh004-table.tex\nE:\\tcc\\academic\\artigo\\generated\\counterfactual-policies-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-primary-matrix-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-supplement-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-ablation-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-adversarial-matrix-table.tex\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.article_figures"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "E:\\tcc\\academic\\artigo\\generated\\figures\\architecture-trust-boundaries.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\architecture-trust-boundaries.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\experimental-flow.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\experimental-flow.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\ctu13-development-holdout-metrics.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\ctu13-development-holdout-metrics.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\grounded-free-text-traceability.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\grounded-free-text-traceability.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\beh002-holdout-distributions.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\beh002-holdout-distributions.png\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.tools\\tectonic\\tectonic.exe",
+        "-X",
+        "compile",
+        "main.tex",
+        "--outdir",
+        "build-v1.1"
+      ],
+      "cwd": "E:\\tcc\\academic\\artigo",
+      "returncode": 0,
+      "stdout": "note: \"version 2\" Tectonic command-line interface activated\nnote: Running TeX ...\nnote: Running BibTeX on main.aux ...\nnote: Rerunning TeX because bibtex was run ...\nnote: Rerunning TeX because \"main.aux\" changed ...\nnote: Running xdvipdfmx ...\nnote: Writing `build-v1.1\\main.pdf` (202.896484375 KiB)\nnote: Skipped writing 3 intermediate files (use --keep-intermediates to keep them)\n",
+      "stderr": "Fontconfig error: Cannot load default config file: No such file: (null)\nwarning: main.tex:60: Underfull \\hbox (badness 3568) in paragraph at lines 59--60\nwarning: main.tex:76: Underfull \\hbox (badness 1635) in paragraph at lines 75--76\nwarning: main.tex:182: Underfull \\hbox (badness 6625) in paragraph at lines 181--182\nwarning: main.tex:267: Underfull \\hbox (badness 1540) in paragraph at lines 266--267\nwarning: generated/llm-repeated-table:17: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:300: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:314: Underfull \\hbox (badness 1635) in paragraph at lines 313--314\nwarning: main.tex:360: Underfull \\hbox (badness 2707) in paragraph at lines 359--360\nwarning: main.tex:60: Underfull \\hbox (badness 3568) in paragraph at lines 59--60\nwarning: main.tex:76: Underfull \\hbox (badness 1635) in paragraph at lines 75--76\nwarning: main.tex:182: Underfull \\hbox (badness 6625) in paragraph at lines 181--182\nwarning: main.tex:267: Underfull \\hbox (badness 1540) in paragraph at lines 266--267\nwarning: generated/llm-repeated-table:17: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:300: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:314: Underfull \\hbox (badness 1635) in paragraph at lines 313--314\nwarning: main.tex:360: Underfull \\hbox (badness 2707) in paragraph at lines 359--360\nwarning: main.bbl:40: Underfull \\hbox (badness 1472) in paragraph at lines 37--40\nwarning: main.tex:60: Underfull \\hbox (badness 3568) in paragraph at lines 59--60\nwarning: main.tex:76: Underfull \\hbox (badness 1635) in paragraph at lines 75--76\nwarning: main.tex:182: Underfull \\hbox (badness 6625) in paragraph at lines 181--182\nwarning: main.tex:267: Underfull \\hbox (badness 1540) in paragraph at lines 266--267\nwarning: generated/llm-repeated-table:17: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:300: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:314: Underfull \\hbox (badness 1635) in paragraph at lines 313--314\nwarning: main.tex:360: Underfull \\hbox (badness 2707) in paragraph at lines 359--360\nwarning: main.bbl:40: Underfull \\hbox (badness 1472) in paragraph at lines 37--40\nwarning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.\n"
+    }
+  ],
+  "pdf": {
+    "path": "E:\\tcc\\academic\\artigo\\build-v1.1\\main.pdf",
+    "sha256": "2f279983e681dbf19a50a7e053b0fbbb546bec4d73fe7dcfb794c4d1c129323a",
+    "bytes": 207766
+  }
+}

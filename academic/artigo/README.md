@@ -1,14 +1,14 @@
 # Scientific article
 
-[`main.tex`](main.tex) is the English, single-column post-approval research
+[`main.tex`](main.tex) is the English, one-column post-approval research
 article derived from the undergraduate project. It does not alter the approved
 monograph. Its claims, negative result, and limitations follow the frozen V2
 protocol and preserved evidence in `research/v2/results/`.
 
-The current article is **V1.0**, frozen on 2026-08-13. Its identifier is kept in
-[`VERSION`](VERSION), printed in the document and embedded in the PDF metadata.
-The named PDF snapshot under [`releases/`](releases/) remains the V1 record when
-`main.tex` is later advanced to another version.
+The current source is **V1.1** and uses a sober, one-column IEEE-based preprint
+(`IEEEtran`) baseline. V1.0 and V1.1 remain preserved as named PDF snapshots
+under [`releases/`](releases/). The current identifier is kept in
+[`VERSION`](VERSION), and [`main.pdf`](main.pdf) is the verified V1.1 build.
 
 Generate the result tables from the repository root before compiling:
 
@@ -16,18 +16,22 @@ Generate the result tables from the repository root before compiling:
 python -m src.article_tables
 ```
 
-The six files under [`generated/`](generated/) are projections of preserved
+The files under [`generated/`](generated/) are projections of preserved
 JSON results and should not be edited manually.
 
 ```sh
-latexmk -xelatex main.tex
+latexmk -pdf main.tex
 ```
 
-Without `latexmk`, run `xelatex`, `bibtex`, `xelatex`, `xelatex`. XeLaTeX is required for Arial.
+Without `latexmk`, run `pdflatex`, `bibtex`, `pdflatex`, `pdflatex`.
 
-On Linux hosts without Arial, `main.tex` explicitly falls back to Liberation
-Sans and Liberation Mono. Tectonic can build the audited working PDF with
-`tectonic -X compile main.tex`; use the Arial/XeLaTeX submission environment
-for the final journal-formatted artifact.
+Tectonic can build the audited PDF with `tectonic -X compile main.tex`.
+The IEEE-based layout is a presentation and quality baseline only; no venue
+submission is planned or implied.
 
-Before submitting to a journal, add the authors' contact details and adapt the document to the journal's template, page limit and real submission/acceptance metadata. The academic approval date is not a journal acceptance date.
+The complete V1.1 requirements and release gates are tracked in
+[`../../docs/V1_1_RESEARCH_PLAN.md`](../../docs/V1_1_RESEARCH_PLAN.md).
+
+If the scope ever changes to publication submission, that later version must
+add confirmed author metadata and follow the chosen venue's current rules. The
+2025 academic approval date is not a journal acceptance date.

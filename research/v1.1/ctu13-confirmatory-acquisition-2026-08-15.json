@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "recorded_at": "2026-08-15T16:40:13-03:00",
+  "selection_record_original_sha256": "b7ec32a07c2013b2d9882021a9c6dd6ba98008b0a81e45dbb698342f2ea86537",
+  "selection_record_corrected_sha256": "2982aabc2ea302bf3cc9e8f49c8e271409787de181a7b283cdc6f017d5e98df6",
+  "timestamp_erratum": "CTU13_SELECTION_ERRATUM.md",
+  "acquisition_action": "download_bytes_verify_http_length_compute_sha256_without_parsing_rows",
+  "storage_root": "E:/tcc/data/ctu13-v1.1",
+  "holdout_state": "downloaded_and_hashed_not_parsed",
+  "sources": [
+    {
+      "scenario": 11,
+      "family": "RBot",
+      "role": "development",
+      "filename": "capture20110818-2.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/detailed-bidirectional-flow-labels/capture20110818-2.binetflow",
+      "expected_bytes": 14596615,
+      "observed_bytes": 14596615,
+      "etag": "\"deba07-50e171a401fc0\"",
+      "last_modified": "Mon, 02 Feb 2015 08:54:31 GMT",
+      "sha256": "cee542d4b5efe4fa1cd59b87ece5aaea9a13d8f0abe56cd07cee31590736428c"
+    },
+    {
+      "scenario": 6,
+      "family": "DonBot",
+      "role": "holdout",
+      "filename": "capture20110816.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-47/detailed-bidirectional-flow-labels/capture20110816.binetflow",
+      "expected_bytes": 76780048,
+      "observed_bytes": 76780048,
+      "etag": "\"4939210-50de1021fe280\"",
+      "last_modified": "Fri, 30 Jan 2015 16:22:18 GMT",
+      "sha256": "801800eeda9a5a44868b1e3e492f93dc6d52b5d14566c1d8431c9e85d0d2adaa"
+    }
+  ]
+}

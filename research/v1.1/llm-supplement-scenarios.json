@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1",
+  "frozen_at": "2026-08-15T18:22:16.6625802-03:00",
+  "nmap_input": "../../examples/nmap/synthetic-enterprise.xml",
+  "conflict_definition": "A conflict is operationalized prospectively as simultaneous findings with comparable detector severity but opposing contextual cues: signed maintenance-like lineage versus missing signer and parent-process context. These cues do not prove authorization, benignity, maliciousness, or compromise.",
+  "scenarios": [
+    {
+      "id": "conflicting-context-dozens-events",
+      "category": "multi-finding-conflicting-context-stress",
+      "description": "Thirty-one inert events produce all four rule types. BEH-001, BEH-002 and BEH-003 include signed maintenance-like context, whereas BEH-004 lacks signer and parent-process context; the model must rank all findings without converting either cue into a security conclusion.",
+      "telemetry": "fixtures/conflicting-context-dozens-events.jsonl",
+      "expected_rule_ids": ["BEH-001", "BEH-002", "BEH-003", "BEH-004"],
+      "minimum_event_count": 20,
+      "expected_event_count": 31,
+      "required_context_groups": {
+        "maintenance_like": ["BEH-001", "BEH-002", "BEH-003"],
+        "missing_lineage": ["BEH-004"]
+      }
+    }
+  ]
+}

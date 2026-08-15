@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0",
+  "evidence_role": "offline-response-policy-counterfactual",
+  "datasets": {
+    "historical-nsis-ay": {
+      "unit_counts": {
+        "positive": 53,
+        "negative": 55,
+        "positive_alerted": 16,
+        "negative_alerted": 32,
+        "positive_multi_rule": 0,
+        "negative_multi_rule": 15
+      },
+      "policies": {
+        "automatic_block_on_alert": {
+          "containment_actions": 48,
+          "normal_origin_actions": 32,
+          "botnet_origin_actions": 16,
+          "botnet_origin_without_action": 37,
+          "rollback_required": true
+        },
+        "automatic_block_after_two_rules": {
+          "containment_actions": 15,
+          "normal_origin_actions": 15,
+          "botnet_origin_actions": 0,
+          "botnet_origin_without_action": 53,
+          "rollback_required": true
+        },
+        "analyst_approval": {
+          "proposals": 48,
+          "containment_actions": 0,
+          "reason": "No analyst decisions are present in the preserved datasets."
+        },
+        "evidence_collection_only": {
+          "review_targets": 48,
+          "normal_origin_review_targets": 32,
+          "botnet_origin_review_targets": 16,
+          "containment_actions": 0
+        },
+        "temporary_rate_limiting_after_approval": {
+          "proposals": 48,
+          "containment_actions": 0,
+          "reason": "Approval and network-impact evidence are absent."
+        },
+        "increased_monitoring": {
+          "monitoring_targets": 48,
+          "normal_origin_targets": 32,
+          "botnet_origin_targets": 16,
+          "containment_actions": 0
+        },
+        "isolation_after_independent_confirmation": {
+          "proposals": 48,
+          "containment_actions": 0,
+          "reason": "No independent confirmation is present in the preserved datasets."
+        }
+      }
+    },
+    "confirmatory-donbot": {
+      "unit_counts": {
+        "positive": 27,
+        "negative": 78,
+        "positive_alerted": 24,
+        "negative_alerted": 29,
+        "positive_multi_rule": 6,
+        "negative_multi_rule": 5
+      },
+      "policies": {
+        "automatic_block_on_alert": {
+          "containment_actions": 53,
+          "normal_origin_actions": 29,
+          "botnet_origin_actions": 24,
+          "botnet_origin_without_action": 3,
+          "rollback_required": true
+        },
+        "automatic_block_after_two_rules": {
+          "containment_actions": 11,
+          "normal_origin_actions": 5,
+          "botnet_origin_actions": 6,
+          "botnet_origin_without_action": 21,
+          "rollback_required": true
+        },
+        "analyst_approval": {
+          "proposals": 53,
+          "containment_actions": 0,
+          "reason": "No analyst decisions are present in the preserved datasets."
+        },
+        "evidence_collection_only": {
+          "review_targets": 53,
+          "normal_origin_review_targets": 29,
+          "botnet_origin_review_targets": 24,
+          "containment_actions": 0
+        },
+        "temporary_rate_limiting_after_approval": {
+          "proposals": 53,
+          "containment_actions": 0,
+          "reason": "Approval and network-impact evidence are absent."
+        },
+        "increased_monitoring": {
+          "monitoring_targets": 53,
+          "normal_origin_targets": 29,
+          "botnet_origin_targets": 24,
+          "containment_actions": 0
+        },
+        "isolation_after_independent_confirmation": {
+          "proposals": 53,
+          "containment_actions": 0,
+          "reason": "No independent confirmation is present in the preserved datasets."
+        }
+      }
+    },
+    "synthetic-implementation-transfer": {
+      "unit_counts": {
+        "positive": 97,
+        "negative": 432,
+        "positive_alerted": 96,
+        "negative_alerted": 48,
+        "positive_multi_rule": 0,
+        "negative_multi_rule": 0
+      },
+      "policies": {
+        "automatic_block_on_alert": {
+          "containment_actions": 144,
+          "normal_origin_actions": 48,
+          "botnet_origin_actions": 96,
+          "botnet_origin_without_action": 1,
+          "rollback_required": true
+        },
+        "automatic_block_after_two_rules": {
+          "containment_actions": 0,
+          "normal_origin_actions": 0,
+          "botnet_origin_actions": 0,
+          "botnet_origin_without_action": 97,
+          "rollback_required": true
+        },
+        "analyst_approval": {
+          "proposals": 144,
+          "containment_actions": 0,
+          "reason": "No analyst decisions are present in the preserved datasets."
+        },
+        "evidence_collection_only": {
+          "review_targets": 144,
+          "normal_origin_review_targets": 48,
+          "botnet_origin_review_targets": 96,
+          "containment_actions": 0
+        },
+        "temporary_rate_limiting_after_approval": {
+          "proposals": 144,
+          "containment_actions": 0,
+          "reason": "Approval and network-impact evidence are absent."
+        },
+        "increased_monitoring": {
+          "monitoring_targets": 144,
+          "normal_origin_targets": 48,
+          "botnet_origin_targets": 96,
+          "containment_actions": 0
+        },
+        "isolation_after_independent_confirmation": {
+          "proposals": 144,
+          "containment_actions": 0,
+          "reason": "No independent confirmation is present in the preserved datasets."
+        }
+      }
+    }
+  },
+  "qualitative_cost_order": {
+    "highest_direct_disruption": [
+      "automatic_block_on_alert",
+      "automatic_block_after_two_rules"
+    ],
+    "bounded_but_not_measurable_without_approval": [
+      "analyst_approval",
+      "temporary_rate_limiting_after_approval",
+      "isolation_after_independent_confirmation"
+    ],
+    "lowest_direct_disruption": [
+      "evidence_collection_only",
+      "increased_monitoring"
+    ]
+  },
+  "automatic_actions_executed": 0,
+  "interpretation_boundary": "Dataset labels approximate origin, not business impact. Counts do not estimate firewall efficacy, analyst accuracy, confirmation quality, or rollback success."
+}

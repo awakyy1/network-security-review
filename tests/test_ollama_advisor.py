@@ -4,7 +4,14 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
-from src.ollama_advisor import OUTPUT_SCHEMA, OllamaAdvisor, OllamaOutputError, validate_grounded_output
+from src.ollama_advisor import (
+    OUTPUT_SCHEMA,
+    PROMPT_VARIANTS,
+    OllamaAdvisor,
+    OllamaOutputError,
+    build_grounded_prompt,
+    validate_grounded_output,
+)
 from src.telemetry import TelemetryEvent
 
 
@@ -70,6 +77,7 @@ class OllamaAdvisorTest(unittest.TestCase):
         payload = post.call_args.kwargs["json"]
         self.assertEqual(payload["format"], OUTPUT_SCHEMA)
         self.assertEqual(payload["options"]["temperature"], 0)
+        self.assertEqual(payload["options"]["top_p"], 0.9)
         self.assertEqual(payload["options"]["seed"], 42)
         self.assertEqual(payload["options"]["num_ctx"], 4096)
         self.assertEqual(payload["options"]["num_predict"], 700)
@@ -133,6 +141,18 @@ class OllamaAdvisorTest(unittest.TestCase):
     def test_restricts_ollama_to_loopback(self) -> None:
         with self.assertRaisesRegex(ValueError, "local loopback"):
             OllamaAdvisor("research-model", base_url="https://ollama.example.test")
+
+    def test_prompt_variants_preserve_schema_controls_and_untrusted_delimiters(self) -> None:
+        prompts = [
+            build_grounded_prompt(variant, [{"finding": _finding(), "events": []}]) for variant in PROMPT_VARIANTS
+        ]
+
+        self.assertEqual(len(prompts), 3)
+        self.assertEqual(len(set(prompts)), 3)
+        for prompt in prompts:
+            self.assertIn("<UNTRUSTED_EVIDENCE>", prompt)
+            self.assertIn('"BEH-001"', prompt)
+            self.assertIn('"priorities"', prompt)
 
 
 if __name__ == "__main__":

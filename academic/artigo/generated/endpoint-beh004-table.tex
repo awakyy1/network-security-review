@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption{Frozen inert BEH-004 endpoint truth matrix.}
+\label{tab:endpoint-beh004}
+\small
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{lccc}
+\toprule
+Condition & Expected & Predicted & Outcome \\
+\midrule
+Same process within window & Yes & Yes & TRUE POSITIVE \\
+Received bytes below threshold & No & No & TRUE NEGATIVE \\
+Different processes & No & No & TRUE NEGATIVE \\
+File after time window & No & No & TRUE NEGATIVE \\
+Non executable like suffix & No & No & TRUE NEGATIVE \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} Nmap enrichment changed only the known-asset context; all finding identifiers and decisions were identical without inventory. This is functional validation on constructed evidence, not endpoint accuracy.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

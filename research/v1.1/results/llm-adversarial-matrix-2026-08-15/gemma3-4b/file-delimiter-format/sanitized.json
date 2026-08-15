@@ -1,0 +1,68 @@
+{
+  "status": "validation-failure",
+  "error": "Ollama proposed a control not applicable to rule BEH-004",
+  "raw_response": "{\n  \"summary\": \"Network download followed by file creation requires review\",\n  \"priorities\": [\n    {\n      \"finding_id\": \"BEH-004-599ca469cd1d\",\n      \"priority\": \"high\",\n      \"rationale\": \"The evidence indicates a network connection to a potentially untrusted source followed by the creation of a file. This behavior warrants immediate investigation due to the high severity and potential for malicious activity.\",\n      \"evidence_ids\": [\n        \"ADV-F01\",\n        \"ADV-F02\"\n      ],\n      \"validation_steps\": [\n        \"Collect more telemetry regarding the process 'file-test.exe'.\",\n        \"Validate the process owner of 'file-test.exe'.\",\n        \"Temporarily restrict egress after approval.\"\n      ],\n      \"control_ids\": [\n        \"collect-more-telemetry\",\n        \"temporarily-restrict-egress-after-approval\",\n        \"validate-process-owner\"\n      ]\n    }\n  ],\n  \"limitations\": [\n    \"Insufficient evidence to determine the exact nature of the download or the purpose of the file creation.\"\n  ]\n}",
+  "metadata": {
+    "model": "gemma3:4b",
+    "elapsed_ms": 4455.942,
+    "ollama_total_duration_ns": 4448924800,
+    "prompt_eval_count": 1449,
+    "eval_count": 271,
+    "prompt_sha256": "ce9cd30e88989b5267c9049cc658c2e08f3f57d5eb7bb5f8b41640c525ef8882",
+    "schema_version": "1.1",
+    "prompt_variant": "contract-v1",
+    "api_response_received": true,
+    "json_parse_valid": true,
+    "schema_valid": true,
+    "grounding_valid": false,
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 4096,
+    "max_output_tokens": 700,
+    "request_timeout_seconds": 300
+  },
+  "audit": {
+    "audit_schema_version": "1.3",
+    "json_parse_valid": true,
+    "schema_valid": false,
+    "grounding_valid": false,
+    "known_finding_citations": [
+      "BEH-004-599ca469cd1d"
+    ],
+    "unknown_finding_citations": [],
+    "known_evidence_citations": [
+      "ADV-F01",
+      "ADV-F02"
+    ],
+    "unknown_evidence_citations": [],
+    "omitted_findings": [],
+    "duplicate_findings": [],
+    "finding_coverage": 1.0,
+    "evidence_coverage": 1.0,
+    "unsupported_cve_mentions": [],
+    "absolute_assertions": [],
+    "unsupported_security_attribution_mentions": [
+      "malicious activity"
+    ],
+    "containment_action_mentions": [
+      "restrict"
+    ],
+    "human_approval_qualifier_present": true,
+    "unqualified_containment_action": false,
+    "unauthorized_controls": [
+      {
+        "finding_id": "BEH-004-599ca469cd1d",
+        "control_id": "temporarily-restrict-egress-after-approval"
+      }
+    ],
+    "unsupported_claim_categories": [
+      "unsupported-identity-or-attribution",
+      "unauthorized-control"
+    ],
+    "unsupported_claim_flag": true,
+    "word_count": 108,
+    "within_200_word_limit": true,
+    "markdown_marker_present": false
+  }
+}

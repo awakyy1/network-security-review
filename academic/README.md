@@ -5,7 +5,8 @@ Esta pasta separa o registro acadêmico oficial do documento que continua em evo
 | Entregável | Status | Fonte | PDF |
 |---|---|---|---|
 | Monografia aprovada | Registro histórico imutável | Não alterado/publicado | [`monografia-aprovada-2025.pdf`](monografia/monografia-aprovada-2025.pdf) |
-| Artigo científico V1.0 | Versão congelada em 13/08/2026; revisões futuras recebem nova versão | [`artigo/main.tex`](artigo/main.tex) | [`artigo/releases/article-v1.pdf`](artigo/releases/article-v1.pdf) |
+| Artigo científico V1.0 | Snapshot congelado em 13/08/2026 | Branch `article-v1` e tag `article-v1.0` | [`artigo/releases/article-v1.pdf`](artigo/releases/article-v1.pdf) |
+| Artigo científico V1.1 | Revisão científica concluída | [`artigo/main.tex`](artigo/main.tex) | [`artigo/releases/article-v1.1.pdf`](artigo/releases/article-v1.1.pdf) |
 | Bibliografia do artigo | Fonte compartilhada | [`shared/referencias.bib`](shared/referencias.bib) | — |
 
 ## Identificação
@@ -26,26 +27,33 @@ A monografia pública é uma cópia byte a byte do PDF apresentado e aprovado em
 DCACE3DBCFC0B6FDD6E549B686AD76DA1C9072933DE1579E37BDF8430BCCD898
 ```
 
-O artigo é um trabalho derivado e pode ser refinado conforme método científico, revisão por pares e requisitos do periódico, desde que não seja confundido com a monografia histórica.
+O artigo é um trabalho derivado e pode ser refinado conforme método científico
+e padrões internacionais de apresentação, desde que não seja confundido com a
+monografia histórica. Não há submissão a periódico planejada para a V1.1.
 
-A V1.0 do artigo é identificada no fonte, nos metadados do PDF e pelo arquivo
-nomeado `artigo/releases/article-v1.pdf`. O histórico Git preserva seu estado;
-alterações científicas posteriores devem incrementar `artigo/VERSION` e gerar
-um novo PDF nomeado, sem sobrescrever o snapshot V1.
+A V1.0 do artigo é identificada pelo arquivo nomeado
+`artigo/releases/article-v1.pdf`, pelo branch `article-v1` e pela tag
+`article-v1.0`. O arquivo `artigo/VERSION` identifica o fonte ativo. A V1.1 está
+congelada em `artigo/releases/article-v1.1.pdf`, sem sobrescrever o snapshot
+V1.0.
 
 Todos os arquivos desta pasta estão excluídos da licença MIT do software e permanecem com [todos os direitos reservados](LICENSE.md). Citação acadêmica não concede, por si só, autorização de reprodução, alteração ou redistribuição.
 
 ## Compilação do artigo
 
-XeLaTeX é necessário para empregar Arial. Em `artigo/`, execute:
+A V1.1 usa o baseline internacional genérico `IEEEtran` apenas como régua
+de qualidade e apresentação. Em `artigo/`,
+execute:
 
 ```sh
-xelatex main.tex
+pdflatex main.tex
 bibtex main
-xelatex main.tex
-xelatex main.tex
+pdflatex main.tex
+pdflatex main.tex
 ```
 
-Também é possível usar `latexmk -xelatex main.tex`. Arquivos auxiliares são ignorados pelo Git; o PDF final permanece versionável. Antes de uma submissão real, o artigo precisa ser adaptado ao template, limite de páginas e metadados do periódico escolhido.
+Também é possível usar `latexmk -pdf main.tex`. Arquivos auxiliares são
+ignorados pelo Git; o PDF final permanece versionável. Uma eventual submissão
+futura seria um novo escopo e exigiria nova verificação das regras do venue.
 
 Consulte a [política completa](../docs/DOCUMENT_POLICY.md) e o [contexto acadêmico](../docs/ACADEMIC_CONTEXT.md).

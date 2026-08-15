@@ -1,0 +1,1319 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T19:48:22.506785+00:00",
+  "evidence_role": "single_confirmatory_holdout_run",
+  "selection_record": {
+    "filename": "ctu13-confirmatory-selection-2026-08-15-corrected.json",
+    "sha256": "2982aabc2ea302bf3cc9e8f49c8e271409787de181a7b283cdc6f017d5e98df6"
+  },
+  "acquisition_record": {
+    "filename": "ctu13-confirmatory-acquisition-2026-08-15.json",
+    "sha256": "e15f0e43e297dd9c91e358253def2c0dd93e7bec340020e886e1e5068ff12d3a"
+  },
+  "development_result": {
+    "filename": "development-tuning.json",
+    "sha256": "88570ed0cc80b23f963774211fdabfa74b89fa71c578a4ff06aed63229711162"
+  },
+  "selected_candidate_index": 97,
+  "scientific_state": [
+    {
+      "path": "src/behavior_detector.py",
+      "bytes": 14008,
+      "sha256": "61220659e1f454ce79fac1e6a8f8a13dade4e99fdb2d27f4e0c67f399023aec5"
+    },
+    {
+      "path": "src/ctu13_acquire.py",
+      "bytes": 6545,
+      "sha256": "c12086341267f123586f1a77a019e038ba63f752c965efd4c51b0724137abb24"
+    },
+    {
+      "path": "src/ctu13_confirmatory.py",
+      "bytes": 18444,
+      "sha256": "b8119b54864744652efe0237cd70ce24a2bd64b3d26917bd015c620573780cb1"
+    },
+    {
+      "path": "src/ctu13_experiment.py",
+      "bytes": 18457,
+      "sha256": "dda8e748f3aac22dd3143e8a8e090a30799aff62548273721584c02c6382db7b"
+    },
+    {
+      "path": "src/telemetry.py",
+      "bytes": 6215,
+      "sha256": "4641cac70f6712efddad39b0e2864bc7347f0e52f7aef61cc141a30ee782f803"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 32,
+      "sha256": "380c8f12c547d8f88a290289b1221b88b1d3c26dd2b63572339ac3c411ecac8c"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "bytes": 14,
+      "sha256": "fe660099e1bd0cf92eed7dc210df7950df3dc888e16aea6519cf2d033622f825"
+    }
+  ],
+  "evaluation": {
+    "scenario": 6,
+    "family": "DonBot",
+    "role": "holdout",
+    "source": {
+      "filename": "capture20110816.binetflow",
+      "bytes": 76780048,
+      "sha256": "801800eeda9a5a44868b1e3e492f93dc6d52b5d14566c1d8431c9e85d0d2adaa"
+    },
+    "window_seconds": 300,
+    "detector_thresholds": {
+      "beh_001_minimum_connections": 6,
+      "beh_001_minimum_mean_interval_seconds": 5,
+      "beh_001_maximum_mean_interval_seconds": 900,
+      "beh_001_maximum_interval_cv": 0.15,
+      "beh_002_minimum_distinct_endpoints": 16,
+      "beh_002_interval_seconds": 60,
+      "beh_003_minimum_bytes_sent": 1000000,
+      "beh_003_minimum_sent_received_ratio": 10,
+      "beh_004_minimum_bytes_received": 32768,
+      "beh_004_maximum_delay_seconds": 120
+    },
+    "unit": "anonymized source host by non-overlapping start-time window",
+    "metrics": {
+      "true_positive": 24,
+      "false_positive": 29,
+      "false_negative": 3,
+      "true_negative": 49,
+      "precision": 0.45283,
+      "precision_wilson_95": [
+        0.326576,
+        0.58546
+      ],
+      "recall": 0.888889,
+      "recall_wilson_95": [
+        0.719422,
+        0.96148
+      ],
+      "specificity": 0.628205,
+      "specificity_wilson_95": [
+        0.517311,
+        0.727064
+      ],
+      "f1": 0.6,
+      "balanced_accuracy": 0.758547,
+      "matthews_correlation_coefficient": 0.452021
+    },
+    "response_simulation": {
+      "automatic_actions_executed": 0,
+      "review_candidates": 53,
+      "review_candidates_on_botnet_origin": 24,
+      "review_candidates_on_normal_origin": 29,
+      "missed_botnet_origin_windows": 3,
+      "counterfactual_unnecessary_action_rate_if_every_alert_were_blocked": 0.54717,
+      "interpretation": "The observed false-positive share makes automatic blocking unsafe; the implemented system produces review candidates only and requires independent confirmation before containment."
+    },
+    "rule_finding_counts": {
+      "BEH-001": {
+        "normal_origin": 26,
+        "botnet_origin": 7
+      },
+      "BEH-002": {
+        "botnet_origin": 24,
+        "normal_origin": 8
+      },
+      "BEH-003": {}
+    },
+    "parse_counts": {
+      "total_rows": 558919,
+      "scored_rows": 12087,
+      "positive_rows": 4630,
+      "negative_rows": 7457,
+      "excluded_background_or_to": 546818,
+      "excluded_unsupported_protocol": 14,
+      "excluded_missing_destination_port": 0,
+      "excluded_mixed_truth_windows": 0
+    },
+    "runtime": {
+      "elapsed_ms": 51464.611,
+      "peak_traced_memory_bytes": 1182506
+    },
+    "units": [
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 91,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 42,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T10:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:00:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 2,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 8,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 131,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-42a9833b65e2"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 62,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:05:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 2,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 129,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-9dd528b26871"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 26,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T10:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:10:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 187,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-86f89fe938c5"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 137,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-a3c9a62d001a"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 259,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T10:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:15:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 153,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-856fdc510f25"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 129,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-70dd92c4539d"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T10:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 2,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:20:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 189,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-0cc9fce095f8"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 81,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:25:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 131,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-0952f5a9b99b"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:25:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T10:25:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 3,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:25:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 203,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-45bee10f6e1a"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:25:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 58,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:30:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 129,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-edd32c7fbeff"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:30:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T10:30:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 5,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:30:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 176,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-29a1e130e2f2"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:30:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 255,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-a8088a6d8341"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:35:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 145,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-a6faa666d401"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:35:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T10:35:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 4,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:35:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 181,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-404db6e6423e"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:35:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 3,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:40:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 566,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-08b60addf783",
+          "BEH-002-e41c227a7726"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:40:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 210,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-73bded8e9c06",
+          "BEH-002-ab6a7862de32"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:45:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 150,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-d2f177a13ce6"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T10:45:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T10:45:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:45:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 170,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-7efea181b437"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:50:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 135,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-b56879165f1e"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:50:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 208,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-64e3b9c40b41"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T10:55:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 560,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-d8c2cb906b1a",
+          "BEH-002-c84c0227e073"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T10:55:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 2,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T10:55:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 4,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T10:55:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 224,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-cd17b6ef2b28"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T10:55:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 9,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 211,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-2d78f395fa00"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T11:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 4,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T11:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T11:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 2,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:00:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 213,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-e5430c04f44e"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T11:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 71,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 140,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-9e98309afa21"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T11:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 46,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T11:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:05:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 209,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-f52cc2d5722b"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 272,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-a81a04e15216",
+          "BEH-002-96184743037e"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T11:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 129,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:10:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 187,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-182832d37c2d"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T11:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 167,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-2f5121407cf9"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 132,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-7dbc7ac4e725"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T11:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T11:15:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:15:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 221,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-f02c2a08e25b",
+          "BEH-002-c6f7bdfb6db6"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 139,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-541d21b3ef82"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T11:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:20:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 190,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-34b42eae0c1d"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T11:20:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:25:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 149,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-7ae19dc7b4a7"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T11:25:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:25:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 184,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-26deb6f4d8d8"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:30:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 135,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-d27eec9923c0"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T11:30:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 5,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:30:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 229,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-86a384b7fa46"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:35:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 137,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-fa51080db0d8"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:35:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 193,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-ba14d7e43718"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:40:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 152,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-0b6971ce71d7"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-b619fbbc4769072c",
+        "window_start": "2011-08-16T11:40:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 4,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:40:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 170,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-34a912d63525"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:45:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 138,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-371edd48f51b"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T11:45:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T11:45:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:45:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 119,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-7f7a72c31555",
+          "BEH-001-f8dfdbe89de8",
+          "BEH-002-a2460359ccb0"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:50:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 141,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-2f734e54f991"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:50:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 211,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-72f526c20c3f"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T11:50:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T11:55:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 140,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-4c136d2fd1b9"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T11:55:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 204,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-344497404c7e",
+          "BEH-002-54f2779bdaa7"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T12:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 140,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001"
+        ],
+        "finding_ids": [
+          "BEH-001-dd0c877d731a"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T12:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 4,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-50fbad858b814711",
+        "window_start": "2011-08-16T12:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 6,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T12:00:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 172,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-76bec861f3e2",
+          "BEH-002-0c8360d8fa76"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T12:00:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 5,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T12:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 999,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-47b0a78e4897",
+          "BEH-002-4671a2eedb3e"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T12:05:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 380,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-002-10d65a56c124"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T12:05:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 211,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-21da592eaedc",
+          "BEH-002-8138b2a0a491"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-038f5d415743a040",
+        "window_start": "2011-08-16T12:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 30,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-11a2e8f7051b89f7",
+        "window_start": "2011-08-16T12:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 246,
+        "predicted_review": true,
+        "rule_ids": [
+          "BEH-001",
+          "BEH-002"
+        ],
+        "finding_ids": [
+          "BEH-001-af02b6bd1f30",
+          "BEH-002-321e828e876e"
+        ]
+      },
+      {
+        "host": "ctu13-s06-src-e817a051fc39e88e",
+        "window_start": "2011-08-16T12:10:00+02:00",
+        "truth": "botnet-origin",
+        "event_count": 12,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      },
+      {
+        "host": "ctu13-s06-src-ee477eabada513c1",
+        "window_start": "2011-08-16T12:10:00+02:00",
+        "truth": "normal-origin",
+        "event_count": 1,
+        "predicted_review": false,
+        "rule_ids": [],
+        "finding_ids": []
+      }
+    ]
+  }
+}

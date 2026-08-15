@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from unittest.mock import Mock, patch
 
-from src.ollama_baseline import HistoricalOllamaAdvisor, audit_free_text
+from src.ollama_baseline import HistoricalOllamaAdvisor, audit_free_text, audit_model_response
 from src.telemetry import TelemetryEvent
 
 
@@ -62,6 +62,32 @@ class HistoricalOllamaAdvisorTest(unittest.TestCase):
 
         self.assertTrue(audit["markdown_marker_present"])
         self.assertFalse(audit["within_200_word_limit"])
+
+    def test_applies_same_taxonomy_to_structured_output(self) -> None:
+        response = """{
+          "summary": "Confirmed malware; isolate now.",
+          "priorities": [{
+            "finding_id": "BEH-001-example",
+            "priority": "high",
+            "rationale": "CVE-2099-99999",
+            "evidence_ids": ["EVT-001"],
+            "validation_steps": [],
+            "control_ids": ["quarantine-file-after-validation"]
+          }],
+          "limitations": ["none"]
+        }"""
+
+        audit = audit_model_response(response, [_finding()])
+
+        self.assertTrue(audit["json_parse_valid"])
+        self.assertFalse(audit["grounding_valid"])
+        self.assertEqual(audit["unsupported_cve_mentions"], ["CVE-2099-99999"])
+        self.assertEqual(
+            audit["unauthorized_controls"],
+            [{"finding_id": "BEH-001-example", "control_id": "quarantine-file-after-validation"}],
+        )
+        self.assertIn("unauthorized-control", audit["unsupported_claim_categories"])
+        self.assertTrue(audit["unsupported_claim_flag"])
 
     @patch("src.ollama_baseline.requests.post")
     def test_reconstructs_free_text_protocol_without_schema_or_system_prompt(self, post: Mock) -> None:

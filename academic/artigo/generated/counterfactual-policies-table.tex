@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{Offline containment-policy counterfactuals; no action was executed.}
+\label{tab:counterfactual-policies}
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset role & \multicolumn{3}{c}{Block every alert} & \multicolumn{3}{c}{Block after two rules} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+ & Actions & Normal & Bot missed & Actions & Normal & Bot missed \\
+\midrule
+Historical NSIS.ay & 48 & 32 & 37 & 15 & 15 & 53 \\
+Confirmatory DonBot & 53 & 29 & 3 & 11 & 5 & 21 \\
+Synthetic transfer & 144 & 48 & 1 & 0 & 0 & 97 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} Dataset labels indicate source origin, not business impact. Approval-gated rate limiting and confirmation-gated isolation executed zero actions because the required decisions are absent; evidence collection and monitoring do not contain hosts.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

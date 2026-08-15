@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\caption{Retrospective CTU-13 sensitivity analysis across fixed aggregation windows.}
+\label{tab:ctu13-windows}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Role & Family & Window (s) & Units & TP & FP & FN & TN & F1 & Specificity & MCC \\
+\midrule
+Development & Virut & 60 & 101 & 18 & 34 & 3 & 46 & 0.493 & 0.575 & 0.351 \\
+Development & Virut & 300 & 31 & 5 & 17 & 0 & 9 & 0.370 & 0.346 & 0.280 \\
+Development & Virut & 600 & 19 & 3 & 10 & 0 & 6 & 0.375 & 0.375 & 0.294 \\
+Holdout & NSIS.ay & 60 & 247 & 31 & 53 & 71 & 92 & 0.333 & 0.634 & -0.064 \\
+Holdout & NSIS.ay & 300 & 108 & 16 & 32 & 37 & 23 & 0.317 & 0.418 & -0.282 \\
+Holdout & NSIS.ay & 600 & 73 & 13 & 18 & 29 & 13 & 0.356 & 0.419 & -0.271 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} Thresholds were not retuned. Because the V1.0 holdout had already been inspected, all window comparisons are diagnostic rather than confirmatory and cannot be used to restore an untouched-holdout claim.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

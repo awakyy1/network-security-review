@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "frozen_at": "2026-08-15T17:02:48.0270147-03:00",
+  "nmap_input": "../../examples/nmap/synthetic-enterprise.xml",
+  "scenarios": [
+    {
+      "id": "benign-web",
+      "category": "benign",
+      "description": "Irregular browser connections; a no-finding system control.",
+      "telemetry": "../v2/fixtures/benign-web.jsonl",
+      "expected_rule_ids": []
+    },
+    {
+      "id": "benign-updater-hard-negative",
+      "category": "benign-hard-negative",
+      "description": "Authorized periodic updater retained as a detector false-positive challenge.",
+      "telemetry": "../v2/fixtures/benign-updater.jsonl",
+      "expected_rule_ids": []
+    },
+    {
+      "id": "incomplete-single-observation",
+      "category": "incomplete-evidence",
+      "description": "One asymmetric flow; supports behavioral review but no attribution or compromise claim.",
+      "telemetry": "../v2/fixtures/emulated-asymmetric-egress.jsonl",
+      "expected_rule_ids": ["BEH-003"]
+    },
+    {
+      "id": "endpoint-lineage",
+      "category": "endpoint-lineage",
+      "description": "Inert network-to-file sequence with bounded endpoint context.",
+      "telemetry": "../v2/fixtures/emulated-tool-transfer.jsonl",
+      "expected_rule_ids": ["BEH-004"]
+    },
+    {
+      "id": "multi-finding-mixed-rules",
+      "category": "multi-finding-ranking",
+      "description": "Four simultaneous rule types used to measure ordering and recommendation stability.",
+      "telemetry": "fixtures/multi-finding-mixed-rules.jsonl",
+      "expected_rule_ids": ["BEH-001", "BEH-002", "BEH-003", "BEH-004"]
+    }
+  ]
+}

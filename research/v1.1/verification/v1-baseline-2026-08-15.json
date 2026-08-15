@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "executed_at": "2026-08-15",
+  "source": {
+    "tag": "article-v1.0",
+    "commit": "a35a134e4e439e56677cb34f339d1af13872522a",
+    "worktree": "E:/tcc/.tmp/v1-baseline-worktree"
+  },
+  "environment": {
+    "python": "E:/tcc/.venv/Scripts/python.exe",
+    "generated_data_drive": "E:"
+  },
+  "verification": {
+    "unit_tests": {
+      "status": "passed",
+      "tests": 40
+    },
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "synthetic_report": {
+      "live_hosts": 4,
+      "review_findings": 14
+    },
+    "phase_a": {
+      "true_positive": 4,
+      "false_positive": 1,
+      "false_negative": 0,
+      "true_negative": 19,
+      "f1": 0.888889
+    }
+  },
+  "automatic_actions_executed": 0,
+  "llm_inference_performed": false,
+  "note": "The baseline ran from a detached worktree at the frozen V1.0 tag. Timestamped derived files remained under E:/tcc/.tmp and did not modify the snapshot."
+}

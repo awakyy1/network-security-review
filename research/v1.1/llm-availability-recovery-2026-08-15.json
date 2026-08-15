@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "status": "frozen-ready-for-availability-recovery",
+  "preregistered_at": "2026-08-15T18:22:16.6625802-03:00",
+  "purpose": "Recover only the four unavailable raw responses needed by the prospectively defined first-repetition blinded human sample.",
+  "selection_rule": "Before recovery inference, select every API-failure item in qwen3:8b/checklist-v1/run-001 because the frozen human protocol samples run-001 from every model/prompt cell.",
+  "source_primary_matrix": "results/llm-primary-matrix-2026-08-15/matrix-summary.json",
+  "source_primary_matrix_sha256": "7cdb3ea94bb5b332515433072ccdfefa2d1aacb90cdf16a433779134f7cf3181",
+  "source_primary_results_directory": "results/llm-primary-matrix-2026-08-15",
+  "source_matrix_definition": "llm-model-matrix-2026-08-15.json",
+  "source_matrix_definition_sha256": "5abe2e7e9b8bd1c281f0b31864179bc7b01bbb418ca928e45bd4b5a420a3d2bc",
+  "manifest": "llm-scenarios.json",
+  "manifest_sha256": "0869e78eb45d7e5a22e039f137fbf1a48dfa6b7bde53d7a677b75388171cc60e",
+  "model": {
+    "tag": "qwen3:8b",
+    "family": "Alibaba Qwen 3",
+    "local_manifest_digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+    "parameter_size": "8.2B",
+    "quantization": "Q4_K_M"
+  },
+  "protocol": {
+    "prompt_variant": "checklist-v1",
+    "repetition": 1,
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 4096,
+    "maximum_output_tokens": 700,
+    "stream": false,
+    "schema_version": "1.1",
+    "model_calls_expected": 4,
+    "network_boundary": "loopback Ollama only; no remote inference API"
+  },
+  "selected_failures": [
+    "benign-updater-hard-negative",
+    "incomplete-single-observation",
+    "endpoint-lineage",
+    "multi-finding-mixed-rules"
+  ],
+  "integrity_policy": {
+    "overwrite_primary_results": false,
+    "recompute_primary_denominators": false,
+    "interpret_recovery_as_primary_success": false,
+    "human_package_use": "Recovery output may replace only a missing raw response in the blinded package; the separate source is retained in the concealed identity mapping."
+  },
+  "code_hashes_at_preregistration": {
+    "src/ollama_advisor.py": "79ab9655ac99648326baabff9942f60fd165ee3e922d47ad7753fd72e99abfbb",
+    "src/ollama_baseline.py": "3975a2c3b8ec0b60a49937a4969845dc12d7fdee15df0fd9cf45f31b81632111",
+    "src/v2_experiment.py": "7d628ede9c1e82fadeecb993029e7780f57649f284535635e01f6aa4f5ee3b96",
+    "src/v2_repetitions.py": "90f1a30a2ec28a81ca70933ab95945b1f36e2b564cd44555aff3a45436337103"
+  }
+}

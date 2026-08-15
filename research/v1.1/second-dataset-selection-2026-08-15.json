@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "selected_at": "2026-08-15T17:08:52.5533947-03:00",
+  "status": "selected-before-download-and-label-inspection",
+  "dataset": {
+    "name": "Botnet Group Activity Dataset",
+    "repository": "Mendeley Data",
+    "dataset_doi": "10.17632/4vftxh97m8.1",
+    "data_article_doi": "10.1016/j.dib.2021.107334",
+    "landing_page": "https://data.mendeley.com/datasets/4vftxh97m8/1",
+    "license": "CC BY-NC 3.0",
+    "archive_name": "NCC_Bot_Group_Activity_Dataset_All.rar",
+    "archive_expected_bytes": 705675032,
+    "archive_expected_sha256": "c57294474afab71d59709df00e52e2db6253e581e83a6e87680250e28d8ee845",
+    "download_url": "https://data.mendeley.com/public-files/datasets/4vftxh97m8/files/5b6aab9b-7ce5-4018-b6cc-8aa704aabd08/file_downloaded"
+  },
+  "selection": {
+    "scenario": "Scenario 1",
+    "target_file_basename": "dataset_result.binetflow",
+    "selection_reason": "First numbered scenario selected without inspecting per-scenario labels or detector outcomes.",
+    "extraction_policy": "List the archive first, then extract only the selected scenario flow file and documentation required to interpret it.",
+    "evaluation_role": "implementation-transfer dataset"
+  },
+  "construct_boundary": {
+    "compatible_fields": ["timestamp", "source IP", "destination IP", "destination port", "protocol", "bytes", "label"],
+    "known_limitations": [
+      "The dataset is synthetic.",
+      "Its botnet group patterns are derived from CTU-13 behavior, so it is not an independent construct-validation source.",
+      "Results must remain separate from CTU-13 development and holdout metrics."
+    ]
+  },
+  "storage": {
+    "archive_path": "E:/tcc/data/botnet-group-activity/NCC_Bot_Group_Activity_Dataset_All.rar",
+    "extraction_root": "E:/tcc/data/botnet-group-activity/scenario-1",
+    "temporary_root": "E:/tcc/.tmp"
+  }
+}

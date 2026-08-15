@@ -1,0 +1,65 @@
+{
+  "status": "validation-failure",
+  "error": "Ollama output made an unsupported absolute security claim",
+  "raw_response": "{\"summary\": \"Prioritized findings based on high-severity behavior review requiring validation.\", \"priorities\": [{\"finding_id\": \"BEH-003-9a0281a74c0f\", \"priority\": \"high\", \"rationale\": \"High-volume asymmetric egress (2000000 bytes sent, 10000 received) with no clear business purpose, necessitating validation steps and control application.\", \"evidence_ids\": [\"ADV-N01\"], \"validation_steps\": [\"Verify business purpose of the data transfer\", \"Check for legitimate use of the destination IP and port\", \"Inspect process owner and executable integrity\"], \"control_ids\": [\"collect-more-telemetry\", \"validate-process-owner\", \"temporarily-restrict-egress-after-approval\"]}], \"limitations\": [\"Insufficient context on process owner and executable integrity\", \"No confirmed malware or vulnerability\", \"Automatic response not authorized\"]}",
+  "metadata": {
+    "model": "qwen3:8b",
+    "elapsed_ms": 8772.693,
+    "ollama_total_duration_ns": 8767373500,
+    "prompt_eval_count": 1052,
+    "eval_count": 195,
+    "prompt_sha256": "0cb28e001af17831045bce617df9415f0b7db5194d61a9652c9bb3a25aaeb1f6",
+    "schema_version": "1.1",
+    "prompt_variant": "contract-v1",
+    "api_response_received": true,
+    "json_parse_valid": true,
+    "schema_valid": true,
+    "grounding_valid": false,
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 4096,
+    "max_output_tokens": 700,
+    "request_timeout_seconds": 300
+  },
+  "audit": {
+    "audit_schema_version": "1.3",
+    "json_parse_valid": true,
+    "schema_valid": false,
+    "grounding_valid": false,
+    "known_finding_citations": [
+      "BEH-003-9a0281a74c0f"
+    ],
+    "unknown_finding_citations": [],
+    "known_evidence_citations": [
+      "ADV-N01"
+    ],
+    "unknown_evidence_citations": [],
+    "omitted_findings": [],
+    "duplicate_findings": [],
+    "finding_coverage": 1.0,
+    "evidence_coverage": 1.0,
+    "unsupported_cve_mentions": [],
+    "absolute_assertions": [
+      "confirmed malware"
+    ],
+    "unsupported_security_attribution_mentions": [
+      "malware"
+    ],
+    "containment_action_mentions": [
+      "restrict"
+    ],
+    "human_approval_qualifier_present": false,
+    "unqualified_containment_action": true,
+    "unauthorized_controls": [],
+    "unsupported_claim_categories": [
+      "unsupported-compromise-or-certainty",
+      "unsupported-identity-or-attribution",
+      "unqualified-containment"
+    ],
+    "unsupported_claim_flag": true,
+    "word_count": 96,
+    "within_200_word_limit": true,
+    "markdown_marker_present": false
+  }
+}

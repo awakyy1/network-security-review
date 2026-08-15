@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "status": "frozen-ready-for-availability-recovery",
+  "preregistered_at": "2026-08-15T18:28:19.5870791-03:00",
+  "purpose": "Repeat the four prospectively selected human-sample recovery calls once after removing two verified orphaned Ollama child processes that caused CUDA allocation failure.",
+  "selection_rule": "Keep exactly the same four API-failure items selected before the first recovery attempt; do not add or remove cases after observing its outcome.",
+  "retry_of": {
+    "protocol": "llm-availability-recovery-2026-08-15.json",
+    "protocol_sha256": "5c0b4b661a6652761a63d5eeb7b59dfd080f24698377171300b506141b31ca52",
+    "benchmark": "results/llm-availability-recovery-2026-08-15/benchmark.json",
+    "benchmark_sha256": "d3fe996b589263d6ff5905081c64c91161dc87d2eecdd8afcd5b3199e11bf1de",
+    "summary": "results/llm-availability-recovery-2026-08-15/recovery-summary.json",
+    "summary_sha256": "538f3117486a4fcf760b74eee0b14bb22f2956363a2a17249aeba43f9e6c3ab4",
+    "observed_failure": "Four HTTP 500 responses caused by cudaMalloc out-of-memory while a 5.7-GiB orphaned qwen llama-server and a second orphaned llama-server remained resident.",
+    "precondition_change": "Terminate only PIDs 8432 and 31064 after verifying both were E:/Ollama/App/lib/ollama/llama-server.exe children of absent parent PID 33780; free physical memory increased from 3.64 GiB to 12.36 GiB.",
+    "maximum_additional_retries": 1
+  },
+  "source_primary_matrix": "results/llm-primary-matrix-2026-08-15/matrix-summary.json",
+  "source_primary_matrix_sha256": "7cdb3ea94bb5b332515433072ccdfefa2d1aacb90cdf16a433779134f7cf3181",
+  "source_primary_results_directory": "results/llm-primary-matrix-2026-08-15",
+  "source_matrix_definition": "llm-model-matrix-2026-08-15.json",
+  "source_matrix_definition_sha256": "5abe2e7e9b8bd1c281f0b31864179bc7b01bbb418ca928e45bd4b5a420a3d2bc",
+  "manifest": "llm-scenarios.json",
+  "manifest_sha256": "0869e78eb45d7e5a22e039f137fbf1a48dfa6b7bde53d7a677b75388171cc60e",
+  "model": {
+    "tag": "qwen3:8b",
+    "family": "Alibaba Qwen 3",
+    "local_manifest_digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+    "parameter_size": "8.2B",
+    "quantization": "Q4_K_M"
+  },
+  "protocol": {
+    "prompt_variant": "checklist-v1",
+    "repetition": 1,
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 4096,
+    "maximum_output_tokens": 700,
+    "stream": false,
+    "schema_version": "1.1",
+    "model_calls_expected": 4,
+    "network_boundary": "loopback Ollama only; no remote inference API"
+  },
+  "selected_failures": [
+    "benign-updater-hard-negative",
+    "incomplete-single-observation",
+    "endpoint-lineage",
+    "multi-finding-mixed-rules"
+  ],
+  "integrity_policy": {
+    "overwrite_primary_results": false,
+    "recompute_primary_denominators": false,
+    "interpret_recovery_as_primary_success": false,
+    "human_package_use": "Retry output may replace only a missing raw response in the blinded package; both failed and successful recovery provenance remain concealed in the identity mapping."
+  },
+  "code_hashes_at_preregistration": {
+    "src/ollama_advisor.py": "79ab9655ac99648326baabff9942f60fd165ee3e922d47ad7753fd72e99abfbb",
+    "src/ollama_baseline.py": "3975a2c3b8ec0b60a49937a4969845dc12d7fdee15df0fd9cf45f31b81632111",
+    "src/v2_experiment.py": "7d628ede9c1e82fadeecb993029e7780f57649f284535635e01f6aa4f5ee3b96",
+    "src/v2_repetitions.py": "90f1a30a2ec28a81ca70933ab95945b1f36e2b564cd44555aff3a45436337103"
+  }
+}

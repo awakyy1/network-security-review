@@ -42,6 +42,43 @@ class TelemetryTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "destination_ip or destination_domain"):
             TelemetryEvent.from_mapping(mapping)
 
+    def test_preserves_bounded_endpoint_lineage_fields(self) -> None:
+        mapping = {
+            "event_id": "END-1",
+            "timestamp": "2026-01-15T12:00:00Z",
+            "host": "lab-host",
+            "event_type": "file_create",
+            "source": "synthetic-lab",
+            "process": "updater.exe",
+            "executable_path": "C:\\Lab\\updater.exe",
+            "signer": "Example Laboratory",
+            "parent_process": "services.exe",
+            "user_context": "LAB-ROLE-01",
+            "command_line": "updater.exe --offline-fixture",
+            "file_hash_sha256": "a" * 64,
+            "path": "C:\\Lab\\fixture.bin",
+        }
+
+        event = TelemetryEvent.from_mapping(mapping)
+
+        self.assertEqual(event.parent_process, "services.exe")
+        self.assertEqual(event.to_evidence()["file_hash_sha256"], "a" * 64)
+
+    def test_rejects_malformed_sha256(self) -> None:
+        mapping = {
+            "event_id": "END-2",
+            "timestamp": "2026-01-15T12:00:00Z",
+            "host": "lab-host",
+            "event_type": "file_create",
+            "source": "synthetic-lab",
+            "process": "updater.exe",
+            "file_hash_sha256": "not-a-hash",
+            "path": "C:\\Lab\\fixture.bin",
+        }
+
+        with self.assertRaisesRegex(ValueError, "64 hexadecimal"):
+            TelemetryEvent.from_mapping(mapping)
+
 
 if __name__ == "__main__":
     unittest.main()

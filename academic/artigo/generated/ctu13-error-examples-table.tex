@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{Deterministically selected five-minute holdout examples.}
+\label{tab:ctu13-error-examples}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{llrrrrr}
+\toprule
+Class & Rule & Events & Evidence IDs & Max. destinations & Max. sent (KiB) & Max. ratio \\
+\midrule
+TP & BEH-002 & 442 & 20 & 278 & 197.0 & 11560.000 \\
+FP & BEH-002 & 142 & 20 & 13 & 390.2 & 2.000 \\
+FN & N/A & 1 & 1 & 1 & 0.1 & 0.426 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} Examples are selected by a deterministic class/time/host ordering from anonymized source-window units; the preserved JSON retains the exact finding and evidence identifiers.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}
