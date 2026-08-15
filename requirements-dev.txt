@@ -1,1 +1,4 @@
+matplotlib==3.11.1
+pymupdf==1.28.2
+pytest==9.1.1
 ruff==0.15.22

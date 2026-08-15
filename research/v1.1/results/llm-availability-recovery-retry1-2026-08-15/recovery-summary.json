@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T21:30:22.225424+00:00",
+  "evidence_role": "availability-recovery-for-blinded-human-sample",
+  "protocol": "llm-availability-recovery-retry1-2026-08-15.json",
+  "protocol_sha256_at_execution": "307e1aff83ef00000f4c1f72a5e22d981d62d5b1afb3420cfb520bc07c2f7fd2",
+  "source_primary_matrix_sha256": "7cdb3ea94bb5b332515433072ccdfefa2d1aacb90cdf16a433779134f7cf3181",
+  "primary_results_modified": false,
+  "primary_denominators_recomputed": false,
+  "expected_model_calls": 4,
+  "observed_model_calls": 4,
+  "api_successes": 4,
+  "accepted": 1,
+  "recovered_items": [
+    {
+      "scenario_id": "benign-updater-hard-negative",
+      "status": "validation-failure",
+      "raw_response_preserved": true
+    },
+    {
+      "scenario_id": "incomplete-single-observation",
+      "status": "accepted",
+      "raw_response_preserved": true
+    },
+    {
+      "scenario_id": "endpoint-lineage",
+      "status": "validation-failure",
+      "raw_response_preserved": true
+    },
+    {
+      "scenario_id": "multi-finding-mixed-rules",
+      "status": "validation-failure",
+      "raw_response_preserved": true
+    }
+  ],
+  "all_selected_items_have_raw_response": true,
+  "automatic_actions_executed": 0
+}

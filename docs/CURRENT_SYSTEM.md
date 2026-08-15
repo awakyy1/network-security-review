@@ -71,9 +71,10 @@ versionados.
 ### 5. Produção e auditoria do artigo
 
 `src/article_tables.py` gera tabelas LaTeX diretamente dos JSON preservados. O
-artigo V1.0, sua bibliografia, o PDF e os resultados usados nas tabelas ficam
-versionados. Testes unitários cobrem parser, relatórios, telemetria, regras,
-Ollama, preservação, repetição, CTU-13, comparação e tabelas.
+snapshot V1.0, sua bibliografia e seus resultados permanecem versionados; o
+artigo atual está congelado como V1.1. Testes unitários cobrem parser,
+relatórios, telemetria, regras, Ollama, preservação, repetição, CTU-13,
+comparação e tabelas.
 
 ## O que o sistema não faz
 
@@ -97,4 +98,5 @@ validação grounded do Ollama, experimentos repetidos, validação externa CTU-
 proveniência com hashes e tabelas geradas.
 
 Essa alteração não modifica retroativamente a monografia aprovada. Ela constitui
-uma extensão pós-defesa, testada e documentada no artigo V1.0.
+uma extensão pós-defesa, testada e documentada no snapshot V1.0; a revisão
+V1.1 amplia a avaliação sem reescrever esse registro histórico.

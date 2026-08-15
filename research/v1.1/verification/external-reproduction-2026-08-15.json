@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "created_at_utc": "2026-08-15T22:00:41.071147+00:00",
+  "repository_root": "E:\\tcc",
+  "output_root": "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15",
+  "llm_inference_performed": false,
+  "external_options": {
+    "download_ctu13": false,
+    "run_ctu13": true,
+    "run_second_dataset": true
+  },
+  "commands": [
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "src/nmap_to_zabbix.py",
+        "--input",
+        "examples/nmap/synthetic-enterprise.xml",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\synthetic-report"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "Parsed 4 live hosts and produced 14 review findings.\nReports: E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\synthetic-report\\network-review.md, E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\synthetic-report\\network-review.json, E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\synthetic-report\\dashboard.html\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.v2_experiment",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\phase-a"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "V2 benchmark: TP=4 FP=1 FN=0 F1=0.889\nReports: E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\phase-a\\benchmark.md, E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\phase-a\\benchmark.json\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.endpoint_experiment",
+        "--manifest",
+        "research/v1.1/endpoint-scenarios.json",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\endpoint"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "{\"false_negative\": 0, \"false_positive\": 0, \"true_negative\": 4, \"true_positive\": 1}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.counterfactual_policies",
+        "--repository-root",
+        "E:\\tcc",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\counterfactual"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "{\"confirmatory-donbot\": {\"negative\": 78, \"negative_alerted\": 29, \"negative_multi_rule\": 5, \"positive\": 27, \"positive_alerted\": 24, \"positive_multi_rule\": 6}, \"historical-nsis-ay\": {\"negative\": 55, \"negative_alerted\": 32, \"negative_multi_rule\": 15, \"positive\": 53, \"positive_alerted\": 16, \"positive_multi_rule\": 0}, \"synthetic-implementation-transfer\": {\"negative\": 432, \"negative_alerted\": 48, \"negative_multi_rule\": 0, \"positive\": 97, \"positive_alerted\": 96, \"positive_multi_rule\": 0}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.ctu13_acquire",
+        "--data-dir",
+        "E:\\tcc\\data\\ctu13"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "[\n  {\n    \"scenario\": 5,\n    \"role\": \"development\",\n    \"filename\": \"capture20110815-2.binetflow\",\n    \"bytes\": 17766203,\n    \"sha256\": \"ef5c9ed6895d4ca5aec723449dae30054ccd1f6b091713a52ffcb681ff78a02c\",\n    \"verified_against_frozen_hash\": true\n  },\n  {\n    \"scenario\": 12,\n    \"role\": \"holdout\",\n    \"filename\": \"capture20110819.binetflow\",\n    \"bytes\": 44718958,\n    \"sha256\": \"1098f0addacedc321c7baefad63ef0d9a0f26630d0155087d37e8da770dd9f2e\",\n    \"verified_against_frozen_hash\": true\n  }\n]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.ctu13_analysis",
+        "--data-dir",
+        "E:\\tcc\\data\\ctu13",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\ctu13-retrospective",
+        "--window-seconds",
+        "60",
+        "300",
+        "600"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "Analyses: 6\nOutput: E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\ctu13-retrospective\\ctu13-window-analysis.json\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.second_dataset_experiment",
+        "--manifest",
+        "research/v1.1/second-dataset-run-2026-08-15.json",
+        "--output-dir",
+        "E:\\tcc\\output\\v1.1-external-reproduction-2026-08-15\\second-dataset"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "{\"balanced_accuracy\": 0.93929, \"f1\": 0.79668, \"false_negative\": 1, \"false_positive\": 48, \"matthews_correlation_coefficient\": 0.763831, \"precision\": 0.666667, \"precision_wilson_95\": [0.586225, 0.738447], \"recall\": 0.989691, \"recall_wilson_95\": [0.943895, 0.998178], \"specificity\": 0.888889, \"specificity_wilson_95\": [0.855758, 0.915164], \"true_negative\": 384, \"true_positive\": 96}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.article_tables"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "E:\\tcc\\academic\\artigo\\generated\\phase-a-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-metrics-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-rules-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-exploratory-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-repeated-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-adversarial-table.tex\nE:\\tcc\\academic\\artigo\\generated\\environment-comparison-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-window-analysis-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-threshold-diagnostics-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-error-examples-table.tex\nE:\\tcc\\academic\\artigo\\generated\\ctu13-confirmatory-table.tex\nE:\\tcc\\academic\\artigo\\generated\\second-dataset-transfer-table.tex\nE:\\tcc\\academic\\artigo\\generated\\endpoint-beh004-table.tex\nE:\\tcc\\academic\\artigo\\generated\\counterfactual-policies-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-primary-matrix-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-supplement-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-ablation-table.tex\nE:\\tcc\\academic\\artigo\\generated\\llm-adversarial-matrix-table.tex\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "E:\\tcc\\.venv\\Scripts\\python.exe",
+        "-m",
+        "src.article_figures"
+      ],
+      "cwd": "E:\\tcc",
+      "returncode": 0,
+      "stdout": "E:\\tcc\\academic\\artigo\\generated\\figures\\architecture-trust-boundaries.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\architecture-trust-boundaries.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\experimental-flow.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\experimental-flow.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\ctu13-development-holdout-metrics.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\ctu13-development-holdout-metrics.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\grounded-free-text-traceability.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\grounded-free-text-traceability.png\nE:\\tcc\\academic\\artigo\\generated\\figures\\beh002-holdout-distributions.pdf\nE:\\tcc\\academic\\artigo\\generated\\figures\\beh002-holdout-distributions.png\n",
+      "stderr": ""
+    }
+  ],
+  "pdf": {
+    "path": "E:\\tcc\\academic\\artigo\\build-v1.1\\main.pdf",
+    "sha256": "2f279983e681dbf19a50a7e053b0fbbb546bec4d73fe7dcfb794c4d1c129323a",
+    "bytes": 207766
+  }
+}

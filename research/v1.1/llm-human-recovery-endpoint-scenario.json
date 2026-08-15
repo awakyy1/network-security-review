@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.1",
+  "frozen_at": "2026-08-15T18:35:00-03:00",
+  "nmap_input": "../../examples/nmap/synthetic-enterprise.xml",
+  "selection_rule": "The initial 36-item package preflight found one non-API-failure first-repetition item with an empty raw response. Select that item and no other item before observing recovery output.",
+  "scenarios": [
+    {
+      "id": "endpoint-lineage",
+      "category": "endpoint-lineage",
+      "description": "Inert network-to-file sequence with bounded endpoint context.",
+      "telemetry": "../v2/fixtures/emulated-tool-transfer.jsonl",
+      "expected_rule_ids": ["BEH-004"]
+    }
+  ]
+}

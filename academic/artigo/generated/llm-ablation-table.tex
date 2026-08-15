@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption{Single-model component-sensitivity ablation.}
+\label{tab:llm-ablation}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Condition & New calls & Attempts & API & JSON & Schema & Accepted & Finding cov. & Evidence cov. \\
+\midrule
+Reference (primary reuse) & 0 & 12 & 12 & 9 & 9 & 7 & 0.750 & 0.750 \\
+Temperature 0.7 & 12 & 12 & 12 & 9 & 9 & 4 & 0.500 & 0.500 \\
+API format removed & 12 & 12 & 12 & 0 & 0 & 0 & 0.000 & 0.000 \\
+Grounding language reduced & 12 & 12 & 12 & 9 & 9 & 9 & 0.750 & 0.750 \\
+Validator bypass (post hoc) & 0 & 12 & 12 & 9 & 9 & 12 & 0.750 & 0.750 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} Reference and validator-bypass rows reuse the same 12 primary responses. Bypass counts every API response as usable and was never connected to operations. Three clustered repetitions support descriptive sensitivity only.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

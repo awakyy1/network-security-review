@@ -4,6 +4,14 @@ This file records meaningful changes to the research artifact. Commit hashes ide
 
 ## Unreleased
 
+- No unreleased changes.
+
+## 1.1 - 2026-08-15
+
+- Start the V1.1 research line with an explicit, auditable plan covering
+  related work, expanded detector validation, endpoint evidence, multi-model
+  and prompt-injection evaluation, counterfactual policies, generated figures,
+  reproducibility and release gates.
 - Make English the canonical repository README and retain Portuguese as
   `README.pt-BR.md`.
 - Freeze the post-approval scientific article as V1.0 with a named PDF snapshot
@@ -25,6 +33,14 @@ This file records meaningful changes to the research artifact. Commit hashes ide
   sets with raw-output hashes and exact measurement boundaries.
 - Report 50/50 versus 0/50 exact identifier traceability while keeping semantic
   superiority and analyst usefulness explicitly unresolved.
+- Complete the automated V1.1 model matrix, component ablations, inert
+  prompt-injection matrix and 31-event conflicting-context supplement while
+  preserving availability failures and keeping recovery calls outside primary
+  denominators.
+- Add a 36-item blinded human-review package without inventing ratings; genuine
+  independent review remains a release gate.
+- Add one-command deterministic regeneration, V1.0/V1.1 verification records,
+  generated figures and tables, and an audited 18-page final V1.1 PDF.
 
 ## 2026-08-03 — Published base (`5d93fac`)
 

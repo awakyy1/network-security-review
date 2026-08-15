@@ -105,6 +105,12 @@ class V2RepetitionsTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "one Ollama protocol"):
             aggregate_results([first, second])
 
+    def test_does_not_mislabel_rejected_multi_finding_rankings(self) -> None:
+        summary = aggregate_results([_result(elapsed_ms=100, accepted=0)])
+
+        self.assertEqual(summary["ollama"]["ranking_stability"], {})
+        self.assertIn("No accepted multi-finding output", summary["ollama"]["ranking_interpretation"])
+
 
 if __name__ == "__main__":
     unittest.main()

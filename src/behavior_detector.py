@@ -37,6 +37,36 @@ class BehaviorFinding:
         return result
 
 
+@dataclass(frozen=True)
+class DetectorThresholds:
+    """Explicit rule thresholds; defaults reproduce the frozen V1.0 detector."""
+
+    beh_001_minimum_connections: int = 6
+    beh_001_minimum_mean_interval_seconds: float = 5
+    beh_001_maximum_mean_interval_seconds: float = 900
+    beh_001_maximum_interval_cv: float = 0.15
+    beh_002_minimum_distinct_endpoints: int = 8
+    beh_002_interval_seconds: int = 60
+    beh_003_minimum_bytes_sent: int = 1_000_000
+    beh_003_minimum_sent_received_ratio: float = 10
+    beh_004_minimum_bytes_received: int = 32_768
+    beh_004_maximum_delay_seconds: int = 120
+
+    def __post_init__(self) -> None:
+        if self.beh_001_minimum_connections < 2:
+            raise ValueError("BEH-001 minimum connections must be at least 2")
+        if not 0 < self.beh_001_minimum_mean_interval_seconds <= self.beh_001_maximum_mean_interval_seconds:
+            raise ValueError("BEH-001 mean-interval bounds are invalid")
+        if self.beh_001_maximum_interval_cv < 0:
+            raise ValueError("BEH-001 maximum interval CV cannot be negative")
+        if self.beh_002_minimum_distinct_endpoints < 2 or self.beh_002_interval_seconds < 1:
+            raise ValueError("BEH-002 thresholds are invalid")
+        if self.beh_003_minimum_bytes_sent < 1 or self.beh_003_minimum_sent_received_ratio <= 0:
+            raise ValueError("BEH-003 thresholds are invalid")
+        if self.beh_004_minimum_bytes_received < 1 or self.beh_004_maximum_delay_seconds < 0:
+            raise ValueError("BEH-004 thresholds are invalid")
+
+
 def inventory_context(hosts: Iterable[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     """Index Nmap inventory without turning fingerprints into vulnerability claims."""
     context: dict[str, dict[str, Any]] = {}
@@ -69,8 +99,13 @@ class BehaviorDetector:
 
     RULE_IDS = {"BEH-001", "BEH-002", "BEH-003", "BEH-004"}
 
-    def __init__(self, inventory: dict[str, dict[str, Any]] | None = None):
+    def __init__(
+        self,
+        inventory: dict[str, dict[str, Any]] | None = None,
+        thresholds: DetectorThresholds | None = None,
+    ):
         self.inventory = inventory or {}
+        self.thresholds = thresholds or DetectorThresholds()
 
     def analyze(self, events: list[TelemetryEvent]) -> list[BehaviorFinding]:
         findings = [
@@ -100,17 +135,21 @@ class BehaviorDetector:
         findings = []
         for (host, process, destination, port), group in groups.items():
             ordered = sorted(group, key=lambda item: item.timestamp)
-            if len(ordered) < 6:
+            if len(ordered) < self.thresholds.beh_001_minimum_connections:
                 continue
             intervals = [
                 (current.timestamp - previous.timestamp).total_seconds()
                 for previous, current in zip(ordered, ordered[1:])
             ]
             mean_interval = statistics.fmean(intervals)
-            if not 5 <= mean_interval <= 900:
+            if not (
+                self.thresholds.beh_001_minimum_mean_interval_seconds
+                <= mean_interval
+                <= self.thresholds.beh_001_maximum_mean_interval_seconds
+            ):
                 continue
             variation = statistics.pstdev(intervals) / mean_interval if mean_interval else float("inf")
-            if variation > 0.15:
+            if variation > self.thresholds.beh_001_maximum_interval_cv:
                 continue
             evidence = ordered[:20]
             findings.append(
@@ -143,7 +182,7 @@ class BehaviorDetector:
                 groups[(event.host, event.process)].append(event)
 
         findings = []
-        window = timedelta(seconds=60)
+        window = timedelta(seconds=self.thresholds.beh_002_interval_seconds)
         for (host, process), group in groups.items():
             ordered = sorted(group, key=lambda item: item.timestamp)
             matched: list[TelemetryEvent] = []
@@ -157,7 +196,7 @@ class BehaviorDetector:
                     )
                     endpoint_counts[endpoint] += 1
                     right += 1
-                if len(endpoint_counts) >= 8:
+                if len(endpoint_counts) >= self.thresholds.beh_002_minimum_distinct_endpoints:
                     matched = ordered[left : min(right, left + 20)]
                     break
                 endpoint = (first.destination_ip or first.destination_domain, first.destination_port)
@@ -176,7 +215,11 @@ class BehaviorDetector:
                     host=host,
                     process=process,
                     evidence_ids=tuple(item.event_id for item in matched),
-                    evidence="The process contacted at least 8 distinct network endpoints within 60 seconds.",
+                    evidence=(
+                        "The process contacted at least "
+                        f"{self.thresholds.beh_002_minimum_distinct_endpoints} distinct network endpoints within "
+                        f"{self.thresholds.beh_002_interval_seconds} seconds."
+                    ),
                     recommendation=(
                         "Confirm whether the process is an authorized scanner, inspect its execution context, "
                         "and use segmentation or rate controls only after validating business impact."
@@ -189,10 +232,13 @@ class BehaviorDetector:
     def _asymmetric_egress(self, events: list[TelemetryEvent]) -> list[BehaviorFinding]:
         findings = []
         for event in events:
-            if event.event_type != "network_connection" or event.bytes_sent < 1_000_000:
+            if (
+                event.event_type != "network_connection"
+                or event.bytes_sent < self.thresholds.beh_003_minimum_bytes_sent
+            ):
                 continue
             ratio = event.bytes_sent / max(event.bytes_received, 1)
-            if ratio < 10:
+            if ratio < self.thresholds.beh_003_minimum_sent_received_ratio:
                 continue
             findings.append(
                 BehaviorFinding(
@@ -229,8 +275,10 @@ class BehaviorDetector:
                 for item in network_events
                 if item.host == file_event.host
                 and item.process == file_event.process
-                and 0 <= (file_event.timestamp - item.timestamp).total_seconds() <= 120
-                and item.bytes_received >= 32_768
+                and 0
+                <= (file_event.timestamp - item.timestamp).total_seconds()
+                <= self.thresholds.beh_004_maximum_delay_seconds
+                and item.bytes_received >= self.thresholds.beh_004_minimum_bytes_received
             ]
             if not candidates:
                 continue

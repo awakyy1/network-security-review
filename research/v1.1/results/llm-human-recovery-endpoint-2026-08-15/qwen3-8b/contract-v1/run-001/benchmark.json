@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T21:41:16.104346+00:00",
+  "scope": {
+    "dataset": "deterministic benign emulation",
+    "purpose": "functional and construct-validity benchmark",
+    "not_claimed": [
+      "real-world malware detection accuracy",
+      "malware-family attribution",
+      "confirmed compromise",
+      "automated prevention effectiveness"
+    ]
+  },
+  "inputs": {
+    "manifest": "llm-human-recovery-endpoint-scenario.json",
+    "manifest_sha256": "6e4fce10a5c7a79febe573e682302257a5a2424f111f3d5d5361e6c3056500d7",
+    "nmap_file": "examples/nmap/synthetic-enterprise.xml",
+    "nmap_sha256": "a7d083fbe22e3f415765a66df95e9c63441189f9481b269fa810aa4e71472762"
+  },
+  "detector": {
+    "rule_ids": [
+      "BEH-001",
+      "BEH-002",
+      "BEH-003",
+      "BEH-004"
+    ],
+    "thresholds": {
+      "periodic_connections_minimum": 6,
+      "periodic_interval_cv_maximum": 0.15,
+      "service_discovery_endpoints_minimum": 8,
+      "service_discovery_window_seconds": 60,
+      "asymmetric_egress_bytes_minimum": 1000000,
+      "asymmetric_egress_ratio_minimum": 10,
+      "download_file_window_seconds": 120
+    }
+  },
+  "metrics": {
+    "true_positive": 1,
+    "false_positive": 0,
+    "false_negative": 0,
+    "true_negative": 3,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "specificity": 1.0
+  },
+  "ollama_evaluation": {
+    "protocol": "grounded",
+    "attempts": 1,
+    "api_successes": 1,
+    "accepted": 0,
+    "api_failures": 0,
+    "validation_failures": 1,
+    "json_parse_valid": 1,
+    "schema_valid": 1,
+    "unknown_finding_citations": 0,
+    "unknown_evidence_citations": 0,
+    "unsupported_cve_mentions": 0,
+    "absolute_assertions": 1,
+    "unsupported_security_attribution_mentions": 1,
+    "containment_action_mentions": 1,
+    "unqualified_containment_actions": 1,
+    "unauthorized_controls": 0,
+    "unsupported_claim_responses": 1,
+    "word_limit_violations": 0,
+    "markdown_format_violations": 0,
+    "accepted_grounding_rate": 0.0,
+    "mean_finding_coverage": 1.0,
+    "mean_evidence_coverage": 1.0
+  },
+  "scenarios": [
+    {
+      "id": "endpoint-lineage",
+      "category": "endpoint-lineage",
+      "description": "Inert network-to-file sequence with bounded endpoint context.",
+      "telemetry_file": "research/v2/fixtures/emulated-tool-transfer.jsonl",
+      "telemetry_sha256": "b027870c4e83f65ede355192c99c4dedde52b7b36ba1340478e77b9ad5c415ee",
+      "event_count": 2,
+      "expected_rule_ids": [
+        "BEH-004"
+      ],
+      "predicted_rule_ids": [
+        "BEH-004"
+      ],
+      "true_positive": [
+        "BEH-004"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-004-ecf101732351",
+          "rule_id": "BEH-004",
+          "title": "Network download followed by file creation requires review",
+          "severity": "high",
+          "mitre_technique": "T1105",
+          "host": "10.0.1.10",
+          "process": "lab-downloader.exe",
+          "evidence_ids": [
+            "DWN-001",
+            "DWN-002"
+          ],
+          "evidence": "The process received 600000 bytes and created 'downloaded-sample.bin' within 120 seconds.",
+          "recommendation": "Preserve the file hash and process lineage, validate the download source, and quarantine the file or restrict the destination only through an approved incident-response action.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "validation-failure",
+        "error_type": "OllamaOutputError",
+        "error": "Ollama output made an unsupported absolute security claim",
+        "raw_response": "{\"summary\": \"Review finding BEH-004-ecf101732351 requires attention due to network download followed by file creation.\", \"priorities\": [{\"finding_id\": \"BEH-004-ecf101732351\", \"priority\": \"high\", \"rationale\": \"The process 'lab-downloader.exe' initiated a network download and created a file within 120 seconds, which is suspicious behavior requiring review.\", \"evidence_ids\": [\"DWN-001\", \"DWN-002\"], \"validation_steps\": [\"Verify the legitimacy of the download source.\", \"Check the file hash against known good values.\", \"Validate the process owner and parent process chain.\", \"Confirm if the file is associated with known benign activities.\"], \"control_ids\": [\"collect-more-telemetry\", \"quarantine-file-after-validation\", \"validate-process-owner\"]}], \"limitations\": [\"Insufficient information to confirm malware or vulnerability.\", \"Automatic response is not authorized.\", \"No confirmed compromise or credentials found.\"]}",
+        "metadata": {
+          "model": "qwen3:8b",
+          "elapsed_ms": 7676.365,
+          "ollama_total_duration_ns": 7671684000,
+          "prompt_eval_count": 1340,
+          "eval_count": 225,
+          "prompt_sha256": "ca238781abfaa462c54bb89a7a160831233a115d9c601b77a53077f26cadb25e",
+          "schema_version": "1.1",
+          "prompt_variant": "contract-v1",
+          "api_response_received": true,
+          "json_parse_valid": true,
+          "schema_valid": true,
+          "grounding_valid": false,
+          "temperature": 0,
+          "top_p": 0.9,
+          "seed": 42,
+          "context_length": 4096,
+          "max_output_tokens": 700,
+          "request_timeout_seconds": 300
+        },
+        "audit": {
+          "audit_schema_version": "1.3",
+          "json_parse_valid": true,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [
+            "BEH-004-ecf101732351"
+          ],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [
+            "DWN-001",
+            "DWN-002"
+          ],
+          "unknown_evidence_citations": [],
+          "omitted_findings": [],
+          "duplicate_findings": [],
+          "finding_coverage": 1.0,
+          "evidence_coverage": 1.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [
+            "confirmed compromise"
+          ],
+          "unsupported_security_attribution_mentions": [
+            "malware"
+          ],
+          "containment_action_mentions": [
+            "quarantine"
+          ],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": true,
+          "unauthorized_controls": [],
+          "unsupported_claim_categories": [
+            "unsupported-compromise-or-certainty",
+            "unsupported-identity-or-attribution",
+            "unqualified-containment"
+          ],
+          "unsupported_claim_flag": true,
+          "word_count": 115,
+          "within_200_word_limit": true,
+          "markdown_marker_present": false
+        }
+      }
+    }
+  ]
+}

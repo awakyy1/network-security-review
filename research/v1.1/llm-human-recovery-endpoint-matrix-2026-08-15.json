@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.1",
+  "status": "frozen-ready-for-supplemental-inference",
+  "evidence_role": "frozen-single-item-human-sample-output-recovery",
+  "preregistered_at": "2026-08-15T18:35:00-03:00",
+  "purpose": "Obtain one displayable raw output for the sole first-repetition human-sample item whose primary API response contained an empty response body.",
+  "selection_evidence": {
+    "primary_benchmark": "results/llm-primary-matrix-2026-08-15/qwen3-8b/contract-v1/run-001/benchmark.json",
+    "primary_benchmark_sha256": "f4caafa32611b9487dbda46f0d29fa00d48b72fe16b0e5c7146a339803da8459",
+    "scenario_id": "endpoint-lineage",
+    "primary_status": "validation-failure",
+    "primary_raw_response_length": 0
+  },
+  "models": [
+    {
+      "tag": "qwen3:8b",
+      "family": "Alibaba Qwen 3",
+      "role": "intermediate-cross-family",
+      "local_manifest_digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+      "parameter_size": "8.2B",
+      "quantization": "Q4_K_M"
+    }
+  ],
+  "protocol": {
+    "prompt_variants": ["contract-v1"],
+    "repetitions_per_cell": 1,
+    "manifest": "llm-human-recovery-endpoint-scenario.json",
+    "manifest_sha256": "6e4fce10a5c7a79febe573e682302257a5a2424f111f3d5d5361e6c3056500d7",
+    "model_calls_expected": 1,
+    "model_calls_formula": "1 model * 1 prompt variant * 1 repetition * 1 scenario producing findings",
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 4096,
+    "maximum_output_tokens": 700,
+    "stream": false,
+    "schema_version": "1.1",
+    "network_boundary": "loopback Ollama only; no remote inference API",
+    "execution_order": "one prospectively selected call; no retry after observing output"
+  },
+  "frozen_fixture_hashes": {
+    "../v2/fixtures/emulated-tool-transfer.jsonl": "b027870c4e83f65ede355192c99c4dedde52b7b36ba1340478e77b9ad5c415ee"
+  },
+  "interpretation_boundary": "The recovered output is used only to display the otherwise empty blinded-review item. It does not alter primary denominators or validator acceptance.",
+  "code_hashes_at_preregistration": {
+    "src/ollama_advisor.py": "79ab9655ac99648326baabff9942f60fd165ee3e922d47ad7753fd72e99abfbb",
+    "src/ollama_baseline.py": "3975a2c3b8ec0b60a49937a4969845dc12d7fdee15df0fd9cf45f31b81632111",
+    "src/v2_experiment.py": "7d628ede9c1e82fadeecb993029e7780f57649f284535635e01f6aa4f5ee3b96",
+    "src/v2_repetitions.py": "90f1a30a2ec28a81ca70933ab95945b1f36e2b564cd44555aff3a45436337103"
+  }
+}

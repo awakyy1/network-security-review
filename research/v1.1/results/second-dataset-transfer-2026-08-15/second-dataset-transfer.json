@@ -1,0 +1,194 @@
+{
+  "schema_version": "1.0",
+  "evidence_role": "implementation-transfer-not-independent-validation",
+  "manifest": "second-dataset-run-2026-08-15.json",
+  "manifest_sha256": "4d13f356cc1822ad3205be7d1ddd5762e48b2ce8023c99cba697523d2ecd800d",
+  "selection_record": {
+    "filename": "second-dataset-selection-2026-08-15.json",
+    "sha256": "79757bd5219d062c04f15460c3a2911b8feec72e74bbbf335556ffa6bd476602"
+  },
+  "source": {
+    "path": "E:/tcc/data/botnet-group-activity/scenario-1/scenario_dataset_1/dataset_result.binetflow",
+    "bytes": 291312467,
+    "sha256": "867eeef8b8936e545129d8d806f86a2dff41f6cafe0339759da4aad0ef7cda0d",
+    "scenario": 1,
+    "family": "synthetic grouped CTU-13-derived bot activity",
+    "role": "implementation-transfer"
+  },
+  "window_seconds": 300,
+  "detector_thresholds": {
+    "beh_001_minimum_connections": 6,
+    "beh_001_minimum_mean_interval_seconds": 5,
+    "beh_001_maximum_mean_interval_seconds": 900,
+    "beh_001_maximum_interval_cv": 0.15,
+    "beh_002_minimum_distinct_endpoints": 16,
+    "beh_002_interval_seconds": 60,
+    "beh_003_minimum_bytes_sent": 1000000,
+    "beh_003_minimum_sent_received_ratio": 10,
+    "beh_004_minimum_bytes_received": 32768,
+    "beh_004_maximum_delay_seconds": 120
+  },
+  "metrics": {
+    "true_positive": 96,
+    "false_positive": 48,
+    "false_negative": 1,
+    "true_negative": 384,
+    "precision": 0.666667,
+    "precision_wilson_95": [
+      0.586225,
+      0.738447
+    ],
+    "recall": 0.989691,
+    "recall_wilson_95": [
+      0.943895,
+      0.998178
+    ],
+    "specificity": 0.888889,
+    "specificity_wilson_95": [
+      0.855758,
+      0.915164
+    ],
+    "f1": 0.79668,
+    "balanced_accuracy": 0.93929,
+    "matthews_correlation_coefficient": 0.763831
+  },
+  "parse_counts": {
+    "total_rows": 2112224,
+    "scored_rows": 46567,
+    "positive_rows": 22000,
+    "negative_rows": 24567,
+    "excluded_background_or_to": 2064611,
+    "excluded_unsupported_protocol": 1046,
+    "excluded_missing_destination_port": 0,
+    "excluded_mixed_truth_windows": 0
+  },
+  "rule_finding_counts": {
+    "BEH-001": {},
+    "BEH-002": {
+      "botnet-origin": 96,
+      "normal-origin": 46
+    },
+    "BEH-003": {
+      "normal-origin": 2
+    }
+  },
+  "rule_combination_counts_by_truth": {
+    "botnet-origin": {
+      "BEH-002": 96,
+      "none": 1
+    },
+    "normal-origin": {
+      "BEH-002": 46,
+      "BEH-003": 2,
+      "none": 384
+    }
+  },
+  "deterministic_examples": [
+    {
+      "truth": "botnet-origin",
+      "rule_combination": [
+        "BEH-002"
+      ],
+      "host": "bga-s01-src-6ec250bb9b72d5c7",
+      "window_start": "2020-01-01T00:00:00+00:00",
+      "event_count": 118,
+      "finding_ids": [
+        "BEH-002-c6db1ac9e81d"
+      ],
+      "evidence_ids": [
+        "BGA01-00000010",
+        "BGA01-00000058",
+        "BGA01-00000128",
+        "BGA01-00000155",
+        "BGA01-00000222",
+        "BGA01-00000255",
+        "BGA01-00000339",
+        "BGA01-00000403",
+        "BGA01-00000413",
+        "BGA01-00000442",
+        "BGA01-00000458",
+        "BGA01-00000600",
+        "BGA01-00000626",
+        "BGA01-00000676",
+        "BGA01-00000797",
+        "BGA01-00001083",
+        "BGA01-00001150",
+        "BGA01-00001238",
+        "BGA01-00001324",
+        "BGA01-00001386"
+      ]
+    },
+    {
+      "truth": "botnet-origin",
+      "rule_combination": [],
+      "host": "bga-s01-src-6ec250bb9b72d5c7",
+      "window_start": "2020-01-01T08:00:00+00:00",
+      "event_count": 1,
+      "finding_ids": [],
+      "evidence_ids": []
+    },
+    {
+      "truth": "normal-origin",
+      "rule_combination": [
+        "BEH-002"
+      ],
+      "host": "bga-s01-src-9f9a4e289b2ed471",
+      "window_start": "2020-01-01T00:15:00+00:00",
+      "event_count": 227,
+      "finding_ids": [
+        "BEH-002-7af3ae547f75"
+      ],
+      "evidence_ids": [
+        "BGA01-00057328",
+        "BGA01-00057452",
+        "BGA01-00057517",
+        "BGA01-00057771",
+        "BGA01-00057793",
+        "BGA01-00057808",
+        "BGA01-00057844",
+        "BGA01-00057922",
+        "BGA01-00057994",
+        "BGA01-00058099",
+        "BGA01-00058290",
+        "BGA01-00058504",
+        "BGA01-00058527",
+        "BGA01-00058538",
+        "BGA01-00058542",
+        "BGA01-00058609",
+        "BGA01-00058767",
+        "BGA01-00058822",
+        "BGA01-00058828",
+        "BGA01-00059015"
+      ]
+    },
+    {
+      "truth": "normal-origin",
+      "rule_combination": [
+        "BEH-003"
+      ],
+      "host": "bga-s01-src-9f9a4e289b2ed471",
+      "window_start": "2020-01-01T03:10:00+00:00",
+      "event_count": 152,
+      "finding_ids": [
+        "BEH-003-9e1e8980cec5"
+      ],
+      "evidence_ids": [
+        "BGA01-00837475"
+      ]
+    },
+    {
+      "truth": "normal-origin",
+      "rule_combination": [],
+      "host": "bga-s01-src-18a0ee098d1d242b",
+      "window_start": "2020-01-01T00:00:00+00:00",
+      "event_count": 2,
+      "finding_ids": [],
+      "evidence_ids": []
+    }
+  ],
+  "runtime": {
+    "elapsed_ms": 32034.828
+  },
+  "interpretation_boundary": "The synthetic source derives bot-group behavior from CTU-13 patterns. These results test parser and detector transfer only and must not be pooled with CTU-13 or described as independent generalization.",
+  "automatic_actions_executed": 0
+}

@@ -57,10 +57,12 @@ def aggregate_results(results: list[dict[str, Any]]) -> dict[str, Any]:
         "unsupported_security_attribution_mentions",
         "containment_action_mentions",
         "unqualified_containment_actions",
+        "unauthorized_controls",
+        "unsupported_claim_responses",
         "word_limit_violations",
         "markdown_format_violations",
     ]
-    totals = {field: sum(item[field] for item in evaluations) for field in count_fields}
+    totals = {field: sum(item.get(field, 0) for item in evaluations) for field in count_fields}
     protocol = next(iter(protocols))
     json_parse_valid = 0
     schema_valid = 0
@@ -69,8 +71,11 @@ def aggregate_results(results: list[dict[str, Any]]) -> dict[str, Any]:
 
     latencies = []
     rankings: dict[str, list[tuple[str, ...]]] = defaultdict(list)
+    multi_finding_scenario_ids: set[str] = set()
     for result in results:
         for scenario in result["scenarios"]:
+            if len(scenario.get("findings", [])) > 1:
+                multi_finding_scenario_ids.add(scenario["id"])
             ollama = scenario["ollama"]
             if not ollama:
                 continue
@@ -159,6 +164,9 @@ def aggregate_results(results: list[dict[str, Any]]) -> dict[str, Any]:
             "json_parse_rate": round(_safe_divide(totals["json_parse_valid"], totals["attempts"]), 6),
             "schema_valid_rate": round(_safe_divide(totals["schema_valid"], totals["attempts"]), 6),
             "accepted_grounding_rate": round(_safe_divide(totals["accepted"], totals["attempts"]), 6),
+            "unsupported_claim_rate": round(
+                _safe_divide(totals["unsupported_claim_responses"], totals["api_successes"]), 6
+            ),
             "mean_finding_coverage": round(_safe_divide(sum(finding_coverage_values), len(finding_coverage_values)), 6),
             "mean_evidence_coverage": round(
                 _safe_divide(sum(evidence_coverage_values), len(evidence_coverage_values)), 6
@@ -173,9 +181,13 @@ def aggregate_results(results: list[dict[str, Any]]) -> dict[str, Any]:
             },
             "ranking_stability": ranking_details,
             "ranking_interpretation": (
-                "Not estimable when each scenario yields at most one finding."
-                if not ranking_details
-                else "Exact agreement with the modal ordering, reported per multi-finding scenario."
+                "Exact agreement with the modal ordering, reported per multi-finding scenario."
+                if ranking_details
+                else (
+                    "No accepted multi-finding output was available; inspect schema-valid raw outputs separately."
+                    if multi_finding_scenario_ids
+                    else "Not applicable because each invoked scenario yields at most one finding."
+                )
             ),
         },
         "measurement_note": (
@@ -229,6 +241,7 @@ def run_repetitions(
     ollama_context: int = 4096,
     ollama_timeout: float = 300,
     ollama_max_output_tokens: int | None = None,
+    ollama_prompt_variant: str = "contract-v1",
 ) -> dict[str, Any]:
     if not 1 <= repetitions <= 100:
         raise ValueError("Repetitions must be between 1 and 100")
@@ -247,11 +260,13 @@ def run_repetitions(
                 ollama_timeout=ollama_timeout,
                 ollama_max_output_tokens=ollama_max_output_tokens,
                 ollama_protocol=protocol,
+                ollama_prompt_variant=ollama_prompt_variant,
             )
         )
     summary = aggregate_results(results)
     summary["model"] = model
     summary["manifest"] = Path(manifest).as_posix()
+    summary["prompt_variant"] = ollama_prompt_variant if protocol == "grounded" else None
     (output / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     (output / "summary.md").write_text(_markdown_report(summary), encoding="utf-8")
     return summary
@@ -267,6 +282,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repetitions", type=int, default=10)
     parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
     parser.add_argument("--ollama-context", type=int, default=4096)
+    parser.add_argument(
+        "--ollama-prompt-variant",
+        choices=("contract-v1", "evidence-first-v1", "checklist-v1"),
+        default="contract-v1",
+    )
     parser.add_argument("--ollama-timeout", type=float, default=300)
     parser.add_argument("--ollama-max-output-tokens", type=int)
     arguments = parser.parse_args(argv)
@@ -281,6 +301,7 @@ def main(argv: list[str] | None = None) -> int:
             ollama_context=arguments.ollama_context,
             ollama_timeout=arguments.ollama_timeout,
             ollama_max_output_tokens=arguments.ollama_max_output_tokens,
+            ollama_prompt_variant=arguments.ollama_prompt_variant,
         )
     except (OSError, ValueError, requests.RequestException) as error:
         parser.error(str(error))

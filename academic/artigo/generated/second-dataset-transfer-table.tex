@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Frozen detector replay on the second, synthetic implementation-transfer dataset.}
+\label{tab:second-dataset-transfer}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Role & Units & TP & FP & FN & TN & Precision & Recall & F1 & Specificity & MCC \\
+\midrule
+Implementation transfer & 529 & 96 & 48 & 1 & 384 & 0.667 & 0.990 & 0.797 & 0.889 & 0.764 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} The Botnet Group Activity source is synthetic and derives group patterns from CTU-13. It tests parser and detector transfer, not independent real-world generalization; these metrics are not pooled with CTU-13.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

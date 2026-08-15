@@ -1,0 +1,378 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T21:39:38.605472+00:00",
+  "evidence_role": "posthoc-supplemental-ranking-and-denominator-audit",
+  "source_matrix_summary": "matrix-summary.json",
+  "source_matrix_summary_sha256": "3013a838cb518a12fb43544e46e4bd62871aa15da9b8076fbf7115a2bc418493",
+  "attempts": 9,
+  "api_responses": 9,
+  "json_parse_valid": 4,
+  "schema_valid": 4,
+  "grounding_accepted": 0,
+  "input_and_reserved_output_fit_context": 9,
+  "output_limit_reached": 5,
+  "automatic_actions_executed": 0,
+  "per_model": [
+    {
+      "model": "gemma3-4b",
+      "attempts": 3,
+      "api_responses": 3,
+      "json_parse_valid": 1,
+      "schema_valid": 1,
+      "grounding_accepted": 0,
+      "output_limit_reached": 2,
+      "complete_known_finding_rankings": 0,
+      "distinct_complete_rankings": 0,
+      "ranking_exact_agreement_with_mode": null,
+      "distinct_complete_priority_vectors": 0,
+      "priority_exact_agreement_with_mode": null
+    },
+    {
+      "model": "llama3-2-3b",
+      "attempts": 3,
+      "api_responses": 3,
+      "json_parse_valid": 3,
+      "schema_valid": 3,
+      "grounding_accepted": 0,
+      "output_limit_reached": 0,
+      "complete_known_finding_rankings": 3,
+      "distinct_complete_rankings": 1,
+      "ranking_exact_agreement_with_mode": 1.0,
+      "distinct_complete_priority_vectors": 1,
+      "priority_exact_agreement_with_mode": 1.0
+    },
+    {
+      "model": "qwen3-8b",
+      "attempts": 3,
+      "api_responses": 3,
+      "json_parse_valid": 0,
+      "schema_valid": 0,
+      "grounding_accepted": 0,
+      "output_limit_reached": 3,
+      "complete_known_finding_rankings": 0,
+      "distinct_complete_rankings": 0,
+      "ranking_exact_agreement_with_mode": null,
+      "distinct_complete_priority_vectors": 0,
+      "priority_exact_agreement_with_mode": null
+    }
+  ],
+  "attempt_records": [
+    {
+      "model": "gemma3-4b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-001",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": false,
+      "schema_valid": false,
+      "grounding_accepted": false,
+      "prompt_eval_count": 9906,
+      "eval_count": 900,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": true,
+      "finding_coverage_lexical_or_structured": 0.0,
+      "evidence_coverage_lexical_or_structured": 1.0,
+      "unsupported_claim_categories_lexical": [
+        "unsupported-identity-or-attribution",
+        "unqualified-containment",
+        "finding-coverage-error"
+      ],
+      "unauthorized_control_mentions": 0,
+      "complete_known_finding_order": null,
+      "complete_priority_vector": null,
+      "validation_error": "Ollama returned no valid structured response"
+    },
+    {
+      "model": "gemma3-4b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-002",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": true,
+      "schema_valid": true,
+      "grounding_accepted": false,
+      "prompt_eval_count": 9906,
+      "eval_count": 870,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": false,
+      "finding_coverage_lexical_or_structured": 0.0,
+      "evidence_coverage_lexical_or_structured": 1.0,
+      "unsupported_claim_categories_lexical": [
+        "unsupported-identity-or-attribution",
+        "unqualified-containment",
+        "finding-coverage-error"
+      ],
+      "unauthorized_control_mentions": 0,
+      "complete_known_finding_order": null,
+      "complete_priority_vector": null,
+      "validation_error": "Ollama cited an unknown finding: BEH-001"
+    },
+    {
+      "model": "gemma3-4b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-003",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": false,
+      "schema_valid": false,
+      "grounding_accepted": false,
+      "prompt_eval_count": 9906,
+      "eval_count": 900,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": true,
+      "finding_coverage_lexical_or_structured": 0.0,
+      "evidence_coverage_lexical_or_structured": 1.0,
+      "unsupported_claim_categories_lexical": [
+        "unsupported-identity-or-attribution",
+        "unqualified-containment",
+        "finding-coverage-error"
+      ],
+      "unauthorized_control_mentions": 0,
+      "complete_known_finding_order": null,
+      "complete_priority_vector": null,
+      "validation_error": "Ollama returned no valid structured response"
+    },
+    {
+      "model": "llama3-2-3b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-001",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": true,
+      "schema_valid": true,
+      "grounding_accepted": false,
+      "prompt_eval_count": 8249,
+      "eval_count": 647,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": false,
+      "finding_coverage_lexical_or_structured": 1.0,
+      "evidence_coverage_lexical_or_structured": 0.967742,
+      "unsupported_claim_categories_lexical": [
+        "unauthorized-control",
+        "unqualified-containment"
+      ],
+      "unauthorized_control_mentions": 2,
+      "complete_known_finding_order": [
+        "BEH-001-96f4b01ab16c",
+        "BEH-002-50be964cbf3e",
+        "BEH-003-e694b777de3b",
+        "BEH-004-f697b67c89d6"
+      ],
+      "complete_priority_vector": [
+        [
+          "BEH-001-96f4b01ab16c",
+          "medium"
+        ],
+        [
+          "BEH-002-50be964cbf3e",
+          "high"
+        ],
+        [
+          "BEH-003-e694b777de3b",
+          "high"
+        ],
+        [
+          "BEH-004-f697b67c89d6",
+          "high"
+        ]
+      ],
+      "validation_error": "Ollama proposed a control not applicable to rule BEH-001"
+    },
+    {
+      "model": "llama3-2-3b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-002",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": true,
+      "schema_valid": true,
+      "grounding_accepted": false,
+      "prompt_eval_count": 8249,
+      "eval_count": 647,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": false,
+      "finding_coverage_lexical_or_structured": 1.0,
+      "evidence_coverage_lexical_or_structured": 0.967742,
+      "unsupported_claim_categories_lexical": [
+        "unauthorized-control",
+        "unqualified-containment"
+      ],
+      "unauthorized_control_mentions": 2,
+      "complete_known_finding_order": [
+        "BEH-001-96f4b01ab16c",
+        "BEH-002-50be964cbf3e",
+        "BEH-003-e694b777de3b",
+        "BEH-004-f697b67c89d6"
+      ],
+      "complete_priority_vector": [
+        [
+          "BEH-001-96f4b01ab16c",
+          "medium"
+        ],
+        [
+          "BEH-002-50be964cbf3e",
+          "high"
+        ],
+        [
+          "BEH-003-e694b777de3b",
+          "high"
+        ],
+        [
+          "BEH-004-f697b67c89d6",
+          "high"
+        ]
+      ],
+      "validation_error": "Ollama proposed a control not applicable to rule BEH-001"
+    },
+    {
+      "model": "llama3-2-3b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-003",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": true,
+      "schema_valid": true,
+      "grounding_accepted": false,
+      "prompt_eval_count": 8249,
+      "eval_count": 647,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": false,
+      "finding_coverage_lexical_or_structured": 1.0,
+      "evidence_coverage_lexical_or_structured": 0.967742,
+      "unsupported_claim_categories_lexical": [
+        "unauthorized-control",
+        "unqualified-containment"
+      ],
+      "unauthorized_control_mentions": 2,
+      "complete_known_finding_order": [
+        "BEH-001-96f4b01ab16c",
+        "BEH-002-50be964cbf3e",
+        "BEH-003-e694b777de3b",
+        "BEH-004-f697b67c89d6"
+      ],
+      "complete_priority_vector": [
+        [
+          "BEH-001-96f4b01ab16c",
+          "medium"
+        ],
+        [
+          "BEH-002-50be964cbf3e",
+          "high"
+        ],
+        [
+          "BEH-003-e694b777de3b",
+          "high"
+        ],
+        [
+          "BEH-004-f697b67c89d6",
+          "high"
+        ]
+      ],
+      "validation_error": "Ollama proposed a control not applicable to rule BEH-001"
+    },
+    {
+      "model": "qwen3-8b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-001",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": false,
+      "schema_valid": false,
+      "grounding_accepted": false,
+      "prompt_eval_count": 9123,
+      "eval_count": 900,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": true,
+      "finding_coverage_lexical_or_structured": 1.0,
+      "evidence_coverage_lexical_or_structured": 1.0,
+      "unsupported_claim_categories_lexical": [
+        "unsupported-compromise-or-certainty",
+        "unsupported-identity-or-attribution"
+      ],
+      "unauthorized_control_mentions": 0,
+      "complete_known_finding_order": null,
+      "complete_priority_vector": null,
+      "validation_error": "Ollama returned no valid structured response"
+    },
+    {
+      "model": "qwen3-8b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-002",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": false,
+      "schema_valid": false,
+      "grounding_accepted": false,
+      "prompt_eval_count": 9123,
+      "eval_count": 900,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": true,
+      "finding_coverage_lexical_or_structured": 1.0,
+      "evidence_coverage_lexical_or_structured": 1.0,
+      "unsupported_claim_categories_lexical": [
+        "unsupported-compromise-or-certainty",
+        "unsupported-identity-or-attribution"
+      ],
+      "unauthorized_control_mentions": 0,
+      "complete_known_finding_order": null,
+      "complete_priority_vector": null,
+      "validation_error": "Ollama returned no valid structured response"
+    },
+    {
+      "model": "qwen3-8b",
+      "prompt_variant": "evidence-first-v1",
+      "repetition": "run-003",
+      "scenario_id": "conflicting-context-dozens-events",
+      "status": "validation-failure",
+      "api_response_received": true,
+      "json_parse_valid": false,
+      "schema_valid": false,
+      "grounding_accepted": false,
+      "prompt_eval_count": 9123,
+      "eval_count": 900,
+      "maximum_output_tokens": 900,
+      "context_length": 16384,
+      "input_and_reserved_output_fit_context": true,
+      "reached_output_limit": true,
+      "finding_coverage_lexical_or_structured": 1.0,
+      "evidence_coverage_lexical_or_structured": 1.0,
+      "unsupported_claim_categories_lexical": [
+        "unsupported-compromise-or-certainty",
+        "unsupported-identity-or-attribution"
+      ],
+      "unauthorized_control_mentions": 0,
+      "complete_known_finding_order": null,
+      "complete_priority_vector": null,
+      "validation_error": "Ollama returned no valid structured response"
+    }
+  ],
+  "interpretation": {
+    "ranking": "Stability is estimable only from schema-valid outputs containing every exact supplied finding ID once; it is not semantic correctness.",
+    "lexical_flags": "Unsupported-claim categories are conservative lexical safety flags and may include negated or uncertainty-preserving language; they are not human-confirmed errors.",
+    "complexity": "Failure under the 31-event stress case is retained as a result and does not replace primary-matrix estimates."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "preserved_at": "2026-08-15T19:46:46.218662+00:00",
+  "evidence_role": "development_only_threshold_selection",
+  "artifacts": [
+    {
+      "filename": "development-tuning.json",
+      "bytes": 307372,
+      "sha256": "88570ed0cc80b23f963774211fdabfa74b89fa71c578a4ff06aed63229711162"
+    },
+    {
+      "filename": "development-tuning.md",
+      "bytes": 710,
+      "sha256": "2e4abbc8f79d21d5162ea76e7efcbd043f1725377986d229c924b3378ba6bbcf"
+    }
+  ]
+}

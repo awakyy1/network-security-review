@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "preserved_at": "2026-08-15T19:48:22.543311+00:00",
+  "evidence_role": "single_confirmatory_holdout_run",
+  "artifacts": [
+    {
+      "filename": "confirmatory-holdout.json",
+      "bytes": 38011,
+      "sha256": "08fc1cece9c10c69f4b737c269c506fa68bab02ac5dbc8cd8abd180d230867e8"
+    },
+    {
+      "filename": "confirmatory-holdout.md",
+      "bytes": 239,
+      "sha256": "e4450827983b1d16754d03072fdbbe2241e719f04f256767cae9620f85482b6c"
+    }
+  ]
+}

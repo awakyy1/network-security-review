@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "recorded_at": "2026-08-15T17:19:41.3120083-03:00",
+  "manifest": {"path": "research/v1.1/endpoint-scenarios.json", "sha256": "b90df3c8128d75b76d6a5e9df4fef31be501950ad0612a5e4787d46450ab53e3"},
+  "scientific_code": [
+    {"path": "src/endpoint_experiment.py", "sha256": "08ddb3e939bc0f2187dd89a9f9923fbed5b5af3f0a47e42de835dfff685761a0"},
+    {"path": "src/telemetry.py", "sha256": "508a4e1698fd4df21b8638be5d80a658a8bb1fd0c62ae07710eb8b1ad41c6b46"},
+    {"path": "src/behavior_detector.py", "sha256": "61220659e1f454ce79fac1e6a8f8a13dade4e99fdb2d27f4e0c67f399023aec5"}
+  ],
+  "outputs": [
+    {"path": "endpoint-beh004.json", "sha256": "3a89d78c6e82e36ffb36e8603a66d441e7ae9605d3d60c230b54c657eea9e919"},
+    {"path": "endpoint-beh004.md", "sha256": "7cf70dde687ab01150c9e10fb4dd70d9a6fa4b78b944bcfc821caba94a7c2370"}
+  ],
+  "automatic_actions_executed": 0
+}

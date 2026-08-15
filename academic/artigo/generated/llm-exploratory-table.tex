@@ -2,7 +2,8 @@
 \centering
 \caption{Exploratory LLM instrumentation runs (not a confirmatory comparison).}
 \label{tab:llm-exploratory}
-\resizebox{\linewidth}{!}{%
+\small
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lrrrrrr}
 \toprule
 Protocol & Calls & API success & Grounded & Evidence coverage & Attribution responses & Unqualified controls \\
@@ -10,8 +11,8 @@ Protocol & Calls & API success & Grounded & Evidence coverage & Attribution resp
 Grounded schema 1.0 & 5 & 5 & 5 & 1.000 & 0 & 0 \\
 Reconstructed free text & 5 & 5 & 0 & 0.000 & 5 & 2 \\
 \bottomrule
-\end{tabular}%
-}
-\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Note:} The free-text run used Markdown in 5/5 responses and exceeded 200 words in 3/5. The audit rubric was refined after this exploratory run.}
-\par\vspace{2pt}{\fontsize{10}{12}\selectfont\textbf{Source:} Prepared by the authors from preserved local Ollama outputs (2026).}
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Note:} The free-text run used Markdown in 5/5 responses and exceeded 200 words in 3/5. The audit rubric was refined after this exploratory run.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
 \end{table}

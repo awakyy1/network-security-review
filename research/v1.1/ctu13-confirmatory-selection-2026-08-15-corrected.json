@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "selection_frozen_at": "2026-08-15T16:37:57-03:00",
+  "selection_stage": "remote_metadata_only_before_flow_download_or_label_inspection",
+  "supersedes_record_sha256": "b7ec32a07c2013b2d9882021a9c6dd6ba98008b0a81e45dbb698342f2ea86537",
+  "correction": "The original record transcribed 16:43 instead of its observed NTFS creation time 16:37:57. Selection content and roles are unchanged; the first selected download file was created at 16:38:25.",
+  "dataset": "CTU-13 labeled bidirectional NetFlows",
+  "dataset_page": "https://www.stratosphereips.org/datasets-ctu13",
+  "publisher": "Stratosphere Laboratory, Czech Technical University",
+  "license": "CC BY",
+  "primary_window_seconds": 300,
+  "unit": "source host by non-overlapping start-time window",
+  "label_policy": {
+    "positive_prefix": "From-Botnet",
+    "negative_prefix": "From-Normal",
+    "excluded_prefixes": [
+      "Background",
+      "From-Background",
+      "To-Background",
+      "To-Botnet",
+      "To-Normal"
+    ]
+  },
+  "selection_policy": "Scenario 11 is development because it adds the RBot family in a compact official text-flow file. Scenario 6 is the only confirmatory holdout because it adds the DonBot family, has a longer capture, remains below the repository's 100 MiB per-file safety bound, and had not been processed by this project. Selection used only official scenario metadata and HTTP headers, never flow labels or detector outputs.",
+  "threshold_selection": {
+    "development_sources_only": true,
+    "primary_metric": "matthews_correlation_coefficient",
+    "tie_break_order": [
+      "balanced_accuracy",
+      "f1",
+      "specificity",
+      "minimum_grid_distance_from_v1_0",
+      "fewer_alerted_units",
+      "lexicographic_parameter_order"
+    ],
+    "candidate_grid": {
+      "beh_001_minimum_connections": [4, 6, 8],
+      "beh_001_maximum_interval_cv": [0.15, 0.3, 0.5],
+      "beh_001_minimum_mean_interval_seconds": [5],
+      "beh_001_maximum_mean_interval_seconds": [900],
+      "beh_002_minimum_distinct_endpoints": [8, 16, 32],
+      "beh_002_interval_seconds": [60],
+      "beh_003_minimum_bytes_sent": [65536, 262144, 1000000],
+      "beh_003_minimum_sent_received_ratio": [5, 10, 20]
+    },
+    "candidate_configurations": 243,
+    "v1_0_reference": {
+      "beh_001_minimum_connections": 6,
+      "beh_001_maximum_interval_cv": 0.15,
+      "beh_001_minimum_mean_interval_seconds": 5,
+      "beh_001_maximum_mean_interval_seconds": 900,
+      "beh_002_minimum_distinct_endpoints": 8,
+      "beh_002_interval_seconds": 60,
+      "beh_003_minimum_bytes_sent": 1000000,
+      "beh_003_minimum_sent_received_ratio": 10
+    }
+  },
+  "holdout_gate": "The holdout file must not be parsed until acquisition hashes are frozen and the development-only selected configuration is written to a separate immutable record.",
+  "sources": [
+    {
+      "scenario": 11,
+      "capture": "CTU-Malware-Capture-Botnet-52",
+      "family": "RBot",
+      "role": "development",
+      "filename": "capture20110818-2.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/detailed-bidirectional-flow-labels/capture20110818-2.binetflow",
+      "content_length": 14596615,
+      "etag": "\"deba07-50e171a401fc0\"",
+      "last_modified": "Mon, 02 Feb 2015 08:54:31 GMT",
+      "flow_sha256": null,
+      "labels_or_detector_outputs_inspected": false
+    },
+    {
+      "scenario": 6,
+      "capture": "CTU-Malware-Capture-Botnet-47",
+      "family": "DonBot",
+      "role": "holdout",
+      "filename": "capture20110816.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-47/detailed-bidirectional-flow-labels/capture20110816.binetflow",
+      "content_length": 76780048,
+      "etag": "\"4939210-50de1021fe280\"",
+      "last_modified": "Fri, 30 Jan 2015 16:22:18 GMT",
+      "flow_sha256": null,
+      "labels_or_detector_outputs_inspected": false
+    }
+  ]
+}

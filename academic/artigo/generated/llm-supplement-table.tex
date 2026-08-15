@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{Supplemental 31-event conflicting-context LLM stress test.}
+\label{tab:llm-supplement}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Model & Calls & API & JSON & Schema & Accepted & Output cap & Complete ranks & Rank agreement \\
+\midrule
+gemma3-4b & 3 & 3 & 1 & 1 & 0 & 2 & 0 & N/A \\
+llama3-2-3b & 3 & 3 & 3 & 3 & 0 & 0 & 3 & 1.000 \\
+qwen3-8b & 3 & 3 & 0 & 0 & 0 & 3 & 0 & N/A \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} All nine inputs plus their reserved output fit the 16,384-token context. Output cap counts responses reaching 900 generated tokens. Ranking agreement is estimable only for schema-valid outputs containing every exact finding identifier once; repeatability is not semantic correctness.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

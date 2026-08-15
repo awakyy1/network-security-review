@@ -10,12 +10,12 @@ import math
 import time
 import tracemalloc
 from collections import Counter, defaultdict
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterator
 
-from .behavior_detector import BehaviorDetector
+from .behavior_detector import BehaviorDetector, DetectorThresholds
 from .ctu13_acquire import load_manifest, sha256_file
 from .telemetry import TelemetryEvent
 
@@ -68,10 +68,16 @@ class LabeledWindow:
     events: tuple[TelemetryEvent, ...]
 
 
-def _parse_timestamp(value: str, row_number: int) -> datetime:
-    for pattern in ("%Y/%m/%d %H:%M:%S.%f", "%Y/%m/%d %H:%M:%S"):
+def _parse_timestamp(
+    value: str,
+    row_number: int,
+    *,
+    capture_timezone: timezone = CAPTURE_TIMEZONE,
+    patterns: tuple[str, ...] = ("%Y/%m/%d %H:%M:%S.%f", "%Y/%m/%d %H:%M:%S"),
+) -> datetime:
+    for pattern in patterns:
         try:
-            return datetime.strptime(value.strip(), pattern).replace(tzinfo=CAPTURE_TIMEZONE)
+            return datetime.strptime(value.strip(), pattern).replace(tzinfo=capture_timezone)
         except ValueError:
             pass
     raise ValueError(f"Invalid CTU-13 StartTime on row {row_number}: {value!r}")
@@ -106,9 +112,9 @@ def _truth(label: str) -> str | None:
     return None
 
 
-def _anonymous_address(scenario: int, role: str, address: str) -> str:
-    digest = hashlib.sha256(f"ctu13:{scenario}:{role}:{address}".encode()).hexdigest()[:16]
-    return f"ctu13-s{scenario:02d}-{role}-{digest}"
+def _anonymous_address(namespace: str, scenario: int, role: str, address: str) -> str:
+    digest = hashlib.sha256(f"{namespace}:{scenario}:{role}:{address}".encode()).hexdigest()[:16]
+    return f"{namespace}-s{scenario:02d}-{role}-{digest}"
 
 
 def _window_start(timestamp: datetime, window_seconds: int) -> datetime:
@@ -142,12 +148,19 @@ def iter_labeled_windows(
     scenario: int,
     window_seconds: int,
     counters: ParseCounters,
+    maximum_file_bytes: int = MAX_FLOW_FILE_BYTES,
+    maximum_rows: int = MAX_FLOW_ROWS,
+    timestamp_patterns: tuple[str, ...] = ("%Y/%m/%d %H:%M:%S.%f", "%Y/%m/%d %H:%M:%S"),
+    capture_timezone: timezone = CAPTURE_TIMEZONE,
+    address_namespace: str = "ctu13",
+    event_prefix: str = "CTU",
+    telemetry_source: str = "ctu13-binetflow",
 ) -> Iterator[LabeledWindow]:
     """Stream clean From-Botnet/From-Normal source-host windows without exposing labels to the detector."""
     source = Path(path)
     size = source.stat().st_size
-    if not 1 <= size <= MAX_FLOW_FILE_BYTES:
-        raise ValueError("CTU-13 flow file is empty or exceeds the 100 MiB research bound")
+    if not 1 <= size <= maximum_file_bytes:
+        raise ValueError(f"Flow file is empty or exceeds the {maximum_file_bytes}-byte research bound")
     if not 60 <= window_seconds <= 3600:
         raise ValueError("CTU-13 window must be between 60 and 3600 seconds")
 
@@ -160,9 +173,14 @@ def iter_labeled_windows(
             raise ValueError("CTU-13 binetflow header does not match the frozen 15-column schema")
         for row_number, row in enumerate(reader, start=2):
             counters.total_rows += 1
-            if counters.total_rows > MAX_FLOW_ROWS:
-                raise ValueError(f"CTU-13 input exceeds {MAX_FLOW_ROWS} rows")
-            timestamp = _parse_timestamp(row["StartTime"], row_number)
+            if counters.total_rows > maximum_rows:
+                raise ValueError(f"Flow input exceeds {maximum_rows} rows")
+            timestamp = _parse_timestamp(
+                row["StartTime"],
+                row_number,
+                capture_timezone=capture_timezone,
+                patterns=timestamp_patterns,
+            )
             if previous_timestamp is not None and timestamp < previous_timestamp:
                 raise ValueError(f"CTU-13 rows are not time-ordered at row {row_number}")
             previous_timestamp = timestamp
@@ -191,16 +209,16 @@ def iter_labeled_windows(
             if source_bytes > total_bytes:
                 raise ValueError(f"CTU-13 SrcBytes exceeds TotBytes on row {row_number}")
 
-            host = _anonymous_address(scenario, "src", row["SrcAddr"].strip())
+            host = _anonymous_address(address_namespace, scenario, "src", row["SrcAddr"].strip())
             event = TelemetryEvent.from_mapping(
                 {
-                    "event_id": f"CTU{scenario:02d}-{row_number:08d}",
+                    "event_id": f"{event_prefix}{scenario:02d}-{row_number:08d}",
                     "timestamp": timestamp.isoformat(),
                     "host": host,
                     "event_type": "network_connection",
-                    "source": "ctu13-binetflow",
+                    "source": telemetry_source,
                     "process": "network-flow-no-process-context",
-                    "destination_ip": _anonymous_address(scenario, "dst", row["DstAddr"].strip()),
+                    "destination_ip": _anonymous_address(address_namespace, scenario, "dst", row["DstAddr"].strip()),
                     "destination_port": destination_port,
                     "protocol": protocol,
                     "bytes_sent": source_bytes,
@@ -263,9 +281,10 @@ def evaluate_binetflow(
     family: str,
     role: str,
     window_seconds: int,
+    thresholds: DetectorThresholds | None = None,
 ) -> dict[str, Any]:
     counters = ParseCounters()
-    detector = BehaviorDetector()
+    detector = BehaviorDetector(thresholds=thresholds)
     confusion = Counter()
     rule_findings = {rule: Counter() for rule in sorted(EXTERNALLY_EVALUABLE_RULES)}
     units = []
@@ -323,6 +342,7 @@ def evaluate_binetflow(
             "sha256": sha256_file(source),
         },
         "window_seconds": window_seconds,
+        "detector_thresholds": asdict(detector.thresholds),
         "unit": "anonymized source host by non-overlapping start-time window",
         "metrics": metrics,
         "response_simulation": {
@@ -356,6 +376,8 @@ def run_external_validation(
     data_root = Path(data_directory).resolve()
     output = Path(output_directory)
     output.mkdir(parents=True, exist_ok=True)
+    threshold_mapping = manifest.get("detector_thresholds")
+    thresholds = DetectorThresholds(**threshold_mapping) if threshold_mapping is not None else DetectorThresholds()
     sources = []
     for source in manifest["sources"]:
         path = data_root / source["filename"]
@@ -372,6 +394,7 @@ def run_external_validation(
                 family=source["family"],
                 role=source["role"],
                 window_seconds=manifest["window_seconds"],
+                thresholds=thresholds,
             )
         )
     result = {

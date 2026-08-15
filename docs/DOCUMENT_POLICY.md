@@ -18,17 +18,30 @@ The English article is a derivative research output. It may be refined to improv
 - distinguish reported historical results from newly reproduced results;
 - avoid unsupported accuracy, scalability or exploitability claims;
 - identify the thesis approval date as academic history, not journal acceptance;
-- follow the selected journal's template and peer-review requirements.
+- use a declared international presentation baseline without implying
+  submission or peer review;
+- use a sober one-column presentation with a grayscale palette and avoid em or
+  en dashes in prose, citations, references, and generated tables.
+
+V1.1 uses the international IEEE article structure and a one-column
+`IEEEtran`-based preprint only as its development quality baseline. The
+repository owner has no
+publication submission planned for this version. UniOpet/ABNT formatting
+applies only to the historical approved monograph, not to the derivative V1.1
+article.
 
 The article never replaces or retroactively modifies the approved monograph.
 
 ### Article versioning
 
-- V1.0 was frozen on 13 August 2026 and is identified by
-  `academic/artigo/VERSION`;
-- the named snapshot is `academic/artigo/releases/article-v1.pdf`;
+- V1.0 was frozen on 13 August 2026 and is identified by its named PDF,
+  release record, `article-v1` branch and `article-v1.0` tag;
+- the V1.0 snapshot is `academic/artigo/releases/article-v1.pdf`;
+- the V1.1 snapshot is `academic/artigo/releases/article-v1.1.pdf`;
 - `academic/artigo/main.pdf` is the working build of the version declared in
   `VERSION`;
+- `academic/artigo/VERSION` identifies the active working source and may carry
+  a development suffix before the next named snapshot is frozen;
 - later scientific changes must increment the version, create a new named PDF
   snapshot and retain earlier snapshots and Git history;
 - a version label records an internal research-artifact state and does not

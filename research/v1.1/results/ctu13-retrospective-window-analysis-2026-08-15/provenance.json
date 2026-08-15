@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "preserved_at": "2026-08-15T19:32:07.226326+00:00",
+  "evidence_role": "retrospective_diagnostic_not_confirmatory_holdout",
+  "execution_source_state": "exact_file_hashes_embedded_and_reverified",
+  "repository_base_commit": "240635f7670f03e5edcb8bc33604ae93ddab6462",
+  "scientific_state_files": [
+    {
+      "path": "src/behavior_detector.py",
+      "bytes": 11538,
+      "sha256": "fbceeb4df96d633148e7b42d2b21dbbc71520b0270d6c94204d6d2a9a575fb33"
+    },
+    {
+      "path": "src/ctu13_acquire.py",
+      "bytes": 6545,
+      "sha256": "c12086341267f123586f1a77a019e038ba63f752c965efd4c51b0724137abb24"
+    },
+    {
+      "path": "src/ctu13_analysis.py",
+      "bytes": 21915,
+      "sha256": "20facff2193953e36bd318b3e0baa60754946cb9ede69a5bd1362c6a3f43fea0"
+    },
+    {
+      "path": "src/ctu13_experiment.py",
+      "bytes": 18083,
+      "sha256": "6158bdca540bad823e53afd41d0ab6826ccfc7c957457234d997ce5195f16554"
+    },
+    {
+      "path": "src/telemetry.py",
+      "bytes": 6215,
+      "sha256": "4641cac70f6712efddad39b0e2864bc7347f0e52f7aef61cc141a30ee782f803"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 32,
+      "sha256": "380c8f12c547d8f88a290289b1221b88b1d3c26dd2b63572339ac3c411ecac8c"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "bytes": 14,
+      "sha256": "fe660099e1bd0cf92eed7dc210df7950df3dc888e16aea6519cf2d033622f825"
+    }
+  ],
+  "artifacts": [
+    {
+      "filename": "ctu13-window-analysis.json",
+      "bytes": 972454,
+      "sha256": "6172adb6f7db3612fc15de137cc960c8d788670602aec70ba06685db85bb4201"
+    },
+    {
+      "filename": "ctu13-window-analysis.md",
+      "bytes": 1521,
+      "sha256": "55d952e298d2d9af5e578f6488f281a12e6cd9c1fea43a3bdd4462d4a4e3a67c"
+    }
+  ]
+}

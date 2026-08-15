@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "status": "frozen-for-blinded-package-generation",
+  "frozen_at": "2026-08-15T18:36:00-03:00",
+  "purpose": "Map only the five first-repetition items without a non-empty primary raw response to separately preserved availability-recovery outputs.",
+  "expected_substitutions": 5,
+  "primary_denominators_modified": false,
+  "entries": [
+    {
+      "model": "qwen3:8b",
+      "prompt_variant": "checklist-v1",
+      "scenario_ids": [
+        "benign-updater-hard-negative",
+        "incomplete-single-observation",
+        "endpoint-lineage",
+        "multi-finding-mixed-rules"
+      ],
+      "benchmark": "results/llm-availability-recovery-retry1-2026-08-15/benchmark.json",
+      "benchmark_sha256": "370b8a169ebfd7168e0da57b1c0153af99690f423a7e393d622cd97e590b423d"
+    },
+    {
+      "model": "qwen3:8b",
+      "prompt_variant": "contract-v1",
+      "scenario_ids": ["endpoint-lineage"],
+      "benchmark": "results/llm-human-recovery-endpoint-2026-08-15/qwen3-8b/contract-v1/run-001/benchmark.json",
+      "benchmark_sha256": "7b0a11b9cfaeadf74bcd41547ff89345037f75e71a508c9ba82ecbc03d936344"
+    }
+  ],
+  "interpretation_boundary": "Substitution supplies reviewable content only. It does not change the primary 145/180 API-response count, the 73/180 acceptance count, or any primary cell metric."
+}

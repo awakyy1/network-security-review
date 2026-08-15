@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "recorded_at": "2026-08-15T17:33:48.1678239-03:00",
+  "scientific_code": {"path": "src/counterfactual_policies.py", "sha256": "23f3b45f2f80b5731473baec2c99528b3735e9962ab99bf9d7706b5324736ecf"},
+  "output": {"path": "counterfactual-policies.json", "sha256": "cfba9a64b9f65e001b5b9bb702dca0e218ead7ef412333d10a222ce1dc368815"},
+  "source_packages": [
+    "ctu13-retrospective-window-analysis-2026-08-15",
+    "ctu13-confirmatory-holdout-2026-08-15",
+    "second-dataset-transfer-2026-08-15"
+  ],
+  "automatic_actions_executed": 0
+}

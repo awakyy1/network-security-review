@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{Execution-environment provenance for the preserved V1.0 runs and V1.1 development.}
+\label{tab:environment-comparison}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llllll}
+\toprule
+Research state & Operating system & CPU & Topology & RAM (GiB) & Inference device \\
+\midrule
+V1.0 initial run & Windows 11 build 26200 & Intel Core i5-1335U & 12 logical processors & 15.7 & CPU; Intel Iris Xe present \\
+V1.0 confirmatory repetitions & Debian GNU/Linux, kernel 6.12.101 & Intel Core i5-1335U & 10 cores / 12 logical processors & 15.4 & CPU \\
+V1.1 development environment & Windows 10 Pro 22H2 build 19045 & AMD Ryzen 5 5600 & 6 cores / 12 logical processors & 31.9 & NVIDIA RTX 3060, 12 GiB VRAM \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} The V1.1 row is an environment inventory, not evidence that a V1.1 experiment had already run. Cross-machine latency is descriptive only because hardware, operating system, driver, runtime version, and CPU/GPU placement differ.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

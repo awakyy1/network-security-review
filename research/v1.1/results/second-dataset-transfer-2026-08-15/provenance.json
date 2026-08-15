@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "recorded_at": "2026-08-15T17:17:11.6305417-03:00",
+  "run_manifest": {
+    "path": "research/v1.1/second-dataset-run-2026-08-15.json",
+    "sha256": "4d13f356cc1822ad3205be7d1ddd5762e48b2ce8023c99cba697523d2ecd800d"
+  },
+  "scientific_code": [
+    {"path": "src/behavior_detector.py", "sha256": "61220659e1f454ce79fac1e6a8f8a13dade4e99fdb2d27f4e0c67f399023aec5"},
+    {"path": "src/ctu13_experiment.py", "sha256": "12c6980a2cc6c224828364fc46c1ebb0638bf2a9b86e1f9169225cc3de2124d7"},
+    {"path": "src/second_dataset_experiment.py", "sha256": "ac9a613179c4edb852660a91e337099d67e83fb3670c8bb2b27a65da5dce0f74"}
+  ],
+  "outputs": [
+    {"path": "second-dataset-transfer.json", "sha256": "2a57d5d91f498769b06e641c48efb47b24d3f89cb583f3bbbd0d3efd83ee5605"},
+    {"path": "second-dataset-transfer.md", "sha256": "2134d8f8c027a5ed371263458abeb32a68b084c834d4c456db13653a80b9f617"}
+  ],
+  "automatic_actions_executed": 0,
+  "claim_boundary": "Synthetic CTU-13-derived implementation transfer, not independent external validation."
+}

@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-from src.behavior_detector import BehaviorDetector, inventory_context
+from src.behavior_detector import BehaviorDetector, DetectorThresholds, inventory_context
 from src.nmap_to_zabbix import NmapParser
 from src.telemetry import load_telemetry
 
@@ -46,6 +46,15 @@ class BehaviorDetectorTest(unittest.TestCase):
         self.assertTrue(finding.asset_context["known_asset"])
         self.assertEqual(finding.asset_context["hostname"], "servidor-web.empresa.local")
         self.assertGreater(len(finding.asset_context["observed_services"]), 0)
+
+    def test_explicit_thresholds_change_detection_without_changing_defaults(self) -> None:
+        events = load_telemetry(self.base_directory / "fixtures/emulated-service-discovery.jsonl")
+        default_rules = {finding.rule_id for finding in BehaviorDetector().analyze(events)}
+        stricter = DetectorThresholds(beh_002_minimum_distinct_endpoints=64)
+        stricter_rules = {finding.rule_id for finding in BehaviorDetector(thresholds=stricter).analyze(events)}
+
+        self.assertIn("BEH-002", default_rules)
+        self.assertNotIn("BEH-002", stricter_rules)
 
 
 if __name__ == "__main__":

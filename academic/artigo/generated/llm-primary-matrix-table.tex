@@ -1,0 +1,25 @@
+\begin{table}[htbp]
+\centering
+\caption{V1.1 primary local-LLM matrix; each cell contains 20 attempted calls.}
+\label{tab:llm-primary-matrix}
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Model & Prompt & Calls & API & JSON & Schema & Accepted & Finding cov. & Evidence cov. \\
+\midrule
+llama3.2:3b & contract-v1 & 20 & 20 & 15 & 15 & 11 & 0.750 & 0.750 \\
+llama3.2:3b & evidence-first-v1 & 20 & 20 & 20 & 20 & 15 & 0.938 & 0.912 \\
+llama3.2:3b & checklist-v1 & 20 & 20 & 15 & 15 & 4 & 0.750 & 0.750 \\
+gemma3:4b & contract-v1 & 20 & 20 & 19 & 19 & 11 & 0.900 & 0.879 \\
+gemma3:4b & evidence-first-v1 & 20 & 20 & 20 & 20 & 14 & 0.750 & 0.750 \\
+gemma3:4b & checklist-v1 & 20 & 20 & 16 & 16 & 2 & 0.738 & 0.712 \\
+qwen3:8b & contract-v1 & 20 & 20 & 14 & 14 & 14 & 0.700 & 0.700 \\
+qwen3:8b & evidence-first-v1 & 20 & 5 & 3 & 3 & 2 & 0.600 & 0.600 \\
+qwen3:8b & checklist-v1 & 20 & 0 & 0 & 0 & 0 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} API is the number of responses received; JSON and Schema are representation checks; Accepted additionally requires the frozen deterministic semantic-policy validator. Coverage is averaged over attempted finding-bearing scenarios, so API failures contribute zero.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

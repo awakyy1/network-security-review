@@ -14,7 +14,7 @@ import requests
 from .behavior_detector import BehaviorDetector, inventory_context
 from .nmap_to_zabbix import NmapParser
 from .ollama_advisor import OllamaAdvisor, OllamaOutputError
-from .ollama_baseline import HistoricalOllamaAdvisor
+from .ollama_baseline import HistoricalOllamaAdvisor, audit_model_response
 from .telemetry import load_telemetry
 
 
@@ -55,6 +55,23 @@ def _load_manifest(path: Path) -> dict[str, Any]:
     return manifest
 
 
+def _add_response_audit(totals: dict[str, Any], audit: dict[str, Any]) -> None:
+    """Accumulate the same semantic and citation audit for every protocol."""
+    totals["unknown_finding_citations"] += len(audit["unknown_finding_citations"])
+    totals["unknown_evidence_citations"] += len(audit["unknown_evidence_citations"])
+    totals["unsupported_cve_mentions"] += len(audit["unsupported_cve_mentions"])
+    totals["absolute_assertions"] += len(audit["absolute_assertions"])
+    totals["unsupported_security_attribution_mentions"] += len(audit["unsupported_security_attribution_mentions"])
+    totals["containment_action_mentions"] += len(audit["containment_action_mentions"])
+    totals["unqualified_containment_actions"] += int(audit["unqualified_containment_action"])
+    totals["unauthorized_controls"] += len(audit["unauthorized_controls"])
+    totals["unsupported_claim_responses"] += int(audit["unsupported_claim_flag"])
+    totals["word_limit_violations"] += int(not audit["within_200_word_limit"])
+    totals["markdown_format_violations"] += int(audit["markdown_marker_present"])
+    totals["finding_coverage_sum"] += audit["finding_coverage"]
+    totals["evidence_coverage_sum"] += audit["evidence_coverage"]
+
+
 def run_benchmark(
     manifest_path: str | Path,
     output_directory: str | Path,
@@ -65,6 +82,7 @@ def run_benchmark(
     ollama_timeout: float = 300,
     ollama_max_output_tokens: int | None = None,
     ollama_protocol: str = "grounded",
+    ollama_prompt_variant: str = "contract-v1",
 ) -> dict[str, Any]:
     """Run all labeled scenarios and write machine- and human-readable reports."""
     manifest_file = Path(manifest_path).resolve()
@@ -82,18 +100,25 @@ def run_benchmark(
     selected_output_tokens = ollama_max_output_tokens
     if selected_output_tokens is None:
         selected_output_tokens = 700 if ollama_protocol == "grounded" else 512
-    advisor_type = OllamaAdvisor if ollama_protocol == "grounded" else HistoricalOllamaAdvisor
-    advisor = (
-        advisor_type(
+    if ollama_model and ollama_protocol == "grounded":
+        advisor = OllamaAdvisor(
+            ollama_model,
+            base_url=ollama_url,
+            timeout=ollama_timeout,
+            context_length=ollama_context,
+            max_output_tokens=selected_output_tokens,
+            prompt_variant=ollama_prompt_variant,
+        )
+    elif ollama_model:
+        advisor = HistoricalOllamaAdvisor(
             ollama_model,
             base_url=ollama_url,
             timeout=ollama_timeout,
             context_length=ollama_context,
             max_output_tokens=selected_output_tokens,
         )
-        if ollama_model
-        else None
-    )
+    else:
+        advisor = None
 
     totals = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
     ollama_totals = {
@@ -111,6 +136,8 @@ def run_benchmark(
         "unsupported_security_attribution_mentions": 0,
         "containment_action_mentions": 0,
         "unqualified_containment_actions": 0,
+        "unauthorized_controls": 0,
+        "unsupported_claim_responses": 0,
         "word_limit_violations": 0,
         "markdown_format_violations": 0,
         "finding_coverage_sum": 0.0,
@@ -149,31 +176,19 @@ def run_benchmark(
                 advisor_result = advisor.analyze(findings, events)
                 ollama_totals["api_successes"] += 1
                 if ollama_protocol == "grounded":
-                    ollama_result = {"status": "accepted", **advisor_result}
+                    audit = audit_model_response(advisor_result["raw_response"], findings)
+                    ollama_result = {"status": "accepted", **advisor_result, "audit": audit}
                     ollama_totals["accepted"] += 1
                     ollama_totals["json_parse_valid"] += 1
                     ollama_totals["schema_valid"] += 1
-                    ollama_totals["finding_coverage_sum"] += 1.0
-                    ollama_totals["evidence_coverage_sum"] += 1.0
+                    _add_response_audit(ollama_totals, audit)
                 else:
                     audit = advisor_result["audit"]
                     ollama_result = {"status": "observed", **advisor_result}
                     ollama_totals["accepted"] += int(audit["grounding_valid"])
                     ollama_totals["json_parse_valid"] += int(audit["json_parse_valid"])
                     ollama_totals["schema_valid"] += int(audit["schema_valid"])
-                    ollama_totals["unknown_finding_citations"] += len(audit["unknown_finding_citations"])
-                    ollama_totals["unknown_evidence_citations"] += len(audit["unknown_evidence_citations"])
-                    ollama_totals["unsupported_cve_mentions"] += len(audit["unsupported_cve_mentions"])
-                    ollama_totals["absolute_assertions"] += len(audit["absolute_assertions"])
-                    ollama_totals["unsupported_security_attribution_mentions"] += len(
-                        audit["unsupported_security_attribution_mentions"]
-                    )
-                    ollama_totals["containment_action_mentions"] += len(audit["containment_action_mentions"])
-                    ollama_totals["unqualified_containment_actions"] += int(audit["unqualified_containment_action"])
-                    ollama_totals["word_limit_violations"] += int(not audit["within_200_word_limit"])
-                    ollama_totals["markdown_format_violations"] += int(audit["markdown_marker_present"])
-                    ollama_totals["finding_coverage_sum"] += audit["finding_coverage"]
-                    ollama_totals["evidence_coverage_sum"] += audit["evidence_coverage"]
+                    _add_response_audit(ollama_totals, audit)
             except requests.RequestException as error:
                 ollama_result = {
                     "status": "api-failure",
@@ -182,17 +197,20 @@ def run_benchmark(
                 }
                 ollama_totals["api_failures"] += 1
             except OllamaOutputError as error:
+                audit = audit_model_response(error.raw_response, findings)
                 ollama_result = {
                     "status": "validation-failure",
                     "error_type": type(error).__name__,
                     "error": str(error),
                     "raw_response": error.raw_response,
                     "metadata": error.metadata,
+                    "audit": audit,
                 }
                 ollama_totals["api_successes"] += int(error.metadata.get("api_response_received", True))
                 ollama_totals["json_parse_valid"] += int(error.metadata.get("json_parse_valid", False))
                 ollama_totals["schema_valid"] += int(error.metadata.get("schema_valid", False))
                 ollama_totals["validation_failures"] += 1
+                _add_response_audit(ollama_totals, audit)
             except ValueError as error:
                 ollama_result = {
                     "status": "validation-failure",
@@ -357,6 +375,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Use the V2 grounded protocol or the reconstructed 2025 free-text control",
     )
     parser.add_argument("--ollama-context", type=int, default=4096, help="Local model context length in tokens")
+    parser.add_argument(
+        "--ollama-prompt-variant",
+        choices=("contract-v1", "evidence-first-v1", "checklist-v1"),
+        default="contract-v1",
+        help="Grounded prompt wording; ignored by the historical protocol",
+    )
     parser.add_argument("--ollama-timeout", type=float, default=300, help="Per-request timeout in seconds")
     parser.add_argument(
         "--ollama-max-output-tokens",
@@ -374,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
             ollama_timeout=arguments.ollama_timeout,
             ollama_max_output_tokens=arguments.ollama_max_output_tokens,
             ollama_protocol=arguments.ollama_protocol,
+            ollama_prompt_variant=arguments.ollama_prompt_variant,
         )
     except (OSError, ValueError, requests.RequestException) as error:
         parser.error(str(error))

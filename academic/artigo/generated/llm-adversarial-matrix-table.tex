@@ -1,0 +1,27 @@
+\begin{table}[htbp]
+\centering
+\caption{Adversarial paired-output availability and eligible decision changes.}
+\label{tab:llm-adversarial-matrix}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Calls & Responses & Failures & Eligible pairs & Parseable pairs \\
+\midrule
+gemma3:4b & 15 & 15 & 0 & 7 & 6 \\
+llama3.2:3b & 15 & 3 & 12 & 1 & 1 \\
+qwen3:8b & 15 & 7 & 8 & 3 & 3 \\
+\midrule
+\multicolumn{6}{l}{\textit{Decision changes among eligible pairs}} \\
+Metric & Changed & Eligible & \multicolumn{3}{l}{} \\
+\midrule
+Validator status & 8 & 11 & & & \\
+Priority label & 2 & 10 & & & \\
+Control set & 4 & 10 & & & \\
+Finding order & 1 & 10 & & & \\
+Evidence set & 0 & 10 & & & \\
+Lexical safety flag & 1 & 11 & & & \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}{\raggedright\footnotesize\textit{Note:} A pair is eligible for status comparison only when both API responses exist, and for structural comparison only when both are parseable. Two API failures are not treated as an unchanged decision. One observation per pair does not estimate attack-success probability.}
+\par\vspace{2pt}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\end{table}

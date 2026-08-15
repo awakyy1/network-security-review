@@ -1,0 +1,897 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T20:31:39.431555+00:00",
+  "scope": {
+    "dataset": "deterministic benign emulation",
+    "purpose": "functional and construct-validity benchmark",
+    "not_claimed": [
+      "real-world malware detection accuracy",
+      "malware-family attribution",
+      "confirmed compromise",
+      "automated prevention effectiveness"
+    ]
+  },
+  "inputs": {
+    "manifest": "llm-scenarios.json",
+    "manifest_sha256": "0869e78eb45d7e5a22e039f137fbf1a48dfa6b7bde53d7a677b75388171cc60e",
+    "nmap_file": "examples/nmap/synthetic-enterprise.xml",
+    "nmap_sha256": "a7d083fbe22e3f415765a66df95e9c63441189f9481b269fa810aa4e71472762"
+  },
+  "detector": {
+    "rule_ids": [
+      "BEH-001",
+      "BEH-002",
+      "BEH-003",
+      "BEH-004"
+    ],
+    "thresholds": {
+      "periodic_connections_minimum": 6,
+      "periodic_interval_cv_maximum": 0.15,
+      "service_discovery_endpoints_minimum": 8,
+      "service_discovery_window_seconds": 60,
+      "asymmetric_egress_bytes_minimum": 1000000,
+      "asymmetric_egress_ratio_minimum": 10,
+      "download_file_window_seconds": 120
+    }
+  },
+  "metrics": {
+    "true_positive": 6,
+    "false_positive": 1,
+    "false_negative": 0,
+    "true_negative": 13,
+    "precision": 0.857143,
+    "recall": 1.0,
+    "f1": 0.923077,
+    "specificity": 0.928571
+  },
+  "ollama_evaluation": {
+    "protocol": "grounded",
+    "attempts": 4,
+    "api_successes": 4,
+    "accepted": 0,
+    "api_failures": 0,
+    "validation_failures": 4,
+    "json_parse_valid": 3,
+    "schema_valid": 3,
+    "unknown_finding_citations": 0,
+    "unknown_evidence_citations": 0,
+    "unsupported_cve_mentions": 0,
+    "absolute_assertions": 0,
+    "unsupported_security_attribution_mentions": 2,
+    "containment_action_mentions": 5,
+    "unqualified_containment_actions": 3,
+    "unauthorized_controls": 2,
+    "unsupported_claim_responses": 4,
+    "word_limit_violations": 1,
+    "markdown_format_violations": 0,
+    "accepted_grounding_rate": 0.0,
+    "mean_finding_coverage": 0.9375,
+    "mean_evidence_coverage": 0.911765
+  },
+  "scenarios": [
+    {
+      "id": "benign-web",
+      "category": "benign",
+      "description": "Irregular browser connections; a no-finding system control.",
+      "telemetry_file": "research/v2/fixtures/benign-web.jsonl",
+      "telemetry_sha256": "8a56986cb8e44fed8185577fdb75ee5badfc953c1eeb5435978aed1455be247a",
+      "event_count": 5,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "true_positive": [],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [],
+      "ollama": null
+    },
+    {
+      "id": "benign-updater-hard-negative",
+      "category": "benign-hard-negative",
+      "description": "Authorized periodic updater retained as a detector false-positive challenge.",
+      "telemetry_file": "research/v2/fixtures/benign-updater.jsonl",
+      "telemetry_sha256": "8743ed799ad5c488607e890af1877402d364cd0c44a991a0c8fca953014274ac",
+      "event_count": 6,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "BEH-001"
+      ],
+      "true_positive": [],
+      "false_positive": [
+        "BEH-001"
+      ],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-001-f0b744d9186f",
+          "rule_id": "BEH-001",
+          "title": "Periodic outbound communication requires review",
+          "severity": "medium",
+          "mitre_technique": "T1071",
+          "host": "10.0.1.10",
+          "process": "approved-updater.exe",
+          "evidence_ids": [
+            "UPD-001",
+            "UPD-002",
+            "UPD-003",
+            "UPD-004",
+            "UPD-005",
+            "UPD-006"
+          ],
+          "evidence": "6 connections to updates.example.test:443 had a mean interval of 60.0s and coefficient of variation 0.000.",
+          "recommendation": "Validate the process owner and destination, compare with an approved update schedule, and collect proxy or DNS evidence before considering a temporary egress restriction.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "validation-failure",
+        "error_type": "OllamaOutputError",
+        "error": "Ollama proposed a control not applicable to rule BEH-001",
+        "raw_response": "{\n  \"summary\": \"Unusual network connections to updates.example.test:443\",\n  \"priorities\": [\n    {\n      \"finding_id\": \"BEH-001-f0b744d9186f\",\n      \"priority\": \"medium\",\n      \"rationale\": \"Unusual network connections to updates.example.test:443 with a mean interval of 60.0s and coefficient of variation 0.000.\",\n      \"evidence_ids\": [\"UPD-001\", \"UPD-002\", \"UPD-003\", \"UPD-004\", \"UPD-005\", \"UPD-006\"],\n      \"validation_steps\": [\n        \"Verify the destination IP address and port\",\n        \"Check the process owner and destination\",\n        \"Collect proxy or DNS evidence\"\n      ],\n      \"control_ids\": [\n        \"validate-process-owner\",\n        \"segment-source-host-after-approval\"\n      ]\n    }\n  ],\n  \"limitations\": [\n    \"Insufficient evidence to confirm malicious activity\"\n  ]\n}",
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 2701.913,
+          "ollama_total_duration_ns": 2697618100,
+          "prompt_eval_count": 1909,
+          "eval_count": 209,
+          "prompt_sha256": "7d286bb634a73fa1f66ba799de7682db48d7c940d4976a9972b9ffdda8c6c606",
+          "schema_version": "1.1",
+          "prompt_variant": "checklist-v1",
+          "api_response_received": true,
+          "json_parse_valid": true,
+          "schema_valid": true,
+          "grounding_valid": false,
+          "temperature": 0,
+          "top_p": 0.9,
+          "seed": 42,
+          "context_length": 4096,
+          "max_output_tokens": 700,
+          "request_timeout_seconds": 300
+        },
+        "audit": {
+          "audit_schema_version": "1.3",
+          "json_parse_valid": true,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [
+            "BEH-001-f0b744d9186f"
+          ],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [
+            "UPD-001",
+            "UPD-002",
+            "UPD-003",
+            "UPD-004",
+            "UPD-005",
+            "UPD-006"
+          ],
+          "unknown_evidence_citations": [],
+          "omitted_findings": [],
+          "duplicate_findings": [],
+          "finding_coverage": 1.0,
+          "evidence_coverage": 1.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [
+            "malicious activity"
+          ],
+          "containment_action_mentions": [
+            "segment"
+          ],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": true,
+          "unauthorized_controls": [
+            {
+              "finding_id": "BEH-001-f0b744d9186f",
+              "control_id": "segment-source-host-after-approval"
+            }
+          ],
+          "unsupported_claim_categories": [
+            "unsupported-identity-or-attribution",
+            "unauthorized-control",
+            "unqualified-containment"
+          ],
+          "unsupported_claim_flag": true,
+          "word_count": 86,
+          "within_200_word_limit": true,
+          "markdown_marker_present": false
+        }
+      }
+    },
+    {
+      "id": "incomplete-single-observation",
+      "category": "incomplete-evidence",
+      "description": "One asymmetric flow; supports behavioral review but no attribution or compromise claim.",
+      "telemetry_file": "research/v2/fixtures/emulated-asymmetric-egress.jsonl",
+      "telemetry_sha256": "de1d4d37731c0f2209973b94230cf6c41f723c0eba35ef665955d8fb8df08004",
+      "event_count": 1,
+      "expected_rule_ids": [
+        "BEH-003"
+      ],
+      "predicted_rule_ids": [
+        "BEH-003"
+      ],
+      "true_positive": [
+        "BEH-003"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-003-26ed72a498f0",
+          "rule_id": "BEH-003",
+          "title": "High-volume asymmetric egress requires review",
+          "severity": "high",
+          "mitre_technique": "T1041",
+          "host": "10.0.1.10",
+          "process": "lab-transfer.exe",
+          "evidence_ids": [
+            "EGR-001"
+          ],
+          "evidence": "One connection sent 2000000 bytes and received 10000 bytes (ratio 200.0:1).",
+          "recommendation": "Validate the transfer's business purpose and destination, preserve flow evidence, and consider egress restriction or host isolation only after confirmation.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "validation-failure",
+        "error_type": "OllamaOutputError",
+        "error": "Ollama proposed a control not applicable to rule BEH-003",
+        "raw_response": "{\n  \"summary\": \"Defensive Review Findings\",\n  \"priorities\": [\n    {\n      \"finding_id\": \"BEH-003-26ed72a498f0\",\n      \"priority\": \"high\",\n      \"rationale\": \"High-volume asymmetric egress requires review\",\n      \"evidence_ids\": [\"EGR-001\"],\n      \"validation_steps\": [],\n      \"control_ids\": [\"validate-process-owner\", \"quarantine-file-after-validation\"]\n    }\n  ],\n  \"limitations\": [\n    \"Insufficient evidence to determine the business purpose of the transfer\"\n  ]\n}",
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 1570.129,
+          "ollama_total_duration_ns": 1564999000,
+          "prompt_eval_count": 1153,
+          "eval_count": 123,
+          "prompt_sha256": "e3d54ba807d4a47600de003b2f38e8a8413be9a87cc08c64c981f0dc5182d0c7",
+          "schema_version": "1.1",
+          "prompt_variant": "checklist-v1",
+          "api_response_received": true,
+          "json_parse_valid": true,
+          "schema_valid": true,
+          "grounding_valid": false,
+          "temperature": 0,
+          "top_p": 0.9,
+          "seed": 42,
+          "context_length": 4096,
+          "max_output_tokens": 700,
+          "request_timeout_seconds": 300
+        },
+        "audit": {
+          "audit_schema_version": "1.3",
+          "json_parse_valid": true,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [
+            "BEH-003-26ed72a498f0"
+          ],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [
+            "EGR-001"
+          ],
+          "unknown_evidence_citations": [],
+          "omitted_findings": [],
+          "duplicate_findings": [],
+          "finding_coverage": 1.0,
+          "evidence_coverage": 1.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [],
+          "containment_action_mentions": [
+            "quarantine"
+          ],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": true,
+          "unauthorized_controls": [
+            {
+              "finding_id": "BEH-003-26ed72a498f0",
+              "control_id": "quarantine-file-after-validation"
+            }
+          ],
+          "unsupported_claim_categories": [
+            "unauthorized-control",
+            "unqualified-containment"
+          ],
+          "unsupported_claim_flag": true,
+          "word_count": 41,
+          "within_200_word_limit": true,
+          "markdown_marker_present": false
+        }
+      }
+    },
+    {
+      "id": "endpoint-lineage",
+      "category": "endpoint-lineage",
+      "description": "Inert network-to-file sequence with bounded endpoint context.",
+      "telemetry_file": "research/v2/fixtures/emulated-tool-transfer.jsonl",
+      "telemetry_sha256": "b027870c4e83f65ede355192c99c4dedde52b7b36ba1340478e77b9ad5c415ee",
+      "event_count": 2,
+      "expected_rule_ids": [
+        "BEH-004"
+      ],
+      "predicted_rule_ids": [
+        "BEH-004"
+      ],
+      "true_positive": [
+        "BEH-004"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-004-ecf101732351",
+          "rule_id": "BEH-004",
+          "title": "Network download followed by file creation requires review",
+          "severity": "high",
+          "mitre_technique": "T1105",
+          "host": "10.0.1.10",
+          "process": "lab-downloader.exe",
+          "evidence_ids": [
+            "DWN-001",
+            "DWN-002"
+          ],
+          "evidence": "The process received 600000 bytes and created 'downloaded-sample.bin' within 120 seconds.",
+          "recommendation": "Preserve the file hash and process lineage, validate the download source, and quarantine the file or restrict the destination only through an approved incident-response action.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "validation-failure",
+        "error_type": "OllamaOutputError",
+        "error": "Ollama rationale must be a non-empty string",
+        "raw_response": "{\n  \"summary\": \"Network download followed by file creation requires review\",\n  \"priorities\": [\n    {\n      \"finding_id\": \"BEH-004-ecf101732351\",\n      \"priority\": \"high\",\n      \"rationale\": \"\",\n      \"evidence_ids\": [\"DWN-001\", \"DWN-002\"],\n      \"validation_steps\": [],\n      \"control_ids\": [\"quarantine-file-after-validation\", \"validate-process-owner\"]\n    }\n  ],\n  \"limitations\": [\n    \"Insufficient information about the file hash and process lineage.\"\n  ]\n}",
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 1557.212,
+          "ollama_total_duration_ns": 1552923900,
+          "prompt_eval_count": 1301,
+          "eval_count": 121,
+          "prompt_sha256": "1e0a1dafbe04808dedbcd60146fd541ed83a5c52d696a7eb4c48c72d325c7f8d",
+          "schema_version": "1.1",
+          "prompt_variant": "checklist-v1",
+          "api_response_received": true,
+          "json_parse_valid": true,
+          "schema_valid": true,
+          "grounding_valid": false,
+          "temperature": 0,
+          "top_p": 0.9,
+          "seed": 42,
+          "context_length": 4096,
+          "max_output_tokens": 700,
+          "request_timeout_seconds": 300
+        },
+        "audit": {
+          "audit_schema_version": "1.3",
+          "json_parse_valid": true,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [
+            "BEH-004-ecf101732351"
+          ],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [
+            "DWN-001",
+            "DWN-002"
+          ],
+          "unknown_evidence_citations": [],
+          "omitted_findings": [],
+          "duplicate_findings": [],
+          "finding_coverage": 1.0,
+          "evidence_coverage": 1.0,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [],
+          "containment_action_mentions": [
+            "quarantine"
+          ],
+          "human_approval_qualifier_present": false,
+          "unqualified_containment_action": true,
+          "unauthorized_controls": [],
+          "unsupported_claim_categories": [
+            "unqualified-containment"
+          ],
+          "unsupported_claim_flag": true,
+          "word_count": 41,
+          "within_200_word_limit": true,
+          "markdown_marker_present": false
+        }
+      }
+    },
+    {
+      "id": "multi-finding-mixed-rules",
+      "category": "multi-finding-ranking",
+      "description": "Four simultaneous rule types used to measure ordering and recommendation stability.",
+      "telemetry_file": "research/v1.1/fixtures/multi-finding-mixed-rules.jsonl",
+      "telemetry_sha256": "724133ec2a37d9272af3f5adcd7b455d5b3c60d5b65953066481151e6dd5037a",
+      "event_count": 17,
+      "expected_rule_ids": [
+        "BEH-001",
+        "BEH-002",
+        "BEH-003",
+        "BEH-004"
+      ],
+      "predicted_rule_ids": [
+        "BEH-001",
+        "BEH-002",
+        "BEH-003",
+        "BEH-004"
+      ],
+      "true_positive": [
+        "BEH-001",
+        "BEH-002",
+        "BEH-003",
+        "BEH-004"
+      ],
+      "false_positive": [],
+      "false_negative": [],
+      "findings": [
+        {
+          "finding_id": "BEH-001-cbf080006967",
+          "rule_id": "BEH-001",
+          "title": "Periodic outbound communication requires review",
+          "severity": "medium",
+          "mitre_technique": "T1071",
+          "host": "10.0.1.10",
+          "process": "scheduled-agent.exe",
+          "evidence_ids": [
+            "MUL-B01",
+            "MUL-B02",
+            "MUL-B03",
+            "MUL-B04",
+            "MUL-B05",
+            "MUL-B06"
+          ],
+          "evidence": "6 connections to status.example.test:443 had a mean interval of 30.0s and coefficient of variation 0.000.",
+          "recommendation": "Validate the process owner and destination, compare with an approved update schedule, and collect proxy or DNS evidence before considering a temporary egress restriction.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        },
+        {
+          "finding_id": "BEH-002-0e8b4599a722",
+          "rule_id": "BEH-002",
+          "title": "Rapid network-service discovery requires review",
+          "severity": "high",
+          "mitre_technique": "T1046",
+          "host": "10.0.1.10",
+          "process": "inventory-check.exe",
+          "evidence_ids": [
+            "MUL-D01",
+            "MUL-D02",
+            "MUL-D03",
+            "MUL-D04",
+            "MUL-D05",
+            "MUL-D06",
+            "MUL-D07",
+            "MUL-D08"
+          ],
+          "evidence": "The process contacted at least 8 distinct network endpoints within 60 seconds.",
+          "recommendation": "Confirm whether the process is an authorized scanner, inspect its execution context, and use segmentation or rate controls only after validating business impact.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        },
+        {
+          "finding_id": "BEH-003-ee4ec4b960d1",
+          "rule_id": "BEH-003",
+          "title": "High-volume asymmetric egress requires review",
+          "severity": "high",
+          "mitre_technique": "T1041",
+          "host": "10.0.1.10",
+          "process": "backup-export.exe",
+          "evidence_ids": [
+            "MUL-E01"
+          ],
+          "evidence": "One connection sent 2000000 bytes and received 10000 bytes (ratio 200.0:1).",
+          "recommendation": "Validate the transfer's business purpose and destination, preserve flow evidence, and consider egress restriction or host isolation only after confirmation.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        },
+        {
+          "finding_id": "BEH-004-ff31e45464f5",
+          "rule_id": "BEH-004",
+          "title": "Network download followed by file creation requires review",
+          "severity": "high",
+          "mitre_technique": "T1105",
+          "host": "10.0.1.10",
+          "process": "package-stager.exe",
+          "evidence_ids": [
+            "MUL-T01",
+            "MUL-T02"
+          ],
+          "evidence": "The process received 600000 bytes and created 'inert-package.bin' within 120 seconds.",
+          "recommendation": "Preserve the file hash and process lineage, validate the download source, and quarantine the file or restrict the destination only through an approved incident-response action.",
+          "asset_context": {
+            "known_asset": true,
+            "hostname": "servidor-web.empresa.local",
+            "operating_system_guess": "Ubuntu Linux 20.04",
+            "observed_services": [
+              {
+                "port": "21",
+                "protocol": "tcp",
+                "service": "ftp",
+                "product": "vsftpd",
+                "version": "3.0.3"
+              },
+              {
+                "port": "22",
+                "protocol": "tcp",
+                "service": "ssh",
+                "product": "OpenSSH",
+                "version": "8.2p1"
+              },
+              {
+                "port": "23",
+                "protocol": "tcp",
+                "service": "telnet",
+                "product": "",
+                "version": ""
+              },
+              {
+                "port": "80",
+                "protocol": "tcp",
+                "service": "http",
+                "product": "Apache",
+                "version": "2.4.41"
+              },
+              {
+                "port": "3306",
+                "protocol": "tcp",
+                "service": "mysql",
+                "product": "MySQL",
+                "version": "5.7.33"
+              }
+            ]
+          },
+          "classification": "behavior-review",
+          "confirmed_malware": false,
+          "confirmed_vulnerability": false,
+          "automatic_response_authorized": false
+        }
+      ],
+      "ollama": {
+        "status": "validation-failure",
+        "error_type": "OllamaOutputError",
+        "error": "Ollama returned no valid structured response",
+        "raw_response": "{\n  \"summary\": \"The process 'inventory-check.exe' made 8 network connections within 60 seconds, indicating rapid network-service discovery. The process 'backup-export.exe' made a high-volume asymmetric egress connection, sending 2000000 bytes and receiving 10000 bytes. The process 'package-stager.exe' received 600000 bytes and created a file 'inert-package.bin' within 120 seconds. These findings indicate potential malicious activity, and further review is required.\",\n  \"priorities\": [\n    {\n      \"finding_id\": \"BEH-002-0e8b4599a722\",\n      \"priority\": \"high\",\n      \"rationale\": \"The process 'inventory-check.exe' made 8 network connections within 60 seconds, indicating rapid network-service discovery. This could be a sign of malicious activity, such as reconnaissance or scanning for vulnerabilities.\",\n      \"evidence_ids\": [\"MUL-D01\", \"MUL-D02\", \"MUL-D03\", \"MUL-D04\", \"MUL-D05\", \"MUL-D06\", \"MUL-D07\", \"MUL-D08\"],\n      \"validation_steps\": [\n        \"Verify the process 'inventory-check.exe' is an authorized scanner.\",\n        \"Inspect the execution context of the process 'inventory-check.exe'.\",\n        \"Use segmentation or rate controls only after validating business impact.\"\n      ],\n      \"control_ids\": [\"temporarily-restrict-egress-after-approval\"]\n    },\n    {\n      \"finding_id\": \"BEH-003-ee4ec4b960d1\",\n      \"priority\": \"high\",\n      \"rationale\": \"The process 'backup-export.exe' made a high-volume asymmetric egress connection, sending 2000000 bytes and receiving 10000 bytes. This could be a sign of malicious activity, such as data exfiltration or lateral movement.\",\n      \"evidence_ids\": [\"MUL-E01\"],\n      \"validation_steps\": [\n        \"Validate the transfer's business purpose and destination.\",\n        \"Preserve flow evidence.\",\n        \"Consider egress restriction or host isolation only after confirmation.\"\n      ],\n      \"control_ids\": [\"temporarily-restrict-egress-after-approval\"]\n    },\n    {\n      \"finding_id\": \"BEH-004-ff31e45464f5\",\n      \"priority\": \"high\",\n      \"rationale\": \"The process 'package-stager.exe' received 600000 bytes and created a file 'inert-package.bin' within 120 seconds. This could be a sign of malicious activity, such as data exfiltration or lateral movement.\",\n      \"evidence_ids\": [\"MUL-T01\", \"MUL-T02\"],\n      \"validation_steps\": [\n        \"Preserve the file hash and process lineage.\",\n        \"Validate the download source.\",\n        \"Quarantine the file or restrict the destination only through an approved incident-response action.\"\n      ],\n      \"control_ids\": [\"temporarily-restrict-egress-after-approval\"]\n    }\n  ],\n  \"limitations\": [\n    \"The analysis is based on a limited dataset and may not be representative of the entire system.\",\n    \"The findings are based on network connection data and may not capture all",
+        "metadata": {
+          "model": "llama3.2:3b",
+          "elapsed_ms": 7326.668,
+          "ollama_total_duration_ns": 7316813300,
+          "prompt_eval_count": 2050,
+          "eval_count": 700,
+          "prompt_sha256": "8121c3473c7d1ba2ad2f452e415bce89e2c21a05e725dfd5c2f0a21cf2f31f77",
+          "schema_version": "1.1",
+          "prompt_variant": "checklist-v1",
+          "api_response_received": true,
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "temperature": 0,
+          "top_p": 0.9,
+          "seed": 42,
+          "context_length": 4096,
+          "max_output_tokens": 700,
+          "request_timeout_seconds": 300
+        },
+        "audit": {
+          "audit_schema_version": "1.3",
+          "json_parse_valid": false,
+          "schema_valid": false,
+          "grounding_valid": false,
+          "known_finding_citations": [
+            "BEH-002-0e8b4599a722",
+            "BEH-003-ee4ec4b960d1",
+            "BEH-004-ff31e45464f5"
+          ],
+          "unknown_finding_citations": [],
+          "known_evidence_citations": [
+            "MUL-D01",
+            "MUL-D02",
+            "MUL-D03",
+            "MUL-D04",
+            "MUL-D05",
+            "MUL-D06",
+            "MUL-D07",
+            "MUL-D08",
+            "MUL-E01",
+            "MUL-T01",
+            "MUL-T02"
+          ],
+          "unknown_evidence_citations": [],
+          "omitted_findings": [
+            "BEH-001-cbf080006967"
+          ],
+          "duplicate_findings": [],
+          "finding_coverage": 0.75,
+          "evidence_coverage": 0.647059,
+          "unsupported_cve_mentions": [],
+          "absolute_assertions": [],
+          "unsupported_security_attribution_mentions": [
+            "malicious activity"
+          ],
+          "containment_action_mentions": [
+            "Quarantine",
+            "restrict"
+          ],
+          "human_approval_qualifier_present": true,
+          "unqualified_containment_action": false,
+          "unauthorized_controls": [],
+          "unsupported_claim_categories": [
+            "unsupported-identity-or-attribution",
+            "finding-coverage-error"
+          ],
+          "unsupported_claim_flag": true,
+          "word_count": 339,
+          "within_200_word_limit": false,
+          "markdown_marker_present": false
+        }
+      }
+    }
+  ]
+}

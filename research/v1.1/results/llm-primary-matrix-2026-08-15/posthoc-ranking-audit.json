@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T21:10:56.841832+00:00",
+  "analysis_role": "posthoc-schema-valid-multi-finding-ranking-audit",
+  "source_summary_sha256": "7cdb3ea94bb5b332515433072ccdfefa2d1aacb90cdf16a433779134f7cf3181",
+  "cells": [
+    {
+      "cell": "gemma3-4b/checklist-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 5,
+      "schema_valid": 5,
+      "schema_valid_ranking_stability": {
+        "observations": 5,
+        "distinct_rankings": 1,
+        "modal_ranking": [
+          "BEH-002-0e8b4599a722",
+          "BEH-003-ee4ec4b960d1",
+          "BEH-004-ff31e45464f5"
+        ],
+        "exact_agreement_with_mode": 1.0
+      }
+    },
+    {
+      "cell": "gemma3-4b/contract-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 4,
+      "schema_valid": 4,
+      "schema_valid_ranking_stability": {
+        "observations": 4,
+        "distinct_rankings": 1,
+        "modal_ranking": [
+          "BEH-002-0e8b4599a722",
+          "BEH-003-ee4ec4b960d1",
+          "BEH-004-ff31e45464f5"
+        ],
+        "exact_agreement_with_mode": 1.0
+      }
+    },
+    {
+      "cell": "gemma3-4b/evidence-first-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 5,
+      "schema_valid": 5,
+      "schema_valid_ranking_stability": {
+        "observations": 5,
+        "distinct_rankings": 1,
+        "modal_ranking": [
+          "BEH-001",
+          "BEH-004"
+        ],
+        "exact_agreement_with_mode": 1.0
+      }
+    },
+    {
+      "cell": "llama3-2-3b/checklist-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 0,
+      "schema_valid": 0,
+      "schema_valid_ranking_stability": null
+    },
+    {
+      "cell": "llama3-2-3b/contract-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 0,
+      "schema_valid": 0,
+      "schema_valid_ranking_stability": null
+    },
+    {
+      "cell": "llama3-2-3b/evidence-first-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 5,
+      "schema_valid": 5,
+      "schema_valid_ranking_stability": {
+        "observations": 5,
+        "distinct_rankings": 1,
+        "modal_ranking": [
+          "BEH-002-0e8b4599a722",
+          "BEH-003-ee4ec4b960d1",
+          "BEH-004-ff31e45464f5"
+        ],
+        "exact_agreement_with_mode": 1.0
+      }
+    },
+    {
+      "cell": "qwen3-8b/checklist-v1",
+      "attempts": 5,
+      "api_responses": 0,
+      "api_failures": 5,
+      "json_parse_valid": 0,
+      "schema_valid": 0,
+      "schema_valid_ranking_stability": null
+    },
+    {
+      "cell": "qwen3-8b/contract-v1",
+      "attempts": 5,
+      "api_responses": 5,
+      "api_failures": 0,
+      "json_parse_valid": 0,
+      "schema_valid": 0,
+      "schema_valid_ranking_stability": null
+    },
+    {
+      "cell": "qwen3-8b/evidence-first-v1",
+      "attempts": 5,
+      "api_responses": 1,
+      "api_failures": 4,
+      "json_parse_valid": 0,
+      "schema_valid": 0,
+      "schema_valid_ranking_stability": null
+    }
+  ],
+  "interpretation_boundary": "Ranking is measured for schema-valid multi-finding responses even when the semantic-policy validator rejected them. It describes repeatability of ordering, not correctness or usefulness. Cells without schema-valid responses have no estimable ranking stability."
+}

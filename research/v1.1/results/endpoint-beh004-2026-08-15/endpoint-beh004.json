@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "evidence_role": "functional-endpoint-lineage-validation",
+  "manifest": "endpoint-scenarios.json",
+  "manifest_sha256": "b90df3c8128d75b76d6a5e9df4fef31be501950ad0612a5e4787d46450ab53e3",
+  "nmap_sha256": "a7d083fbe22e3f415765a66df95e9c63441189f9481b269fa810aa4e71472762",
+  "truth_matrix": [
+    {
+      "id": "same-process-within-window",
+      "telemetry_sha256": "759231ec80b577cbb8dcde9c14f5456ae8c8522c8b2ce8e5b2f2513f5bfecf3a",
+      "event_count": 2,
+      "expected_beh_004": true,
+      "predicted_beh_004": true,
+      "outcome": "true_positive",
+      "finding_ids": [
+        "BEH-004-db11c2802bb1"
+      ],
+      "evidence_ids": [
+        "EPT-P01",
+        "EPT-P02"
+      ],
+      "inventory_known_asset_with_nmap": true,
+      "inventory_known_asset_without_nmap": false
+    },
+    {
+      "id": "received-bytes-below-threshold",
+      "telemetry_sha256": "525251b14c4b4124b0ea9dcad670534376248a8040d289c71d4598496b9b5f0c",
+      "event_count": 2,
+      "expected_beh_004": false,
+      "predicted_beh_004": false,
+      "outcome": "true_negative",
+      "finding_ids": [],
+      "evidence_ids": [],
+      "inventory_known_asset_with_nmap": true,
+      "inventory_known_asset_without_nmap": false
+    },
+    {
+      "id": "different-processes",
+      "telemetry_sha256": "45a1df7205787113c533a6c5bb1ed2fd8a98afe7f816e13f6e10de33eb714fe1",
+      "event_count": 2,
+      "expected_beh_004": false,
+      "predicted_beh_004": false,
+      "outcome": "true_negative",
+      "finding_ids": [],
+      "evidence_ids": [],
+      "inventory_known_asset_with_nmap": true,
+      "inventory_known_asset_without_nmap": false
+    },
+    {
+      "id": "file-after-time-window",
+      "telemetry_sha256": "cd60692cd3bb5baf829574bfdac248ec4de3a337a3ce073651adb3c791c7023d",
+      "event_count": 2,
+      "expected_beh_004": false,
+      "predicted_beh_004": false,
+      "outcome": "true_negative",
+      "finding_ids": [],
+      "evidence_ids": [],
+      "inventory_known_asset_with_nmap": true,
+      "inventory_known_asset_without_nmap": false
+    },
+    {
+      "id": "non-executable-like-suffix",
+      "telemetry_sha256": "69165437c9681f362ee215411bcb8952ceb253dd0a2888468e31366b04281e5c",
+      "event_count": 2,
+      "expected_beh_004": false,
+      "predicted_beh_004": false,
+      "outcome": "true_negative",
+      "finding_ids": [],
+      "evidence_ids": [],
+      "inventory_known_asset_with_nmap": true,
+      "inventory_known_asset_without_nmap": false
+    }
+  ],
+  "confusion": {
+    "true_positive": 1,
+    "false_positive": 0,
+    "false_negative": 0,
+    "true_negative": 4
+  },
+  "inventory_ablation": {
+    "predictions_identical": true,
+    "known_asset_context_added": 5,
+    "interpretation": "Nmap enriched asset context but did not create, remove, or reclassify a BEH-004 finding."
+  },
+  "automatic_actions_executed": 0,
+  "claim_boundary": "Constructed inert fixtures validate rule logic and evidence lineage, not endpoint detection accuracy."
+}

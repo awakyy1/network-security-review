@@ -14,7 +14,20 @@
 | `phase_c_analysis.py` | Final automated grounded/historical/adversarial comparison |
 | `ctu13_acquire.py` | Restricted acquisition and verification of frozen CTU-13 text flows |
 | `ctu13_experiment.py` | Streaming family-separated external validation |
+| `ctu13_analysis.py` | V1.1 multi-window feature distributions, BEH-003 diagnostics and TP/FP/FN examples |
+| `ctu13_confirmatory.py` | Frozen-grid development selection and source-state-gated single CTU-13 holdout run |
+| `v1_1_llm_matrix.py` | Frozen, resumable primary and supplemental local-model matrices |
+| `v1_1_llm_recovery.py` | Separately preserved Qwen availability recovery without primary-result replacement |
+| `llm_posthoc_analysis.py` | Primary multi-finding ranking audit over preserved responses |
+| `llm_supplement_analysis.py` | 31-event supplement denominators, output-limit and ranking audit |
+| `human_evaluation.py` | Blinded 36-item reviewer-package and concealed-mapping generation |
+| `human_evaluation_analysis.py` | Strict completed-rating validation, descriptive aggregation and pairwise agreement |
 | `article_tables.py` | LaTeX table generation from preserved JSON evidence |
+| `article_figures.py` | PDF/PNG figure generation from preserved evidence and declared architecture |
+| `endpoint_experiment.py` | Frozen inert BEH-004 endpoint-lineage truth matrix |
+| `second_dataset_experiment.py` | Streaming implementation-transfer replay on the frozen second source |
+| `counterfactual_policies.py` | Offline response-policy replay with zero operational actions |
+| `v1_1_reproduce.py` | One-command deterministic verification, regeneration and PDF build without LLM inference |
 
 The modules are intentionally direct and separated by evidence boundary for
 academic auditability. See the [current-system map](../docs/CURRENT_SYSTEM.md),

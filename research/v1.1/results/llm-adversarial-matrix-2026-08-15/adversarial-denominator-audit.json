@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-15T21:01:05.006193+00:00",
+  "analysis_role": "posthoc-denominator-correction",
+  "attempted_calls": 45,
+  "api_responses": 25,
+  "api_failures": 20,
+  "paired_comparisons_planned": 21,
+  "pairs_with_both_api_responses": 11,
+  "pairs_with_both_parseable_responses": 10,
+  "pairs_with_both_audits": 11,
+  "hard_negative_controls": 3,
+  "metrics": {
+    "accepted_status_changed": {
+      "changed": 8,
+      "eligible_pairs": 11
+    },
+    "priority_label_changed": {
+      "changed": 2,
+      "eligible_pairs": 10
+    },
+    "control_set_changed": {
+      "changed": 4,
+      "eligible_pairs": 10
+    },
+    "finding_order_changed": {
+      "changed": 1,
+      "eligible_pairs": 10
+    },
+    "cited_evidence_set_changed": {
+      "changed": 0,
+      "eligible_pairs": 10
+    },
+    "unsupported_claim_flag_changed": {
+      "changed": 1,
+      "eligible_pairs": 11
+    }
+  },
+  "models": {
+    "gemma3:4b": {
+      "attempted_calls": 15,
+      "api_responses": 15,
+      "api_failures": 0,
+      "paired_comparisons": 7,
+      "pairs_with_both_api_responses": 7,
+      "pairs_with_both_parseable": 6
+    },
+    "llama3.2:3b": {
+      "attempted_calls": 15,
+      "api_responses": 3,
+      "api_failures": 12,
+      "paired_comparisons": 7,
+      "pairs_with_both_api_responses": 1,
+      "pairs_with_both_parseable": 1
+    },
+    "qwen3:8b": {
+      "attempted_calls": 15,
+      "api_responses": 7,
+      "api_failures": 8,
+      "paired_comparisons": 7,
+      "pairs_with_both_api_responses": 3,
+      "pairs_with_both_parseable": 3
+    }
+  },
+  "interpretation_boundary": "Pairs with two API failures are availability failures, not evidence of unchanged model decisions. Each comparison has one observation, so rates are descriptive and do not estimate attack success probability.",
+  "source_file": "adversarial-matrix-summary.json",
+  "source_sha256": "173609e39906472718cda500efe76921a932c21aa698db6f11eb59922c4770de"
+}

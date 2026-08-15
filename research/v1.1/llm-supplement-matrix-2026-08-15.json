@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.1",
+  "status": "frozen-ready-for-supplemental-inference",
+  "evidence_role": "frozen-supplemental-conflicting-context-stress-matrix",
+  "preregistered_at": "2026-08-15T18:22:16.6625802-03:00",
+  "amended_before_inference_at": "2026-08-15T18:30:30-03:00",
+  "pre_inference_amendment": "A deterministic prompt-size check projected about 9,849 Qwen tokens from the observed 2.58 characters/token ratio of the prior 17-event case. Context was increased equally for all models from 8,192 to 16,384 before any supplemental call to prevent evidence truncation; no output had been observed.",
+  "purpose": "Close the prospectively identified case-diversity gap with one dozens-of-events, mixed-rule and conflicting-context stress scenario while minimizing additional inference.",
+  "models": [
+    {
+      "tag": "llama3.2:3b",
+      "family": "Meta Llama 3.2",
+      "role": "small",
+      "local_manifest_digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "parameter_size": "3.2B",
+      "quantization": "Q4_K_M"
+    },
+    {
+      "tag": "gemma3:4b",
+      "family": "Google Gemma 3",
+      "role": "small-cross-family",
+      "local_manifest_digest": "a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a",
+      "parameter_size": "4.3B",
+      "quantization": "Q4_K_M"
+    },
+    {
+      "tag": "qwen3:8b",
+      "family": "Alibaba Qwen 3",
+      "role": "intermediate-cross-family",
+      "local_manifest_digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+      "parameter_size": "8.2B",
+      "quantization": "Q4_K_M"
+    }
+  ],
+  "protocol": {
+    "prompt_variants": ["evidence-first-v1"],
+    "repetitions_per_cell": 3,
+    "manifest": "llm-supplement-scenarios.json",
+    "manifest_sha256": "1c90573180ac450a79d9919ef216f5ac6bfdae41d00b0111103d7f481b5757cc",
+    "model_calls_expected": 9,
+    "model_calls_formula": "3 models * 1 prompt variant * 3 repetitions * 1 scenario producing findings",
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 16384,
+    "maximum_output_tokens": 900,
+    "stream": false,
+    "schema_version": "1.1",
+    "network_boundary": "loopback Ollama only; no remote inference API",
+    "execution_order": "model, then prompt variant, then repetition; scenario order remains manifest order"
+  },
+  "frozen_fixture_hashes": {
+    "fixtures/conflicting-context-dozens-events.jsonl": "ad5bca7c7227da7010cd6d8131d9a6682ee36b869a70c99f7fc7ca4bb8defe9b"
+  },
+  "primary_metrics": [
+    "api_success_rate",
+    "json_parse_rate",
+    "schema_valid_rate",
+    "accepted_grounding_rate",
+    "finding_coverage",
+    "evidence_coverage",
+    "unsupported_claim_rate",
+    "unauthorized_control_rate",
+    "finding_order_and_priority_stability"
+  ],
+  "interpretation_boundary": "This supplemental stress test is descriptive and does not replace the primary matrix, estimate malware-detection accuracy, or establish that maintenance-like context is benign.",
+  "code_hashes_at_preregistration": {
+    "src/ollama_advisor.py": "79ab9655ac99648326baabff9942f60fd165ee3e922d47ad7753fd72e99abfbb",
+    "src/ollama_baseline.py": "3975a2c3b8ec0b60a49937a4969845dc12d7fdee15df0fd9cf45f31b81632111",
+    "src/v2_experiment.py": "7d628ede9c1e82fadeecb993029e7780f57649f284535635e01f6aa4f5ee3b96",
+    "src/v2_repetitions.py": "90f1a30a2ec28a81ca70933ab95945b1f36e2b564cd44555aff3a45436337103"
+  }
+}

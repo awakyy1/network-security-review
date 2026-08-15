@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
@@ -43,6 +44,12 @@ class TelemetryEvent:
     event_type: str
     source: str
     process: str
+    executable_path: str = ""
+    signer: str = ""
+    parent_process: str = ""
+    user_context: str = ""
+    command_line: str = ""
+    file_hash_sha256: str = ""
     destination_ip: str = ""
     destination_domain: str = ""
     destination_port: int | None = None
@@ -79,6 +86,12 @@ class TelemetryEvent:
             event_type=event_type,
             source=_text(mapping, "source", required=True),
             process=_text(mapping, "process", required=True),
+            executable_path=_text(mapping, "executable_path"),
+            signer=_text(mapping, "signer"),
+            parent_process=_text(mapping, "parent_process"),
+            user_context=_text(mapping, "user_context"),
+            command_line=_text(mapping, "command_line"),
+            file_hash_sha256=_text(mapping, "file_hash_sha256"),
             destination_ip=_text(mapping, "destination_ip"),
             destination_domain=_text(mapping, "destination_domain"),
             destination_port=destination_port,
@@ -91,6 +104,8 @@ class TelemetryEvent:
         return event
 
     def _validate_type_specific_fields(self) -> None:
+        if self.file_hash_sha256 and not re.fullmatch(r"[0-9a-fA-F]{64}", self.file_hash_sha256):
+            raise ValueError("file_hash_sha256 must contain exactly 64 hexadecimal characters")
         if self.event_type == "network_connection":
             if not (self.destination_ip or self.destination_domain):
                 raise ValueError("Network events require a destination_ip or destination_domain")

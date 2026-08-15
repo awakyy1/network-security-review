@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "status": "frozen-ready-for-ablation-inference",
+  "model": {
+    "tag": "llama3.2:3b",
+    "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72"
+  },
+  "scenario_manifest": {
+    "path": "llm-scenarios.json",
+    "sha256": "0869e78eb45d7e5a22e039f137fbf1a48dfa6b7bde53d7a677b75388171cc60e"
+  },
+  "base_parameters": {
+    "prompt_variant": "contract-v1",
+    "temperature": 0,
+    "top_p": 0.9,
+    "seed": 42,
+    "context_length": 4096,
+    "maximum_output_tokens": 700
+  },
+  "repetitions": 3,
+  "conditions": [
+    {
+      "id": "reference-primary-reuse",
+      "new_calls": 0,
+      "definition": "Reuse repetitions 1-3 from the frozen Llama/contract-v1 primary cell."
+    },
+    {
+      "id": "temperature-0.7",
+      "new_calls": 12,
+      "single_change": "temperature changes from 0 to 0.7"
+    },
+    {
+      "id": "api-format-removed",
+      "new_calls": 12,
+      "single_change": "Ollama format JSON schema parameter is omitted; schema text and grounding instructions remain"
+    },
+    {
+      "id": "grounding-language-reduced",
+      "new_calls": 12,
+      "single_change": "schema and evidence remain, but explicit untrusted-data, exact-citation, non-attribution and authorization language is removed"
+    },
+    {
+      "id": "validator-bypass-posthoc",
+      "new_calls": 0,
+      "definition": "Reuse reference responses and count every API response as usable without deterministic semantic-policy rejection; never expose it to operations."
+    }
+  ],
+  "expected_new_calls": 36,
+  "scientific_code": {
+    "src/v1_1_ablation_matrix.py": "1ed4a3978584bdd9c5a24d700acd22557ddeae7cd2f59c8065009b71764dd2cc",
+    "src/ollama_advisor.py": "79ab9655ac99648326baabff9942f60fd165ee3e922d47ad7753fd72e99abfbb",
+    "src/ollama_baseline.py": "3975a2c3b8ec0b60a49937a4969845dc12d7fdee15df0fd9cf45f31b81632111",
+    "src/v2_experiment.py": "7d628ede9c1e82fadeecb993029e7780f57649f284535635e01f6aa4f5ee3b96",
+    "src/v2_repetitions.py": "90f1a30a2ec28a81ca70933ab95945b1f36e2b564cd44555aff3a45436337103"
+  },
+  "primary_metrics": [
+    "json_parse_rate",
+    "schema_valid_rate",
+    "accepted_grounding_rate",
+    "finding_coverage",
+    "evidence_coverage",
+    "unsupported_claim_rate",
+    "unauthorized_control_rate"
+  ],
+  "claim_boundary": "Three clustered repetitions describe observed component sensitivity only; differences are not causal population estimates."
+}

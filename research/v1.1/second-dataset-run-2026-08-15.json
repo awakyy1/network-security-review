@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "status": "frozen-before-detector-run",
+  "selection_record": {
+    "filename": "second-dataset-selection-2026-08-15.json",
+    "sha256": "79757bd5219d062c04f15460c3a2911b8feec72e74bbbf335556ffa6bd476602"
+  },
+  "source": {
+    "path": "E:/tcc/data/botnet-group-activity/scenario-1/scenario_dataset_1/dataset_result.binetflow",
+    "bytes": 291312467,
+    "sha256": "867eeef8b8936e545129d8d806f86a2dff41f6cafe0339759da4aad0ef7cda0d",
+    "scenario": 1,
+    "family": "synthetic grouped CTU-13-derived bot activity",
+    "role": "implementation-transfer"
+  },
+  "parser_profile": {
+    "maximum_file_bytes": 536870912,
+    "maximum_rows": 3000000,
+    "timestamp_patterns": ["%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"],
+    "capture_timezone": "UTC normalization because the source description supplies no timezone",
+    "address_namespace": "bga",
+    "event_prefix": "BGA",
+    "telemetry_source": "botnet-group-activity-binetflow"
+  },
+  "window_seconds": 300,
+  "detector_thresholds": {
+    "beh_001_minimum_connections": 6,
+    "beh_001_minimum_mean_interval_seconds": 5,
+    "beh_001_maximum_mean_interval_seconds": 900,
+    "beh_001_maximum_interval_cv": 0.15,
+    "beh_002_minimum_distinct_endpoints": 16,
+    "beh_002_interval_seconds": 60,
+    "beh_003_minimum_bytes_sent": 1000000,
+    "beh_003_minimum_sent_received_ratio": 10,
+    "beh_004_minimum_bytes_received": 32768,
+    "beh_004_maximum_delay_seconds": 120
+  },
+  "output_policy": {
+    "retain_raw_flow_file": true,
+    "retain_per_unit_records": false,
+    "retain_rule_combination_counts_by_truth": true,
+    "retain_first_example_per_truth_and_rule_combination": true,
+    "reason": "Bound output size for a high-cardinality synthetic dataset while preserving replayable aggregate policy counts."
+  }
+}
