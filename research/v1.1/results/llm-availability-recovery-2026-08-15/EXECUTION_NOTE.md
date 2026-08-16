@@ -22,8 +22,8 @@ two `E:\Ollama\App\lib\ollama\llama-server.exe` processes (PIDs 8432 and
 5.7 GiB of working set. Before cleanup, NVIDIA telemetry reported 7,088 MiB
 used/5,028 MiB free and Windows reported 3.64 GiB free physical memory.
 
-Only those two verified orphaned processes were terminated. No editor, Codex,
-browser or unrelated process was stopped. After cleanup, NVIDIA telemetry
+Only those two verified orphaned processes were terminated. No editor, browser
+or unrelated process was stopped. After cleanup, NVIDIA telemetry
 reported 2,731 MiB used/9,385 MiB free and Windows reported 12.36 GiB free
 physical memory.
 

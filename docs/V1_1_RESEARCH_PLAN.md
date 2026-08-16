@@ -37,7 +37,7 @@ The requirement-by-requirement evidence map is maintained in
 
 ## Phase 0 — Environment, versioning and baselines
 
-- [x] Create the local `codex/article-v1.1` development branch.
+- [x] Create an isolated local development branch for article V1.1.
 - [x] Install Python 3.12 and create the repository-local `.venv`.
 - [x] Install the dependencies pinned in `requirements.txt` and
   `requirements-dev.txt`.
