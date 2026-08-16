@@ -256,9 +256,8 @@ user-authorized step.
 - [CTU-13 dataset summary and original-paper link](https://fkie-cad.github.io/COMIDDS/content/datasets/ctu_13/)
 - [HaluEval primary paper](https://arxiv.org/abs/2305.11747)
 
-## Conversation continuity
+## Research continuity
 
-The same Codex chat can be reopened from Recent chats. In Codex CLI, start in
-the repository directory and use `codex resume`. The transcript is chat state;
-the authoritative research state is the checked-out repository plus preserved
-experiment outputs.
+The authoritative research state is the checked-out repository plus the
+preserved experiment outputs. Continue the work from the latest validated
+commit and record any new experimental decisions in the repository.
