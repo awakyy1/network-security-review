@@ -3,8 +3,8 @@
 ## Status and integrity boundary
 
 This document is the authoritative implementation and evidence checklist for
-the V1.1 research revision. V1.0 remains frozen on the `article-v1` branch,
-the `article-v1.0` tag and `academic/artigo/releases/article-v1.pdf`. Work for
+the V1.1 research revision. V1.0 remains frozen by the published
+`article-v1.0` tag and `academic/artigo/releases/article-v1.pdf`. Work for
 V1.1 must not overwrite V1.0 source evidence, raw outputs, manifests or the
 named PDF snapshot.
 

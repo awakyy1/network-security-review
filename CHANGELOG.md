@@ -1,12 +1,22 @@
 # Changelog
 
-This file records meaningful changes to the research artifact. Commit hashes identify reproducible repository states; no semantic-version release has been published yet.
+This file records meaningful changes to the research artifact. Repository
+releases use semantic-version tags; article V1.0 and V1.1 are separate
+research-document versions. Commit hashes identify reproducible repository
+states.
 
 ## Unreleased
 
-- No unreleased changes.
+- Clarify the published repository release and the article V1.0 tag references in documentation.
 
-## 1.1 - 2026-08-15
+## Repository v1.0.0 - 2026-10-28
+
+- Publish the first semantic-versioned repository release at `3d7a46e`,
+  covering the documented post-defense research artifact, approved monograph,
+  article V1.1 snapshot, and subsequent portability and documentation fixes.
+- Preserve the existing `article-v1.0` tag as the separate frozen V1.0 article state.
+
+## Article V1.1 - 2026-08-15
 
 - Start the V1.1 research line with an explicit, auditable plan covering
   related work, expanded detector validation, endpoint evidence, multi-model
@@ -37,8 +47,8 @@ This file records meaningful changes to the research artifact. Commit hashes ide
   prompt-injection matrix and 31-event conflicting-context supplement while
   preserving availability failures and keeping recovery calls outside primary
   denominators.
-- Add a 36-item blinded human-review package without inventing ratings; genuine
-  independent review remains a release gate.
+- Add a 36-item blinded human-review package without inventing ratings;
+  independent human review remains future work, with no human-result claim.
 - Add one-command deterministic regeneration, V1.0/V1.1 verification records,
   generated figures and tables, and an audited 18-page final V1.1 PDF.
 

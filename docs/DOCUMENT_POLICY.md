@@ -35,7 +35,7 @@ The article never replaces or retroactively modifies the approved monograph.
 ### Article versioning
 
 - V1.0 was frozen on 13 August 2026 and is identified by its named PDF,
-  release record, `article-v1` branch and `article-v1.0` tag;
+  snapshot record and published `article-v1.0` tag;
 - the V1.0 snapshot is `academic/artigo/releases/article-v1.pdf`;
 - the V1.1 snapshot is `academic/artigo/releases/article-v1.1.pdf`;
 - `academic/artigo/main.pdf` is the working build of the version declared in

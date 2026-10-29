@@ -5,7 +5,7 @@ Esta pasta separa o registro acadêmico oficial do documento que continua em evo
 | Entregável | Status | Fonte | PDF |
 |---|---|---|---|
 | Monografia aprovada | Registro histórico imutável | Não alterado/publicado | [`monografia-aprovada-2025.pdf`](monografia/monografia-aprovada-2025.pdf) |
-| Artigo científico V1.0 | Snapshot congelado em 13/08/2026 | Branch `article-v1` e tag `article-v1.0` | [`artigo/releases/article-v1.pdf`](artigo/releases/article-v1.pdf) |
+| Artigo científico V1.0 | Snapshot congelado em 13/08/2026 | Tag `article-v1.0` | [`artigo/releases/article-v1.pdf`](artigo/releases/article-v1.pdf) |
 | Artigo científico V1.1 | Revisão científica concluída | [`artigo/main.tex`](artigo/main.tex) | [`artigo/releases/article-v1.1.pdf`](artigo/releases/article-v1.1.pdf) |
 | Bibliografia do artigo | Fonte compartilhada | [`shared/referencias.bib`](shared/referencias.bib) | — |
 
@@ -32,8 +32,9 @@ e padrões internacionais de apresentação, desde que não seja confundido com 
 monografia histórica. Não há submissão a periódico planejada para a V1.1.
 
 A V1.0 do artigo é identificada pelo arquivo nomeado
-`artigo/releases/article-v1.pdf`, pelo branch `article-v1` e pela tag
-`article-v1.0`. O arquivo `artigo/VERSION` identifica o fonte ativo. A V1.1 está
+`artigo/releases/article-v1.pdf` e pela tag publicada `article-v1.0`.
+Não há branch `article-v1` no repositório remoto. O arquivo `artigo/VERSION`
+identifica o fonte ativo. A V1.1 está
 congelada em `artigo/releases/article-v1.1.pdf`, sem sobrescrever o snapshot
 V1.0.
 

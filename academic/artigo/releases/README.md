@@ -10,7 +10,8 @@ working files in the parent directory.
 
 V1.0 is an internal research-artifact version. It is not a journal submission,
 peer-review decision or acceptance record. The corresponding source state is
-preserved by the `article-v1` Git branch and the `article-v1.0` local tag.
+preserved by the published `article-v1.0` Git tag. There is no remote
+`article-v1` branch.
 
 V1.1 is the completed research revision. It preserves negative results,
 availability failures, the absence of independent human ratings, and the

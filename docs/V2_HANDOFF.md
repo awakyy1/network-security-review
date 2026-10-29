@@ -240,9 +240,9 @@ responses and result JSON before changing the protocol.
    immutable monograph hash were re-audited;
 5. the article V1 commit scope is documented in `docs/V2_COMMIT_SCOPE.md`.
 
-The V1 state belongs on the `article-v1` branch and is identified by the local
-`article-v1.0` tag. Publishing the branch or tag remains an explicit
-user-authorized step.
+At the time of this handoff, the V1 state was kept on a local `article-v1`
+branch and identified by the local `article-v1.0` tag. The tag has since been
+published to the remote repository; no `article-v1` branch exists there.
 
 ## Primary sources selected
 
