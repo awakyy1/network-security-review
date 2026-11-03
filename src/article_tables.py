@@ -429,23 +429,30 @@ def environment_comparison_table(result: dict[str, Any]) -> str:
         r"\centering",
         r"\caption{Execution-environment provenance for the preserved V1.0 runs and V1.1 development.}",
         r"\label{tab:environment-comparison}",
-        r"\resizebox{\textwidth}{!}{%",
-        r"\begin{tabular}{llllll}",
+        r"\begingroup",
+        r"\setlength{\tabcolsep}{5pt}",
+        r"\renewcommand{\arraystretch}{1.2}",
+        r"\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}"
+        + ">{\\raggedright\\arraybackslash}X" * len(environments)
+        + "@{}}",
         r"\toprule",
-        r"Research state & Operating system & CPU & Topology & RAM (GiB) & Inference device \\",
+        "Research state & " + " & ".join(item["research_state"] for item in environments) + r" \\",
         r"\midrule",
     ]
-    for environment in environments:
-        lines.append(
-            f"{environment['research_state']} & {environment['operating_system']} & "
-            f"{environment['cpu']} & {environment['cpu_topology']} & "
-            f"{environment['memory_gib']:.1f} & {environment['inference_device']} \\\\"
-        )
+    for label, field in (
+        ("Operating system", "operating_system"),
+        ("CPU", "cpu"),
+        ("Topology", "cpu_topology"),
+        ("RAM (GiB)", "memory_gib"),
+        ("Inference device", "inference_device"),
+    ):
+        values = [f"{item[field]:.1f}" if field == "memory_gib" else item[field] for item in environments]
+        lines.append(label + " & " + " & ".join(values) + r" \\")
     lines.extend(
         [
             r"\bottomrule",
-            r"\end{tabular}%",
-            r"}",
+            r"\end{tabularx}",
+            r"\endgroup",
             (
                 r"\par\vspace{2pt}{\footnotesize\textit{Note:} The V1.1 row is an environment inventory, "
                 r"not evidence that a V1.1 experiment had already run. Cross-machine latency is descriptive "

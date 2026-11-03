@@ -1,9 +1,27 @@
+% IEEEtran initializes Times through NFSS while the class is loading. Supply
+% that encoding first; Unicode engines use the explicit OpenType fonts below.
+\RequirePackage[T1]{fontenc}
 \documentclass[11pt,a4paper,onecolumn]{IEEEtran}
 
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+\else
+  \usepackage{fontspec}
+  \setmainfont{texgyretermes-regular.otf}[
+    BoldFont=texgyretermes-bold.otf,
+    ItalicFont=texgyretermes-italic.otf,
+    BoldItalicFont=texgyretermes-bolditalic.otf]
+  \setmonofont{texgyrecursor-regular.otf}[
+    BoldFont=texgyrecursor-bold.otf,
+    ItalicFont=texgyrecursor-italic.otf,
+    BoldItalicFont=texgyrecursor-bolditalic.otf]
+\fi
 \usepackage[english]{babel}
 \usepackage{microtype}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{tabularx}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{adjustbox}
@@ -27,6 +45,8 @@
 \renewcommand{\thesection}{\arabic{section}}
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 \renewcommand{\thetable}{\arabic{table}}
+\setlength{\textfloatsep}{16pt plus 2pt minus 2pt}
+\setlength{\intextsep}{16pt plus 2pt minus 2pt}
 
 \begin{document}
 \bstctlcite{BSTcontrol}
@@ -37,7 +57,7 @@
 \maketitle
 
 \begin{abstract}
-Security telemetry contains observable events, not proof of compromise. This study asks whether local language models can prioritize transparent behavioral findings while preserving evidence boundaries and withholding response authority. The artifact correlates authorized Nmap inventory with normalized telemetry, applies four auditable rules, assigns stable evidence identifiers, and validates schema-constrained output deterministically. Evaluation combines inert fixtures, family-separated CTU-13 sources, a synthetic implementation-transfer source, a 180-call three-model/three-prompt matrix, adversarial pairs, and component ablations. The inert benchmark reached F1 0.889. An inspected NSIS.ay holdout reached F1 0.317 and a Matthews correlation coefficient (MCC) of -0.282; a prospectively frozen DonBot holdout reached F1 0.600 and MCC 0.452. On NSIS.ay, block-on-alert would have acted on 32 normal windows and missed 37 botnet windows. A single-model comparison retained exact identifiers in 50/50 grounded calls and 0/50 reconstructed free-text calls. In the broader matrix, 145/180 calls received responses and 73 passed deterministic validation; 35 Qwen attempts failed after the local server exited. Removing the API format constraint yielded no valid JSON in 12 calls. Among 11 adversarial pairs with both responses, validator status changed in eight. These results justify model-assisted triage only when deterministic checks remain in control. They do not support autonomous attribution or containment.
+Security review requires a distinction between observed behavior, model interpretation, and an authorized response. This study evaluates an architecture that preserves those boundaries while using local language models (LLMs) to organize behavioral findings. The artifact combines authorized Nmap inventory with normalized telemetry, applies four transparent rules, and checks model outputs against exact evidence identifiers and a fixed control policy. Evaluation covers constructed fixtures, family-separated CTU-13 flows, a synthetic transfer source, and a 180-attempt matrix spanning three models and three prompts, with supplementary adversarial and ablation tests. Detector performance varied by scenario: the inspected NSIS.ay holdout yielded F1 0.317 and Matthews correlation coefficient (MCC) -0.282; the prospectively frozen DonBot holdout yielded F1 0.600 and MCC 0.452. These are separate evaluations, not a paired estimate of improvement. In the primary LLM matrix, 145 attempts returned responses and 73 passed the deterministic validator. No primary multi-finding attempt passed; a nine-call conflicting-context supplement also produced no accepted response. The results demonstrate machine-checkable traceability and rejection of contract violations, but do not establish correct prioritization or benefit to analysts. The contribution is an auditable integration and a documented account of its failure modes. The evaluated system provides no evidential basis for autonomous attribution or containment.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -46,15 +66,15 @@ network telemetry, local language model, behavioral detection, CTU-13, defensive
 
 \section{Introduction}
 
-Network discovery and operating-system telemetry describe different layers of a security event. Nmap can identify reachable hosts, open ports, and uncertain service fingerprints \cite{lyon2009,nmapdocs2025}; endpoint telemetry can associate connections, DNS queries, and file creation with processes \cite{sysmonevents2026}. Neither source alone establishes that software is malicious or that a vulnerability is exploitable. Those conclusions require provenance, context, and independent validation.
+Security tools expose observations that require interpretation. Nmap reports reachable hosts, open ports, and uncertain service fingerprints \cite{lyon2009,nmapdocs2025}; endpoint telemetry can link connections, DNS queries, and file creation to processes \cite{sysmonevents2026}. These records can motivate investigation, but an open port does not establish exploitability, and a suspicious connection pattern does not establish compromise. A review system must preserve that distinction as it moves from collection to explanation and response.
 
-Large language models (LLMs) can organize evidence and make technical output easier to review, but fluent text can also erase the distinction between an observation and a conclusion. Local inference reduces disclosure to external services, not epistemic risk. The NIST AI Risk Management Framework emphasizes governance, measurement, and continued risk management instead of treating model output as self-validating \cite{nistai1001}.
+Large language models (LLMs) offer a possible interface for organizing such evidence. Their fluency, however, can make unsupported interpretations appear conclusive. Local execution limits disclosure to external inference services; it does not establish the accuracy of a recommendation. The NIST AI Risk Management Framework accordingly emphasizes governance, measurement, and continued risk management \cite{nistai1001}. The engineering question addressed here is how to make model interpretations inspectable and rejectable before they acquire operational authority.
 
-The starting point was an undergraduate project approved in 2025. That system parsed authorized Nmap XML, produced reports, optionally requested local Ollama narratives, and proposed future firewall integration. The current implementation narrows and tests that idea. Deterministic code owns observations and rule matches, the LLM may prioritize only supplied findings, and every disruptive action remains outside the model trust boundary.
+The artifact extends an undergraduate project approved in 2025 that parsed authorized Nmap XML, generated reports, and optionally requested local Ollama narratives. The present study evaluates a narrower role for the model: it may prioritize supplied findings and propose controls from a fixed catalog, while deterministic code retains ownership of observations and rule evaluation. A separate validator checks the output, and the model has neither execution credentials nor authority to initiate a response. The approved monograph remains a historical record; the research extension is evaluated independently.
 
-The study asks three questions. \textbf{RQ1:} how do frozen transparent behavior rules perform on inert functional fixtures and on independently labeled external flows? \textbf{RQ2:} can a schema-constrained local LLM preserve exact evidence traceability compared with the reconstructed 2025 free-text protocol? \textbf{RQ3:} which defensive actions are justified before malicious activity is independently confirmed?
+Three research questions define the evaluation. \textbf{RQ1:} How do the transparent behavior rules perform on constructed fixtures and independently labeled external flows? \textbf{RQ2:} How consistently do constrained local LLM outputs preserve exact evidence references and satisfy the implemented policy, including under adversarial input? \textbf{RQ3:} What response boundaries are supported by the observed detector errors and output failures? The reconstructed 2025 free-text protocol provides a historical traceability comparison for RQ2; it is not a controlled test of comparative semantic quality.
 
-The contributions are: (1) a normalized telemetry schema with stable evidence identifiers; (2) four auditable behavior rules with explicit non-confirmation fields; (3) a loopback-only LLM protocol whose citations and controls are deterministically validated; (4) a streaming CTU-13 adapter with frozen provenance and family-separated holdout; (5) multi-model, prompt-variant, adversarial and ablation evaluations that preserve availability and policy failures; and (6) retained negative results that quantify why neither alerts nor model narratives should directly trigger containment.
+The contribution has two parts. First, the artifact integrates normalized telemetry, stable evidence identifiers, explicit behavior rules, constrained local generation, and independent output validation into an auditable review pipeline. Second, the evaluation documents where that integration fails, distinguishing detector errors, output-contract violations, and runtime unavailability. It includes a prospectively frozen family-separated holdout, multi-model and prompt comparisons, adversarial inputs, and offline response-policy counterfactuals. The study does not introduce a new language model or claim state-of-the-art intrusion detection. Analyst benefit, ranking correctness, and production effectiveness remain unmeasured.
 
 \section{Foundations and Evidence Boundary}
 
@@ -70,7 +90,7 @@ The external corpus is CTU-13, a set of thirteen scenarios containing labeled bo
 
 Ollama supports local inference and JSON-schema structured outputs \cite{ollama2025,ollamastructured2026}. A schema can constrain representation, but it cannot prove semantic correctness. The implemented validator consequently checks that every cited finding and event identifier existed in the supplied evidence, rejects unsupported CVEs and absolute compromise claims, requires complete finding coverage, and permits only controls pre-mapped to each transparent rule.
 
-The system preserves five states: Nmap observation, normalized event, deterministic rule match, LLM prioritization, and independent analyst conclusion. No earlier state may be presented as a later one. Every finding explicitly denies confirmed malware and vulnerability and denies authorization for automatic response.
+The system distinguishes a scan observation, a normalized event, a rule match, a model interpretation, and an independent analyst conclusion. A rule match is a candidate for review. Its metadata explicitly records that malware and vulnerability are unconfirmed and that automatic response is not authorized. Throughout this article, \emph{accepted} means that an output passed the implemented deterministic contract; it does not mean that its interpretation was independently judged correct.
 
 \section{Related Work and Positioning}
 
@@ -82,20 +102,20 @@ One preprint review and two peer-reviewed reviews place LLMs across SOC detectio
 
 Structured generation addresses representation but not semantic truth. JSONSchemaBench finds meaningful differences in constraint coverage, efficiency, and output quality across decoding frameworks even when JSON Schema is the common interface \cite{geng2025}. Human-AI interaction guidance similarly emphasizes communicating uncertainty, supporting correction, and preserving user control when an AI system is wrong \cite{amershi2019}. Here, a closed schema prevents unbounded response shapes, while a separate deterministic validator checks identifier provenance, complete finding coverage, forbidden attribution, and rule-applicable controls. Schema validity, evidence grounding, and semantic-policy acceptance are reported independently.
 
-Telemetry is also an adversarial input surface. Peer-reviewed indirect-prompt-injection research exploits the blurred boundary between application instructions and externally controlled data \cite{greshake2023}. A recent SOC-specific preprint places instructions inside log fields and reports that constrained output and prompt hardening reduce but do not eliminate decision manipulation \cite{pandey2026}. Here, telemetry strings are marked as untrusted, the model has no execution tools, outputs are checked after generation, and rejected responses remain part of the record. The experiment combines stable evidence identifiers, constrained representation, deterministic enforcement, no model response authority, negative detector results, and a counterfactual estimate of automatic-containment harm.
+Telemetry is also an adversarial input surface. Indirect-prompt-injection research examines the boundary between application instructions and externally controlled data \cite{greshake2023}. A recent SOC-specific preprint places instructions inside log fields and reports residual decision manipulation under constrained output and prompt hardening \cite{pandey2026}. The present artifact treats telemetry strings as untrusted and evaluates output changes without granting the model execution tools. Its positioning is the integration and evaluation of these safeguards in a small, reproducible review pipeline, rather than a claim that any individual safeguard is novel or sufficient.
 
 \section{Artifact Design}
 
 \subsection{Trust-boundary architecture}
 
-Figure~\ref{fig:architecture} presents the revised architecture. Evidence acquisition and rule evaluation are deterministic. The local model receives an evidence pack rather than raw authority, while a validator mediates every output. The final human gate is the only path to a separately authorized response system.
+Figure~\ref{fig:architecture} separates deterministic evidence processing, untrusted generation, output validation, and analyst review. The model receives an evidence pack and may return a candidate interpretation. A rejected output stops at the validator. A passing output remains advisory; independent confirmation and authorization belong to the analyst and any separately controlled response system.
 
 \begin{figure}[htbp]
 \centering
-\caption{Evidence flow and response trust boundaries.}
+\caption{Review architecture. Dashed boundaries separate untrusted model generation from deterministic processing and validation. Passing validation does not authorize a response.}
 \label{fig:architecture}
-\includegraphics[width=0.82\linewidth]{generated/figures/architecture-trust-boundaries.pdf}
-\parbox{0.82\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research design (2026).}
+\includegraphics[width=\linewidth]{generated/figures/architecture-trust-boundaries.pdf}
+\parbox{\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research design (2026).}
 \end{figure}
 
 \subsection{Transparent behavior rules}
@@ -118,14 +138,14 @@ The control reconstructs the historical technical free-text path with temperatur
 
 The study follows an applied Design Science Research structure: artifact construction, demonstration, evaluation, and communication \cite{peffers2007}. The 2025 monograph is treated as a historical record, while the experiments reported here use new code and evidence. The confirmatory boundary was defined before the final repetitions: exploratory outputs that influenced a metric or rubric cannot be reused as confirmatory evidence.
 
-The evaluation has five components. Phase A is a deterministic functional benchmark. Phase B1 reports the Virut/NSIS.ay external validation and retrospective diagnostics. Phase B2 uses a prospectively frozen RBot development source, a predeclared threshold grid, and a DonBot holdout parsed once only after configuration and source-state freeze. Phase B3 replays that configuration on a separately published synthetic flow source. Phase C compares grounded and historical LLM protocols over repeated calls and separately tests inert prompt-injection telemetry. The automated Phase-C repetitions are complete; blinded human ratings were not collected. Figure~\ref{fig:experimental-flow} summarizes these roles without combining their metrics.
+The evaluation comprises five components with distinct evidentiary roles (Figure~\ref{fig:experimental-flow}). Phase A checks implementation behavior on constructed cases. Phase B1 evaluates the historical Virut/NSIS.ay pair and diagnoses its errors retrospectively. Phase B2 selects thresholds on RBot and evaluates a prospectively frozen DonBot holdout. Phase B3 tests implementation transfer on synthetic flows derived from CTU-13 patterns. Phase C measures local-model output compliance, availability, component sensitivity, and responses to inert prompt injection. These components do not constitute independent replications of a single performance estimate. No blinded human assessment or live-response trial was conducted.
 
 \begin{figure}[htbp]
 \centering
-\caption{Experimental phases and evidentiary roles. Metrics are not pooled across roles.}
+\caption{Evaluation map. Rows describe distinct evidence roles rather than a sequential experiment; their metrics are not pooled.}
 \label{fig:experimental-flow}
-\includegraphics[width=0.62\linewidth]{generated/figures/experimental-flow.pdf}
-\parbox{0.62\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research design (2026).}
+\includegraphics[width=\linewidth]{generated/figures/experimental-flow.pdf}
+\parbox{\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research design (2026).}
 \end{figure}
 
 \subsection{Execution environments and comparison boundary}
@@ -182,7 +202,7 @@ The primary V1.1 matrix uses three quantized local models from different familie
 
 Five clustered repetitions cover a no-finding case, a benign periodic-updater hard negative, an incomplete single observation, an endpoint-lineage case, and a 17-event case producing all four findings. Only the four finding-bearing scenarios invoke the model, yielding 20 calls per model/prompt cell and 180 planned calls. API receipt, JSON parsing, closed-schema validity, deterministic semantic-policy acceptance, finding coverage, evidence coverage and lexical safety flags are reported separately. The no-finding case verifies that no model call is made when the detector has no finding. A separately frozen supplement closes the remaining case-diversity gap with 31 unique events and all four rules. It prospectively defines conflicting context as comparable detector severities accompanied by opposing cues: signed maintenance-like lineage versus missing signer and parent context. Neither cue is treated as proof. The three models receive the same evidence-first prompt, schema and validator in three repetitions (nine calls). A pre-inference prompt-size check increased context equally from 8,192 to 16,384 tokens before any supplemental output was observed.
 
-The preserved 2025 comparison remains a historical control: five finding-bearing Phase-A cases were submitted ten times to one grounded protocol and to a reconstructed free-text path, yielding 50 calls per condition. It supports a direct exact-identifier comparison for that fixed model and environment but is not pooled with the V1.1 matrix.
+The historical comparison submits five finding-bearing Phase-A cases ten times to each of two protocols, yielding 50 calls per condition. The grounded protocol and reconstructed free-text path differ in instructions, output schema, and temperature. The comparison therefore measures the two complete protocols' exact-identifier behavior; it cannot isolate the effect of grounding, schema constraints, or decoding, and it cannot establish comparative semantic quality. Its results remain separate from the V1.1 matrix.
 
 The adversarial matrix contains six paired telemetry-field injections and one paired Nmap inventory injection, plus one unpaired benign hard negative per model. Attack and sanitized conditions differ only in the declared field, for 45 calls. All fixtures are inert and cover fake identifiers, fictional CVE-like text, instruction override, unauthorized controls, delimiter/JSON text, Unicode confusables, long strings, command line, process, DNS, file, host and inventory fields. After 12 responses had been preserved, execution exposed a precondition defect: the hard negative's empty truth label had been confused with its expected \texttt{BEH-001} detector false positive. A recorded amendment separated truth from detector precondition without changing any telemetry, prompt, parameter, validator or paired metric; the 12 protocol-identical records were reused.
 
@@ -194,12 +214,11 @@ The symmetric automatic audit is deliberately conservative. It applies the same 
 
 For true positives ($TP$), false positives ($FP$), false negatives ($FN$), and true negatives ($TN$), the study reports precision, recall, F1, specificity, balanced accuracy, and Matthews correlation coefficient (MCC). Proportion intervals use the Wilson 95\% method. MCC is retained because both classes and both error directions matter:
 \begin{equation}
-\resizebox{0.95\columnwidth}{!}{$\displaystyle
 \mathrm{MCC}=\frac{TP\,TN-FP\,FN}
-{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}.$}
+{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}.
 \end{equation}
 
-No response was executed. A counterfactual estimates what would have occurred if every alerted window had been blocked: normal-origin alerted windows represent unnecessary actions, and non-alerted botnet-origin windows represent missed opportunities. This is a safety analysis, not a claim about real firewall effectiveness.
+No response was executed. An offline counterfactual maps each alerted source-window to a hypothetical containment decision. It counts normal-origin windows selected for action and botnet-origin windows left without action, and also evaluates a two-rule requirement. These are label-based exposure counts, not measurements of unique hosts disrupted, successful prevention, or business harm. Their purpose is to assess whether the observed error profile supports those response policies within this artifact.
 
 Inputs, hashes, model identifier, prompts, raw outputs, environment, per-call errors, aggregate JSON, and table-generation code are preserved in the repository \cite{ielen2025repo}. The flow parsers are streaming; CTU-13 retains anonymized scored units, while the higher-cardinality second dataset retains truth-separated rule-combination counts and deterministic examples. Article tables are generated directly from committed result JSON to prevent transcription drift.
 
@@ -213,20 +232,20 @@ The endpoint matrix in Table~\ref{tab:endpoint-beh004} produced one TP and four 
 
 \input{generated/endpoint-beh004-table}
 
-\subsection{External validation}
+\subsection{Historical CTU-13 evaluation}
 
 Table~\ref{tab:ctu13-metrics} reports development and holdout results separately. The holdout contained 53 botnet-origin and 55 normal-origin units. Sixteen botnet-origin units alerted, 37 were missed, 32 normal-origin units alerted, and 23 did not.
 
 \input{generated/ctu13-metrics-table}
 
-Figure~\ref{fig:ctu13-development-holdout} compares F1 and MCC while keeping historical and prospective roles separate.
+Figure~\ref{fig:ctu13-development-holdout} places the four CTU-13 results alongside their research roles. The historical and prospective evaluations use different families and cannot estimate the effect of a threshold change on the same test population.
 
 \begin{figure}[htbp]
 \centering
-\caption{F1 and MCC for the historical inspected pair and the prospectively gated CTU-13 pair. Roles remain separate.}
+\caption{CTU-13 results by family and research role. The dashed divider separates the historical pair from the prospective pair. Differences across rows are not paired estimates of detector improvement.}
 \label{fig:ctu13-development-holdout}
-\includegraphics[width=0.76\linewidth]{generated/figures/ctu13-development-holdout-metrics.pdf}
-\parbox{0.76\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\includegraphics[width=\linewidth]{generated/figures/ctu13-development-holdout-metrics.pdf}
+\parbox{\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
 \end{figure}
 
 Development precision had a Wilson 95\% interval from 0.101 to 0.434, recall from 0.566 to 1.000, and specificity from 0.194 to 0.538. Holdout intervals were from 0.217 to 0.475 for precision, from 0.195 to 0.435 for recall, and from 0.297 to 0.550 for specificity. The holdout MCC of $-0.282$ is a negative generalization result, not evidence of reliable botnet detection.
@@ -245,7 +264,7 @@ Table~\ref{tab:ctu13-windows} reports the fixed 1-, 5-, and 10-minute window ana
 
 The component analysis in Table~\ref{tab:ctu13-threshold-diagnostics} explains why the fixed rules failed differently. Most botnet-origin holdout units never reached six same-endpoint connections, whereas the periodicity rule matched only normal-origin units. Destination diversity overlapped substantially between classes: the normal-origin median exceeded the rule threshold, while the botnet-origin distribution combined many low-count units with a large upper tail. For asymmetric egress, no scored unit in either source reached the 1-MB (1,000,000-byte) per-flow component. Many units exceeded the 10:1 ratio alone, so the absolute byte threshold was the immediate non-firing condition. Flow aggregation and missing process/file context prevent interpreting non-firing as proof that exfiltration-like behavior was absent.
 
-An MCC below zero means that, under this binary source-window definition, alert and truth labels were inversely associated rather than merely weakly associated. It is not a probability of error, but it shows that treating the five-minute alert as a malware-origin classifier would be worse than an uninformative zero-correlation result on this holdout.
+The negative MCC indicates an inverse association between alerts and source-origin labels under the five-minute scoring definition. It is not an error probability or a statement about every event in a window. It provides no support for treating these fixed alerts as reliable standalone malware-origin classifications in this scenario.
 
 \input{generated/ctu13-threshold-diagnostics-table}
 
@@ -255,8 +274,8 @@ Figure~\ref{fig:beh002-distributions} shows the overlap between the two destinat
 \centering
 \caption{Empirical BEH-002 destination-count distributions in the five-minute NSIS.ay holdout. The exact-value empirical overlap coefficient is descriptive and sample-specific.}
 \label{fig:beh002-distributions}
-\includegraphics[width=0.76\linewidth]{generated/figures/beh002-holdout-distributions.pdf}
-\parbox{0.76\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\includegraphics[width=\linewidth]{generated/figures/beh002-holdout-distributions.pdf}
+\parbox{\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
 \end{figure}
 
 Table~\ref{tab:ctu13-error-examples} makes the operational error modes concrete. The selected TP is a high-diversity botnet-origin window; the selected FP is normal-origin traffic that also exceeds the diversity threshold; and the selected FN contains only one retained event, leaving no rule enough evidence to fire. Exact anonymized host, time, finding, and evidence identifiers remain in the preserved machine-readable result rather than being manually transcribed into the manuscript.
@@ -269,7 +288,7 @@ Table~\ref{tab:ctu13-confirmatory} reports the prospectively gated analysis. RBo
 
 \input{generated/ctu13-confirmatory-table}
 
-On the single DonBot holdout run, the selected detector identified most botnet-origin units and produced a positive MCC. This is evidence of family-specific generalization under the frozen protocol, not universal botnet detection. False-positive burden remained operationally large, and \texttt{BEH-003} again produced no finding. Across the four CTU-13 sources, 262 source-window units were scored, but no pooled metric is reported because development, retrospective and confirmatory roles differ.
+The frozen DonBot evaluation produced TP=24, FP=29, FN=3, and TN=49, with F1 0.600 and MCC 0.452. This is a positive out-of-development result for one family under the selected configuration. It is not a causal estimate of improvement over V1.0: no paired old-versus-new configuration result is available for the DonBot holdout. More than half of the alerts were normal-origin windows, and \texttt{BEH-003} again produced no finding. The four CTU-13 sources contribute 262 scored source-windows in total, but their distinct development and evaluation roles preclude treating them as one test set.
 
 \subsection{Second-dataset implementation transfer}
 
@@ -279,9 +298,11 @@ The Scenario-1 replay retained 46,567 of 2,112,224 flows for clean binary scorin
 
 The archive's own description reports 23,000 bot records, whereas 22,000 entered scoring. The parser excluded 1,046 unsupported-protocol records overall and preserved the complete exclusion accounting; it did not silently reinterpret those records. Because the source is generated from CTU-13-derived patterns, the positive MCC establishes software and representation transfer only. It cannot be used as an independent replication of the DonBot result.
 
-\subsection{Local-LLM traceability, ablation and adversarial results}
+\subsection{Local-model output compliance and availability}
 
-Table~\ref{tab:llm-primary-matrix} reports all 180 primary attempts. The local endpoint returned 145 responses; 122 were valid JSON matching the closed schema, and 73 passed the semantic-policy validator. Thus, acceptance was 73/180 by the planned attempt denominator and 73/145 among received responses. Across the seven cells with all 20 API responses, acceptance ranged from 0.10 to 0.75. These cell differences are descriptive because prompt repetitions are clustered and no human correctness labels exist.
+\subsubsection{Primary matrix}
+
+Table~\ref{tab:llm-primary-matrix} separates successive output checks. Of 180 planned attempts, 145 returned responses, 122 matched the JSON schema, and 73 passed the full deterministic policy. Acceptance was therefore 73/180 across attempts and 73/145 among received responses. This is contract compliance, not an independently assessed correctness rate. Among the seven cells with complete API availability, acceptance ranged from 0.10 to 0.75; the small, clustered scenario repetitions support descriptive comparisons only.
 
 \input{generated/llm-primary-matrix-table}
 
@@ -289,29 +310,35 @@ The Qwen contract cell completed, but the local Ollama server exited during the 
 
 Availability recovery was kept outside the primary matrix. Its first four-call attempt returned four HTTP 500 responses because two orphaned Ollama child processes remained resident and the Qwen load failed at CUDA allocation. After only those verified orphaned processes were removed, one declared retry returned 4/4 response bodies, of which one passed the validator. Package preflight then found one additional primary Qwen response with an empty body; a prospectively selected single-call recovery produced schema-valid content that the validator rejected. These five outputs make the blinded display package complete but do not revise the primary 145/180 response or 73/180 acceptance denominators.
 
-Every one of the 45 multi-finding attempts was either rejected or lacked an API response. A post-hoc audit could extract schema-valid rankings in four of nine cells. Each of those four repeated one ordering exactly across its available observations, but every ordering omitted findings, used non-exact identifiers, cited evidence across finding boundaries, or selected an inapplicable control. Repeatable ordering therefore did not imply complete or correct ranking; the other five cells had no schema-valid ranking to estimate.
+\subsubsection{Multi-finding cases}
 
-The supplemental stress test in Table~\ref{tab:llm-supplement} received 9/9 API responses. Four outputs were valid JSON/schema and none passed deterministic grounding-policy validation. All nine inputs plus reserved output fit the 16,384-token context, while five responses reached the 900-token output cap. Only Llama supplied all exact finding IDs in a schema-valid form across three repetitions; its order and priority vector repeated exactly, but every output selected rule-inapplicable controls and was rejected. Gemma yielded one schema-valid response with non-exact finding IDs, and Qwen yielded no complete JSON. The supplement covers the missing scenario type but does not reverse the negative complex-ranking result.
+None of the 45 primary multi-finding attempts passed validation: each was rejected or lacked an API response. A post-hoc audit extracted schema-valid rankings in four of nine model/prompt cells. Each repeated an ordering across its available observations, but the outputs omitted findings, used non-exact identifiers, crossed finding-evidence boundaries, or selected inapplicable controls. The remaining five cells had no schema-valid ranking to compare. Repeatability thus coexisted with contract violations and cannot be interpreted as ranking correctness.
+
+The 31-event supplement (Table~\ref{tab:llm-supplement}) separates complex-output failures from missing responses: all nine calls returned, four outputs matched the schema, and none passed the full policy. All inputs plus reserved output fit the 16,384-token context, but five responses reached the 900-token generation cap. Truncation may therefore explain part of the observed failure and limits conclusions about other generation budgets. It does not explain every rejection: Llama returned complete exact-ID rankings in all three repetitions without reaching the cap, but selected rule-inapplicable controls each time. Gemma produced one schema-valid response with non-exact finding IDs; Qwen produced no complete JSON.
 
 \input{generated/llm-supplement-table}
 
-The historical comparison in Table~\ref{tab:llm-repeated} and Figure~\ref{fig:traceability} remains useful within its narrower scope. Grounded output preserved exact finding and evidence IDs in 50/50 calls, versus 0/50 for reconstructed free text, and 40/50 grounded responses passed policy validation. Free text was not asked to emit JSON, so its zero schema validity is a representation difference rather than an independent quality failure.
+\subsubsection{Historical comparison and component ablation}
+
+The historical comparison (Table~\ref{tab:llm-repeated}; Figure~\ref{fig:traceability}) retained exact finding and evidence IDs in 50/50 grounded calls and 0/50 reconstructed free-text calls. Forty grounded responses passed the policy; ten selected an inapplicable control. The result documents a traceability difference between the complete protocols, whose instructions, temperature, and schema differ. Free text was not asked to emit JSON, so its lack of schema-valid output is not independent evidence of poor interpretation.
 
 \input{generated/llm-repeated-table}
 
 \begin{figure}[htbp]
 \centering
-\caption{Preserved single-model traceability comparison. System acceptance includes deterministic grounding and policy validation.}
+\caption{Historical single-model comparison over 50 calls per protocol. Markers show exact-ID traceability and acceptance under the implemented policy, not semantic-quality or analyst-benefit scores. Protocol conditions differ.}
 \label{fig:traceability}
-\includegraphics[width=0.72\linewidth]{generated/figures/grounded-free-text-traceability.pdf}
-\parbox{0.72\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
+\includegraphics[width=\linewidth]{generated/figures/grounded-free-text-traceability.pdf}
+\parbox{\linewidth}{\raggedright\fontsize{9}{11}\selectfont\textbf{Source:} Research data (2026).}
 \end{figure}
 
 The ablation in Table~\ref{tab:llm-ablation} isolates observable component sensitivity for the first three Llama/contract repetitions. The reference accepted 7/12 attempts. Raising temperature to 0.7 accepted 4/12. Omitting only the API format constraint produced 12 API responses but zero valid JSON, zero schema-valid outputs and zero accepted outputs. Reduced grounding language accepted 9/12, showing that this small sample does not identify a monotonic benefit from longer instructions. The unsafe validator bypass labels all 12 received reference responses usable, including three that lacked valid JSON/schema output.
 
 \input{generated/llm-ablation-table}
 
-The adversarial executor attempted all 45 calls, but 20 returned HTTP 500 and only 11 of 21 attack/sanitized pairs received both responses; ten pairs had two parseable outputs. Table~\ref{tab:llm-adversarial-matrix} therefore uses eligible denominators. Validator acceptance status changed in 8/11 available pairs. Among ten parseable pairs, priority changed in two, control set in four, finding order in one, and cited evidence set in none. The conservative lexical safety flag changed in 1/11 audited pairs. These observations show decision sensitivity and enforcement value; they do not estimate attack success probability from one observation per pair. Pairs with two failures are availability failures, not evidence of robustness.
+\subsubsection{Adversarial inputs}
+
+Of 45 adversarial-matrix calls, 20 returned HTTP 500. Both responses were available for 11 of the 21 attack/sanitized pairs, and ten pairs had two parseable outputs (Table~\ref{tab:llm-adversarial-matrix}). Validator acceptance changed in 8/11 available pairs. Among the ten parseable pairs, priority changed in two, the control set in four, finding order in one, and the cited evidence set in none. The lexical safety flag changed in 1/11 audited pairs. A change in acceptance is not, by itself, a successful attack: its meaning depends on the resulting output and the validator's decision. One observation per pair does not estimate attack-success probability, and pairs with failed calls provide no evidence of resistance.
 
 \input{generated/llm-adversarial-matrix-table}
 
@@ -319,7 +346,7 @@ All three benign hard-negative calls were accepted as grounded reviews of a \tex
 
 \subsection{Counterfactual response safety}
 
-The system executed zero automatic actions. In the historical five-minute holdout, a block-on-every-alert policy would have targeted normal-origin windows in 32 of 48 cases while missing 37 botnet-origin units. In the new confirmatory holdout, it would have targeted normal-origin windows in 29 of 53 alerts and missed three botnet-origin units. Thus, even the stronger confirmatory MCC does not justify automatic block-on-alert: more than half of the proposed actions would still have been unnecessary under the dataset labels.
+No automatic action was executed. Under the block-on-every-alert counterfactual, 32 of 48 selected historical-holdout windows were normal-origin, while 37 botnet-origin windows were missed. The DonBot counts were 29 normal-origin windows among 53 selections and three missed botnet-origin windows. These counts expose a substantial mismatch between the proposed policy and the dataset labels. They do not establish how many distinct hosts would be disrupted or whether a particular block would prevent harm.
 
 Table~\ref{tab:counterfactual-policies} also evaluates automatic blocking only after two simultaneous rules. That stricter policy does not solve the tradeoff: on historical NSIS.ay it would act on 15 normal-origin units, no botnet-origin unit, and miss all 53 positives; on DonBot it would act on six of 27 positive units and five normal units while leaving 21 positives without action. No unit in the synthetic transfer source had two rules, so the policy would take no action and miss all 97 positive units.
 
@@ -329,23 +356,25 @@ Analyst approval, temporary rate limiting after approval, and isolation after in
 
 \section{Discussion}
 
-\subsection{RQ1: transparent rules generalize unevenly and remain review triggers}
+\subsection{RQ1: scenario-dependent signals}
 
-The functional, retrospective, development, confirmatory and implementation-transfer results answer different questions. Phase A shows agreement with constructed patterns. Phase B1 shows that timing and destination diversity can be common in ordinary traffic and absent from many labeled botnet windows. Phase B2 demonstrates that a source-state-gated configuration can generalize positively to DonBot, but the same configuration detected no RBot development unit and still alerted on many normal-origin DonBot windows. Phase B3 shows that the parser and frozen detector transfer to a larger compatible source, but its synthetic CTU-13-derived construction prevents treating the favorable MCC as independent replication. Combining these roles would hide both the failures and the conditional improvements. RQ1 is therefore mixed for cross-family signal and negative for reliable standalone malware-origin classification: the rules remain explainable hypotheses for review.
+The rules recognize the constructed patterns but show substantial variation on externally labeled flows. Destination diversity accounts for much of the signal and many normal-origin alerts; periodicity and byte asymmetry are not consistently discriminative under the chosen windows and thresholds. The positive DonBot result is bounded by a single held-out family, a small development source, and a large normal-origin alert burden. The synthetic transfer result checks a compatible implementation and representation rather than independently confirming generalization. RQ1 therefore supports using the rules as inspectable review triggers within the evaluated scenarios, not as validated standalone malware classifiers.
 
-The error pattern identifies a concrete systems requirement. Network flows lack process ownership, executable identity, signer information, parent-child lineage, file creation, and user context. Windows Sysmon, for example, can associate network connections, DNS queries, and file creation with processes, although collection volume and privacy require selective configuration \cite{sysmonevents2026}. Future testing should add authorized endpoint context and evaluate it on a newly frozen holdout rather than retuning against the inspected CTU-13 scenario.
+The error analysis motivates testing richer context, without demonstrating that it will solve the errors. Network flows lack process ownership, executable identity, signer information, parent-child lineage, file creation, and user context. Sysmon can supply some of these associations, subject to selective collection and privacy controls \cite{sysmonevents2026}. The constructed endpoint cases establish that the implemented correlation behaves as specified; they do not establish the detection benefit of adding real endpoint evidence.
 
-\subsection{RQ2: constraints improve observability, not intrinsic reliability}
+\subsection{RQ2: traceability and enforceable output checks}
 
-For the preserved single-model comparison, grounded output supported exact traceability: all supplied identifiers appeared in 50/50 calls, versus 0/50 for reconstructed free text. End-to-end grounded acceptance was 40/50 because the validator consistently blocked a rule-inapplicable control. The broader V1.1 matrix prevents generalizing that result into semantic superiority. Only 73 of 145 received responses passed the deterministic validator, no primary multi-finding response was accepted, and 35 Qwen calls had no response after the local server exited. The 31-event supplement likewise accepted 0/9 despite complete API availability, separating runtime recovery from semantic-policy success.
+The historical comparison demonstrates exact-ID retention under one complete grounded protocol. The broader matrix narrows its interpretation: only 73 of 180 attempted calls passed the contract, and no multi-finding attempt did so. A validator can reject known forms of noncompliance without making the generation process reliable. Acceptance also does not establish truth: all three benign hard-negative responses passed as grounded reviews of an actual detector finding. The contract checks the relationship between an output and its supplied evidence, not whether an incident occurred.
 
-The ablation separates API formatting from post-generation validation. The API-level format constraint was necessary for parseable output in this sample, while the validator prevented malformed or policy-invalid responses from becoming usable. Prompt wording and temperature changed observed acceptance, but three clustered repetitions cannot identify population-level causal effects. Schema-valid multi-finding order was perfectly repeated in four estimable cells while remaining incomplete or semantically invalid; ranking repeatability was therefore not ranking correctness.
+The ablation distinguishes constrained generation from post-generation rejection. Removing the API format constraint yielded no valid JSON in the tested sample; bypassing validation would have admitted malformed responses. Neither observation establishes the quality of a free-text explanation. The smaller instruction variant also passed more often than the reference in this small sample, so longer grounding instructions cannot be assumed to help. For complex cases, generation-budget effects require a controlled follow-up: some outputs were capped, while uncapped complete outputs still selected inapplicable controls.
 
-The adversarial pairs further show that exact evidence citation can remain unchanged while acceptance, priority or controls change. This answers RQ2 for machine-checkable traceability and enforcement in the implemented artifact, not for interpretive correctness or analyst usefulness. The symmetric lexical audit overflags some negated safety language, and no blinded expert ratings were collected. Constrained generation makes failure more visible and rejection enforceable; it does not make generation intrinsically reliable.
+The paired adversarial cases show that preserving evidence identifiers does not guarantee stable priorities or controls. Their small effective sample, API failures, and conservative lexical audit prevent a general robustness claim. RQ2 is answered for the implemented machine-checkable references and policy constraints. Correct prioritization, resistance to a broader attack distribution, and interpretive usefulness remain open.
 
-\subsection{RQ3: the justified contribution is triage}
+The missing practical comparison is consequential. No blinded analyst ratings, investigation-time measurements, or task-accuracy outcomes were collected. Nor was the model compared with a deterministic report containing the same findings and rule-mapped controls. Because the recommendations come from a fixed catalog, that baseline is needed to identify any added value of language-model interpretation. The present results justify studying that value; they do not establish it.
 
-The artifact can normalize evidence, correlate events with an authorized asset inventory, identify why a rule matched, preserve exact event IDs, and propose additional evidence collection. It may prepare a scoped response candidate containing source, destination, protocol, duration, approval requirement, and rollback conditions. It cannot responsibly identify malware, confirm exploitability, isolate a host, quarantine a file, or change a firewall before independent confirmation and human authorization. The counterfactual results quantify why that confirmation is necessary.
+\subsection{RQ3: response boundaries for the evaluated artifact}
+
+The implemented deterministic stages can normalize evidence, attach asset context, explain rule matches, and preserve exact references. A model may draft an advisory response candidate, but the observed errors provide no basis for allowing this artifact to infer compromise or initiate containment autonomously. Requiring two simultaneous rules did not remove the label-based false-action/missed-action tradeoff. Independent confirmation and authorization therefore remain design requirements for this system. This conclusion is scoped to the evaluated architecture and evidence; it is not a general prohibition on automated security response under other validated policies.
 
 \section{Threats to Validity and Ethical Constraints}
 
@@ -353,7 +382,9 @@ Construct validity is limited because CTU-13 labels describe flow origin, not wh
 
 Internal validity is limited by heuristic thresholds, source-host windowing, and the possibility that scenario-specific traffic generation affects both labels and patterns. The historical NSIS.ay holdout has already been inspected and must not be reused as untouched evidence after tuning. The prospective DonBot role and grid were frozen before parsing, but the RBot development set contained only three positive units, making threshold selection unstable despite the deterministic rule.
 
-The LLM analysis is also limited by clustered fixed prompts, deterministic decoding that does not create independent samples, and local-runtime availability. The adversarial precondition amendment was recorded after 12 calls; it changed only the distinction between the benign truth label and expected detector false positive, but the matrix cannot be described as unamended preregistration. The supplemental context amendment occurred before inference and followed deterministic prompt sizing. The primary Qwen server exit and adversarial HTTP 500 responses reduce comparable denominators. Availability-recovery outputs are disclosed separately and never replace primary attempts. Absence of a response cannot be interpreted as resistance, and post-hoc denominator and ranking audits are labeled as such.
+The historical and prospective results also differ in evaluation family. Without a paired old-versus-new configuration comparison on the same holdout, their metric difference cannot be attributed to threshold selection. Source-windows may share hosts and temporal conditions; window-level Wilson intervals do not model that dependence and should not be read as population-level guarantees.
+
+The LLM analysis uses clustered fixed prompts and repeated scenarios rather than independent task samples. The historical protocols change several factors together, and the component ablations have only three repetitions. Generation caps constrain the complex-output tests. The adversarial precondition amendment was recorded after 12 calls; it separated the benign truth label from the expected detector false positive, but the matrix is not unamended preregistration. The supplemental context change preceded inference and followed deterministic prompt sizing. Server failure and HTTP 500 responses reduce comparable denominators; separately disclosed recovery outputs never replace primary attempts. Missing responses are not evidence of resistance, and post-hoc audits remain explicitly retrospective.
 
 The retrospective V1.1 window analysis does not repair that limitation. It is reported to expose sensitivity and failure mechanisms, with thresholds unchanged, but no winning window is selected from it. Any confirmatory V1.1 claim requires a newly frozen family-separated holdout whose labels were not consulted during threshold, window, adapter, or feature decisions.
 
@@ -365,13 +396,13 @@ All collection must be authorized. Infrastructure and endpoint telemetry can con
 
 \section{Conclusion}
 
-This study evaluated an evidence-grounded local-LLM architecture instead of assuming that a persuasive narrative improves security. Functional fixtures passed their intended rules, while the inspected NSIS.ay holdout retained a negative MCC. The prospectively frozen DonBot holdout produced recall 0.889, specificity 0.628, F1 0.600, and MCC 0.452 under the RBot-selected configuration. That improvement is bounded: 29 of 53 confirmatory alerts were normal-origin windows, and three botnet-origin windows were missed. A larger synthetic CTU-13-derived source produced F1 0.797 and MCC 0.764, but its proper evidentiary role is implementation transfer, not independent validation.
+This study evaluated an auditable architecture for behavioral review with local language models. Its deterministic stages retain evidence provenance and its validator rejects specified output-contract violations. Detector results were scenario-dependent: the historical NSIS.ay holdout had negative MCC, while the prospectively frozen DonBot holdout yielded F1 0.600 and MCC 0.452. The latter still selected 29 normal-origin windows among 53 alerts. These separate-family results do not establish a causal improvement from threshold selection, and the CTU-13-derived synthetic source provides implementation-transfer evidence rather than independent replication.
 
-The LLM evaluation was also mixed. The historical grounded/free-text comparison supports exact identifier traceability for one fixed model, but the broader matrix accepted only 73 of 145 received responses, rejected every primary multi-finding output, and retained 35 Qwen availability failures. The 31-event conflicting-context supplement received all nine responses but accepted none; five outputs exhausted their generation cap. The format ablation produced no valid JSON without the API constraint, whereas validator bypass would have admitted malformed responses. Adversarial telemetry changed validator status in eight of 11 pairs with both responses; 20 other adversarial calls failed at the API. Exact evidence sets remained stable in the ten parseable pairs, but one observation per pair cannot establish robustness. No automatic action was executed.
+The primary LLM matrix accepted 73 of 180 attempted calls, or 73 of 145 received responses. No primary multi-finding attempt passed, and the nine-call supplement produced no accepted output despite complete response availability. Constrained generation and validation made these failures measurable and rejectable; they did not establish correct ranking, broad adversarial robustness, or analyst benefit. No automatic action was executed.
 
-The main empirical contribution is the combination of a prospectively gated detector improvement and documented failures. Transparent rules and constrained local generation can produce auditable candidates, but neither schema validity nor repeated ordering establishes semantic correctness. Deterministic collection, validation and triage may be automated; attribution and containment may not.
+The contribution is the integration of explicit evidence boundaries with a reproducible evaluation of detector, model-output, and availability failures. The evidence supports inspectable review candidates and enforced rejection within the implemented contract. It does not support autonomous attribution or containment by this system.
 
-Future work should evaluate an independently constructed contemporary flow dataset, reserve family-separated holdouts, collect privacy-reviewed endpoint evidence, replicate multi-finding and adversarial cases, obtain ethics-reviewed blinded expert ratings, and test reversible response proposals in an isolated authorized laboratory. Later threshold, prompt, validator or audit changes must be reported as a new version rather than retroactively improving this result.
+Future evaluation should compare model-assisted and deterministic reports on blinded analyst tasks, control generation budgets, and use contemporary independent holdouts. Endpoint and adversarial extensions require new protocols and versioned results; none may replace the preserved experiments.
 
 \bibliographystyle{IEEEtran}
 \bibliography{../shared/referencias}

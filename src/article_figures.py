@@ -1,4 +1,4 @@
-"""Generate V1.1 article figures from preserved results and declared architecture."""
+"""Draw vector article figures from frozen results; no inference or detector reruns."""
 
 from __future__ import annotations
 
@@ -16,14 +16,29 @@ import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch  # noqa: E402
+from matplotlib.patches import FancyArrowPatch  # noqa: E402
 
-BLUE = "#2F2F2F"
-ORANGE = "#777777"
-GREEN = "#555555"
-RED = "#1F1F1F"
-GRAY = "#666666"
-LIGHT_GRAY = "#F3F3F3"
+INK, SECONDARY, RULE, GRID = "#20252B", "#68717A", "#B8BEC4", "#E8EBEE"
+plt.rcParams.update(
+    {
+        "font.family": "serif",
+        "font.serif": ["STIXGeneral"],
+        "font.size": 10,
+        "text.color": INK,
+        "axes.labelcolor": INK,
+        "axes.edgecolor": RULE,
+        "axes.linewidth": 0.65,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "xtick.color": SECONDARY,
+        "ytick.color": INK,
+        "xtick.labelsize": 9,
+        "ytick.labelsize": 10,
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
+        "savefig.facecolor": "white",
+    }
+)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -34,13 +49,12 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 
 def empirical_overlap(first: list[int], second: list[int]) -> float:
-    """Return the discrete empirical overlap coefficient on exact observed values."""
+    """Return overlap of the exact-value empirical probability masses."""
     if not first or not second:
         raise ValueError("Overlap requires two non-empty samples")
-    first_counts = Counter(first)
-    second_counts = Counter(second)
+    first_counts, second_counts = Counter(first), Counter(second)
     support = first_counts.keys() | second_counts.keys()
-    return sum(min(first_counts[item] / len(first), second_counts[item] / len(second)) for item in support)
+    return sum(min(first_counts[x] / len(first), second_counts[x] / len(second)) for x in support)
 
 
 def _save(fig: plt.Figure, output: Path, stem: str) -> list[Path]:
@@ -48,231 +62,212 @@ def _save(fig: plt.Figure, output: Path, stem: str) -> list[Path]:
     paths = []
     for suffix in ("pdf", "png"):
         path = output / f"{stem}.{suffix}"
-        fig.savefig(path, bbox_inches="tight", dpi=300)
+        metadata = {"CreationDate": None, "ModDate": None} if suffix == "pdf" else None
+        fig.savefig(path, bbox_inches="tight", pad_inches=0.06, dpi=300, metadata=metadata)
         paths.append(path)
     plt.close(fig)
     return paths
 
 
 def architecture_figure(output: Path) -> list[Path]:
-    fig, ax = plt.subplots(figsize=(7.2, 2.25))
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
+    fig, ax = plt.subplots(figsize=(7.2, 2.05))
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    ax.set(xlim=(0, 7.2), ylim=(0, 2.05))
     ax.axis("off")
-    boxes = [
-        (0.02, "1. Evidence", "Nmap inventory\nNetwork and endpoint events"),
-        (0.27, "2. Detection", "Validation and rules\nStable evidence identifiers"),
-        (0.52, "3. LLM review", "Local inference\nSchema and output validator"),
-        (0.77, "4. Human decision", "Independent confirmation\nOptional reversible action"),
+    centers = [0.66, 2.12, 3.58, 5.04, 6.50]
+    stages = [
+        ("Evidence", "Nmap inventory\nNetwork events\nEndpoint events"),
+        ("Rule evaluation", "Normalize events\nApply fixed rules\nAssign evidence IDs"),
+        ("Local model", "Prioritize findings\nPropose controls\nNo execution access"),
+        ("Output validator", "Check schema\nVerify evidence IDs\nEnforce policy"),
+        ("Analyst", "Review evidence\nConfirm incident\nAuthorize response"),
     ]
-    for x, title, body in boxes:
-        patch = FancyBboxPatch(
-            (x, 0.29),
-            0.21,
-            0.42,
-            boxstyle="round,pad=0.012,rounding_size=0.02",
-            linewidth=1.1,
-            edgecolor=RED,
-            facecolor=LIGHT_GRAY,
+    for x, (title, body) in zip(centers, stages, strict=True):
+        ax.plot([x - 0.61, x + 0.61], [1.52, 1.52], color=INK, lw=0.8)
+        ax.text(x, 1.34, title, ha="center", va="center", fontsize=10, fontweight="bold")
+        ax.text(x, 0.82, body, ha="center", va="center", fontsize=9, linespacing=1.45)
+    for left, right in zip(centers, centers[1:]):
+        ax.add_patch(
+            FancyArrowPatch(
+                (left + 0.63, 1.34), (right - 0.63, 1.34), arrowstyle="-|>", mutation_scale=8, lw=0.7, color=SECONDARY
+            )
         )
-        ax.add_patch(patch)
-        ax.text(
-            x + 0.105,
-            0.60,
-            title,
-            ha="center",
-            va="center",
-            fontsize=7.7,
-            weight="bold",
-            color=RED,
-            linespacing=1.0,
-        )
-        ax.text(x + 0.105, 0.41, body, ha="center", va="center", fontsize=6.4, linespacing=1.25)
-    for x in (0.23, 0.48, 0.73):
-        ax.add_patch(FancyArrowPatch((x, 0.5), (x + 0.035, 0.5), arrowstyle="-|>", mutation_scale=12, color=GRAY))
-    ax.text(0.625, 0.14, "The model has no credentials or direct containment path", ha="center", fontsize=7.5)
+    for x in (2.85, 4.31):
+        ax.plot([x, x], [0.38, 1.78], color=SECONDARY, lw=0.7, linestyle=(0, (3, 3)))
+    ax.text(3.58, 1.88, "UNTRUSTED GENERATION", ha="center", fontsize=8, color=SECONDARY)
+    ax.text(
+        3.60,
+        0.13,
+        "Rejected outputs stop at the validator; model output never authorizes an action.",
+        ha="center",
+        va="center",
+        fontsize=9,
+        color=SECONDARY,
+    )
     return _save(fig, output, "architecture-trust-boundaries")
 
 
 def experimental_flow_figure(output: Path) -> list[Path]:
-    fig, ax = plt.subplots(figsize=(5.8, 4.6))
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
+    """Map distinct evidence roles without implying sequential data flow."""
+    fig, ax = plt.subplots(figsize=(7.2, 3.15))
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    ax.set(xlim=(0, 7.2), ylim=(0, 3.15))
     ax.axis("off")
-
-    def box(y: float, height: float, title: str, body: str) -> None:
-        x = 0.20
-        width = 0.60
-        ax.add_patch(
-            FancyBboxPatch(
-                (x, y),
-                width,
-                height,
-                boxstyle="round,pad=0.01",
-                linewidth=1.1,
-                edgecolor=RED,
-                facecolor=LIGHT_GRAY,
-            )
-        )
-        ax.text(
-            x + width / 2,
-            y + height * 0.70,
-            title,
-            ha="center",
-            va="center",
-            weight="bold",
-            color=RED,
-            fontsize=8,
-        )
-        ax.text(x + width / 2, y + height * 0.35, body, ha="center", va="center", fontsize=6.8, linespacing=1.3)
-
-    box(0.80, 0.14, "Phase A: functional checks", "Inert fixtures and endpoint truth matrix")
-    box(
-        0.43,
-        0.28,
-        "Phase B: detector evaluation",
-        "B1: inspected CTU-13 diagnostics\nB2: RBot development and DonBot holdout\nB3: synthetic implementation transfer",
+    columns = (0.06, 1.30, 4.22)
+    for x, title in zip(columns, ("Evaluation", "Evidence", "What it evaluates"), strict=True):
+        ax.text(x, 2.94, title, fontsize=10, fontweight="bold", va="center")
+    ax.plot([0.04, 7.15], [2.76, 2.76], lw=0.8, color=INK)
+    rows = [
+        ("A  Functional", "Constructed network and endpoint cases", "Implementation conformance"),
+        ("B1  Historical", "Virut development; NSIS.ay holdout", "Rule errors and window sensitivity"),
+        ("B2  Prospective", "RBot development; frozen DonBot holdout", "Performance on one unseen family"),
+        ("B3  Transfer", "CTU-13-derived synthetic flows", "Parser and representation transfer"),
+        ("C  Local LLM", "Three models; prompts and adversarial pairs", "Traceability, policy and availability"),
+    ]
+    for i, row in enumerate(rows):
+        y = 2.48 - i * 0.46
+        for x, value in zip(columns, row, strict=True):
+            ax.text(x, y, value, fontsize=9, va="center")
+        ax.plot([0.04, 7.15], [y - 0.23, y - 0.23], lw=0.5, color=RULE)
+    ax.text(
+        0.06,
+        0.16,
+        "Not evaluated: benefit to analysts, production effectiveness or live containment.",
+        fontsize=9,
+        color=SECONDARY,
+        va="center",
     )
-    box(0.22, 0.14, "Phase C: local LLM evaluation", "Three models, three prompts, adversarial tests and ablations")
-    box(0.01, 0.14, "Human assessment", "Not performed in this revision; no automatic actions")
-    for start, end in ((0.80, 0.71), (0.43, 0.36), (0.22, 0.15)):
-        ax.add_patch(FancyArrowPatch((0.5, start), (0.5, end), arrowstyle="-|>", mutation_scale=11, color=GRAY))
     return _save(fig, output, "experimental-flow")
 
 
 def ctu_metrics_figure(root: Path, output: Path) -> list[Path]:
-    historical = _read_json(root / "research" / "v2" / "results" / "ctu13-external-validation-v1.json")
-    prospective_development = _read_json(
-        root / "research" / "v1.1" / "results" / "ctu13-confirmatory-development-2026-08-15" / "development-tuning.json"
+    historical = _read_json(root / "research/v2/results/ctu13-external-validation-v1.json")
+    development = _read_json(
+        root / "research/v1.1/results/ctu13-confirmatory-development-2026-08-15/development-tuning.json"
     )
-    prospective_holdout = _read_json(
-        root / "research" / "v1.1" / "results" / "ctu13-confirmatory-holdout-2026-08-15" / "confirmatory-holdout.json"
-    )
-    historical_by_role = {item["role"]: item for item in historical["sources"]}
+    holdout = _read_json(root / "research/v1.1/results/ctu13-confirmatory-holdout-2026-08-15/confirmatory-holdout.json")
+    by_role = {item["role"]: item for item in historical["sources"]}
     datasets = [
-        ("Virut\nhistorical dev.", historical_by_role["development"]["metrics"]),
-        ("NSIS.ay\ninspected holdout", historical_by_role["holdout"]["metrics"]),
-        ("RBot\nprospective dev.", prospective_development["selected"]["metrics"]),
-        ("DonBot\nfrozen holdout", prospective_holdout["evaluation"]["metrics"]),
+        ("Virut / development", by_role["development"]["metrics"]),
+        ("NSIS.ay / inspected holdout", by_role["holdout"]["metrics"]),
+        ("RBot / development", development["selected"]["metrics"]),
+        ("DonBot / frozen holdout", holdout["evaluation"]["metrics"]),
     ]
-    x = list(range(len(datasets)))
-    width = 0.34
-    f1 = [item[1]["f1"] for item in datasets]
-    mcc = [item[1]["matthews_correlation_coefficient"] for item in datasets]
-    fig, ax = plt.subplots(figsize=(7.2, 3.4))
-    ax.bar([item - width / 2 for item in x], f1, width, label="F1", color=BLUE)
-    ax.bar(
-        [item + width / 2 for item in x],
-        mcc,
-        width,
-        label="MCC",
-        color=ORANGE,
-        edgecolor="black",
-        hatch="//",
-    )
-    ax.axhline(0, color="black", linewidth=0.8)
-    ax.set_ylim(-0.4, 1.0)
-    ax.set_ylabel("Metric value")
-    ax.set_xticks(x, [item[0] for item in datasets])
-    ax.legend(frameon=False, ncols=2, loc="upper left")
-    ax.grid(axis="y", alpha=0.25)
-    ax.text(0.5, -0.25, "Historical inspected pair", ha="center", transform=ax.get_xaxis_transform(), fontsize=8)
-    ax.text(2.5, -0.25, "Prospectively gated pair", ha="center", transform=ax.get_xaxis_transform(), fontsize=8)
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9), sharey=True)
+    fig.subplots_adjust(left=0.29, right=0.96, top=0.82, bottom=0.13, wspace=0.32)
+    y = [3.4, 2.4, 1.0, 0.0]
+    for ax, metric, title, marker in zip(
+        axes, ("f1", "matthews_correlation_coefficient"), ("F1", "MCC"), ("o", "s"), strict=True
+    ):
+        values = [row[1][metric] for row in datasets]
+        ax.set_axisbelow(True)
+        ax.grid(axis="x", color=GRID, lw=0.6)
+        ax.axvline(0, color=RULE, lw=0.8)
+        ax.scatter(values, y, s=25, marker=marker, color=INK, zorder=3)
+        for value, row_y in zip(values, y, strict=True):
+            ax.annotate(
+                f"{value:.3f}", (value, row_y), xytext=(7, 0), textcoords="offset points", va="center", fontsize=9
+            )
+        ax.set_title(title, fontsize=11, fontweight="bold", loc="left", pad=15)
+        ax.set_ylim(-0.5, 3.9)
+        ax.axhline(1.7, color=RULE, lw=0.65, linestyle=(0, (3, 3)))
+        ax.tick_params(axis="y", length=0, pad=8)
+        ax.spines["left"].set_visible(False)
+        ax.set_xlim((-0.06, 1.13) if metric == "f1" else (-1.08, 1.13))
+        ax.set_xticks([0, 0.5, 1] if metric == "f1" else [-1, 0, 1])
+    axes[0].set_yticks(y, [row[0] for row in datasets])
     return _save(fig, output, "ctu13-development-holdout-metrics")
 
 
 def traceability_figure(root: Path, output: Path) -> list[Path]:
-    result = _read_json(root / "research" / "v2" / "results" / "phase-c-comparison-v1.json")
-    grounded = result["phase_a"]["grounded"]
-    historical = result["phase_a"]["historical"]
-    labels = ["Exact finding IDs", "Exact evidence IDs", "System accepted"]
-    grounded_values = [
-        grounded["exact_finding_coverage"],
-        grounded["exact_evidence_coverage"],
-        grounded["accepted"],
+    result = _read_json(root / "research/v2/results/phase-c-comparison-v1.json")
+    grounded, historical = result["phase_a"]["grounded"], result["phase_a"]["historical"]
+    labels = ["Exact finding IDs", "Exact evidence IDs", "Accepted under exact-ID policy"]
+    values = [
+        [grounded["exact_finding_coverage"], grounded["exact_evidence_coverage"], grounded["accepted"]],
+        [historical["exact_finding_coverage"], historical["exact_evidence_coverage"], historical["grounding_valid"]],
     ]
-    historical_values = [
-        historical["exact_finding_coverage"],
-        historical["exact_evidence_coverage"],
-        historical["grounding_valid"],
-    ]
-    x = list(range(len(labels)))
-    width = 0.36
-    fig, ax = plt.subplots(figsize=(6.7, 3.3))
-    ax.bar([item - width / 2 for item in x], grounded_values, width, label="Grounded schema", color=BLUE)
-    ax.bar(
-        [item + width / 2 for item in x],
-        historical_values,
-        width,
-        label="Reconstructed free text",
-        color=ORANGE,
-        edgecolor="black",
-        hatch="//",
-    )
-    ax.set_ylim(0, 55)
-    ax.set_ylabel("Responses out of 50")
-    ax.set_xticks(x, labels)
-    ax.legend(frameon=False, ncols=2, loc="lower center", bbox_to_anchor=(0.5, 1.01))
-    ax.grid(axis="y", alpha=0.25)
-    for positions, values in (
-        ([item - width / 2 for item in x], grounded_values),
-        ([item + width / 2 for item in x], historical_values),
+    fig, ax = plt.subplots(figsize=(7.2, 3.1))
+    fig.subplots_adjust(left=0.30, right=0.91, top=0.73, bottom=0.28)
+    for counts, offset, marker, color, label in zip(
+        values, (0.13, -0.13), ("o", "s"), (INK, SECONDARY), ("Grounded schema", "Reconstructed free text"), strict=True
     ):
-        for position, value in zip(positions, values, strict=True):
-            ax.text(position, value + 1, str(value), ha="center", va="bottom", fontsize=8)
+        positions = [2 + offset, 1 + offset, offset]
+        ax.scatter(counts, positions, s=25, marker=marker, color=color, label=label, zorder=3)
+        for count, row_y in zip(counts, positions, strict=True):
+            ax.annotate(
+                f"{count}/50",
+                (count, row_y),
+                xytext=(7, 0),
+                textcoords="offset points",
+                va="center",
+                fontsize=9,
+                color=color,
+            )
+    ax.set(xlim=(-2, 57), ylim=(-0.45, 2.45))
+    ax.set_yticks([2, 1, 0], labels)
+    ax.set_xticks([0, 10, 20, 30, 40, 50])
+    ax.tick_params(axis="y", length=0, pad=8)
+    ax.spines["left"].set_visible(False)
+    ax.set_axisbelow(True)
+    ax.grid(axis="x", color=GRID, lw=0.6)
+    ax.legend(frameon=False, ncols=2, loc="lower left", bbox_to_anchor=(-0.01, 1.10), handletextpad=0.4)
+    fig.text(
+        0.30,
+        0.07,
+        "Protocols differ in instructions, decoding and format.\nThese counts measure traceability, not comparative analyst benefit.",
+        fontsize=9,
+        color=SECONDARY,
+        linespacing=1.3,
+    )
     return _save(fig, output, "grounded-free-text-traceability")
 
 
 def beh002_distribution_figure(root: Path, output: Path) -> list[Path]:
     result = _read_json(
-        root
-        / "research"
-        / "v1.1"
-        / "results"
-        / "ctu13-retrospective-window-analysis-2026-08-15"
-        / "ctu13-window-analysis.json"
+        root / "research/v1.1/results/ctu13-retrospective-window-analysis-2026-08-15/ctu13-window-analysis.json"
     )
     analysis = next(item for item in result["analyses"] if item["role"] == "holdout" and item["window_seconds"] == 300)
     values = {"botnet-origin": [], "normal-origin": []}
     for unit in analysis["units"]:
         values[unit["truth"]].append(unit["features"]["maximum_distinct_endpoints_in_60_seconds"])
     overlap = empirical_overlap(values["botnet-origin"], values["normal-origin"])
-    fig, ax = plt.subplots(figsize=(6.8, 3.5))
-    for truth, color, linestyle in (
-        ("botnet-origin", BLUE, "-"),
-        ("normal-origin", ORANGE, "--"),
-    ):
+    fig, ax = plt.subplots(figsize=(7.2, 3.55))
+    fig.subplots_adjust(left=0.10, right=0.98, top=0.86, bottom=0.19)
+    for truth, color, linestyle in (("botnet-origin", INK, "-"), ("normal-origin", SECONDARY, (0, (4, 3)))):
         ordered = sorted(values[truth])
-        cumulative = [(index + 1) / len(ordered) for index in range(len(ordered))]
+        cumulative = [(i + 1) / len(ordered) for i in range(len(ordered))]
         ax.step(
             ordered,
             cumulative,
             where="post",
             color=color,
             linestyle=linestyle,
-            linewidth=2,
+            lw=1.6,
             label=f"{truth} (n={len(ordered)})",
         )
-    ax.axvline(8, color="black", linestyle=":", linewidth=1.5, label="BEH-002 threshold = 8")
-    ax.set_xscale("log")
-    ax.set_xlabel("Maximum distinct destinations in any 60-second interval (log scale)")
-    ax.set_ylabel("Empirical cumulative proportion")
-    ax.grid(alpha=0.25)
-    ax.legend(frameon=False, loc="lower right")
-    ax.text(0.02, 0.92, f"Exact-value empirical overlap = {overlap:.3f}", transform=ax.transAxes, fontsize=8)
+    ax.axvline(8, color=SECONDARY, linestyle=":", lw=1.1)
+    ax.text(8, 1.04, "Threshold = 8", fontsize=9, ha="center", va="bottom", color=SECONDARY)
+    ax.set(xscale="log", ylim=(0, 1.02))
+    ax.set_xlabel("Maximum distinct destinations in a 60-second interval (log scale)", labelpad=8)
+    ax.set_ylabel("Cumulative proportion", labelpad=8)
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", color=GRID, lw=0.6)
+    ax.legend(frameon=False, loc="lower right", handlelength=2.7)
+    fig.text(0.10, 0.96, f"Exact-value empirical overlap: {overlap:.3f}", fontsize=9, color=SECONDARY)
     return _save(fig, output, "beh002-holdout-distributions")
 
 
 def generate_figures(repository_root: str | Path) -> list[Path]:
     root = Path(repository_root).resolve()
-    output = root / "academic" / "artigo" / "generated" / "figures"
-    paths = []
-    paths.extend(architecture_figure(output))
-    paths.extend(experimental_flow_figure(output))
-    paths.extend(ctu_metrics_figure(root, output))
-    paths.extend(traceability_figure(root, output))
-    paths.extend(beh002_distribution_figure(root, output))
-    return paths
+    output = root / "academic/artigo/generated/figures"
+    return (
+        architecture_figure(output)
+        + experimental_flow_figure(output)
+        + ctu_metrics_figure(root, output)
+        + traceability_figure(root, output)
+        + beh002_distribution_figure(root, output)
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

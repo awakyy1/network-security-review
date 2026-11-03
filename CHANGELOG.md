@@ -7,6 +7,10 @@ states.
 
 ## Unreleased
 
+- Revise the working article's argument and figures using the existing V1.1
+  evidence: delimit claims, distinguish contract acceptance from correctness,
+  explain unmeasured analyst benefit, and replace the diagrams and charts with
+  consistent vector artwork. Preserve frozen results and release snapshots.
 - Clarify the published repository release and the article V1.0 tag references in documentation.
 
 ## Repository v1.0.0 - 2026-10-28
